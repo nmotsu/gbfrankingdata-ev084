@@ -1,0 +1,4124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>if(location.protocol==='http:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){location.replace('https://'+location.hostname+location.pathname+location.search+location.hash);}</script>
+<title>GBF古戦場ランキング</title>
+<meta name="description" content="グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開。20分速・朝活・日速・残業など時間帯別の貢献度集計に対応した非公式ファンサイト。">
+<meta property="og:title" content="GBF古戦場ランキング">
+<meta property="og:description" content="グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開。20分速・朝活・日速など時間帯別の貢献度集計に対応した非公式ファンサイト。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="GBF古戦場ランキング">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GBF古戦場ランキング">
+<meta name="twitter:description" content="グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開する非公式ファンサイト。">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GBF古戦場ランキング","url":"https://gbfranking.com/","description":"グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開する非公式ファンサイト","applicationCategory":"Sports","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
+<link rel="icon" href="./favicon-rich.png" type="image/png"><link rel="apple-touch-icon" href="./favicon-rich.png">
+<style>
+/* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
+
+/* --- Display --- */
+.flex        { display: flex; }
+.flex-col    { flex-direction: column; }
+.flex-1      { flex: 1 1 0%; }
+.flex-wrap   { flex-wrap: wrap; }
+.flex-shrink-0 { flex-shrink: 0; }
+.items-center   { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+
+/* --- Gap / Spacing --- */
+.gap-1  { gap: 4px; }
+.gap-2  { gap: 8px; }
+.gap-4  { gap: 16px; }
+.ml-1   { margin-left: 4px; }
+.ml-auto { margin-left: auto; }
+.mt-1   { margin-top: 4px; }
+.mt-2   { margin-top: 8px; }
+.mb-1   { margin-bottom: 4px; }
+
+/* --- Sizing --- */
+.w-full  { width: 100%; }
+.min-w-0 { min-width: 0; }
+
+/* --- Overflow --- */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto   { overflow: auto; }
+
+/* --- Position --- */
+.relative { position: relative; }
+.sticky   { position: sticky; }
+
+/* --- Text size --- */
+.text-xs  { font-size: 0.75rem; line-height: 1rem; }
+.text-sm  { font-size: 0.875rem; line-height: 1.25rem; }
+
+/* --- Text color (dark theme向け: Tailwind互換近似値) --- */
+.text-white    { color: #ffffff; }
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-blue-300 { color: #93c5fd; }
+.text-blue-400 { color: #60a5fa; }
+.text-red-400  { color: #f87171; }
+
+/* --- ライトモードで読みづらい白系/淡灰をダーク寄りに上書き --- */
+html[data-theme="light"] .text-white    { color: #1a1d21; }
+html[data-theme="light"] .text-gray-400 { color: #5b6470; }
+html[data-theme="light"] .text-gray-500 { color: #6b7280; }
+html[data-theme="light"] .text-gray-600 { color: #4b5563; }
+html[data-theme="light"] .text-blue-300 { color: #2563eb; }
+html[data-theme="light"] .text-blue-400 { color: #1d4ed8; }
+html[data-theme="light"] .hover\:text-white:hover { color: #1a1d21; }
+
+/* --- Hover text color --- */
+.hover\:text-white:hover    { color: #ffffff; }
+.hover\:text-blue-400:hover { color: #60a5fa; }
+.hover\:text-red-400:hover  { color: #f87171; }
+
+/* --- Font --- */
+.font-mono { font-family: 'Consolas', 'Menlo', 'Monaco', monospace; }
+.font-bold { font-weight: 700; }
+
+/* --- Truncate --- */
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+</style>
+<style>
+/* sidebar.css — サイドバー折りたたみ/展開デザイン */
+
+/* === 変数 === */
+:root {
+  --sidebar-expanded: 218px;
+  --sidebar-collapsed: 48px;
+  --sidebar-ease: cubic-bezier(0.2, 0, 0, 1);
+  --sidebar-dur: 180ms;
+}
+
+/* === PC サイドバー全体 (既存CSSを上書き) === */
+@media (min-width: 1024px) {
+  #side-panel {
+    width: var(--sidebar-expanded);
+    flex-shrink: 0;
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0 4px 8px;
+    transition: width var(--sidebar-dur) var(--sidebar-ease);
+    position: sticky;
+    top: 4px;
+    max-height: calc(100vh - 8px);
+    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  #side-panel::-webkit-scrollbar { display: none; }
+
+  /* === 折りたたみ状態 (48px) === */
+  #side-panel.collapsed {
+    width: var(--sidebar-collapsed);
+    padding: 4px 0;
+    overflow: hidden;
+  }
+
+  /* カードを丸ごと非表示 → 折りたたみアイコン表示 */
+  #side-panel.collapsed .side-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 4px;
+    border-radius: var(--md-shape-sm);
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* カード内コンテンツはすべて非表示 */
+  #side-panel.collapsed .side-card-title,
+  #side-panel.collapsed .side-card-value,
+  #side-panel.collapsed .side-card-sub,
+  #side-panel.collapsed #side-watch-list,
+  #side-panel.collapsed #side-elem-wrap { display: none; }
+
+  /* 折りたたみ時アイコン表示 */
+  #side-panel.collapsed .side-card::before {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--md-on-surface-variant);
+    opacity: 0.7;
+  }
+  #side-panel.collapsed #side-event-card::before { content: '📅'; }
+  #side-panel.collapsed #side-top-card::before   { content: '🏆'; }
+  #side-panel.collapsed #side-watch-card::before  { content: '★'; color: var(--md-warning); opacity: 1; font-style: normal; }
+
+  /* ホバーで一時展開 */
+  #side-panel.collapsed:hover {
+    width: var(--sidebar-expanded);
+    padding: 4px 0 4px 8px;
+    z-index: 50;
+    box-shadow: -4px 0 16px rgba(0,0,0,0.4);
+  }
+  #side-panel.collapsed:hover .side-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+    min-height: unset;
+  }
+  #side-panel.collapsed:hover .side-card::before { display: none; }
+  #side-panel.collapsed:hover .side-card-title,
+  #side-panel.collapsed:hover .side-card-value,
+  #side-panel.collapsed:hover .side-card-sub,
+  #side-panel.collapsed:hover #side-watch-list,
+  #side-panel.collapsed:hover #side-elem-wrap { display: revert; }
+
+  /* 折りたたみトグルボタン */
+  #side-collapse-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--md-outline-variant);
+    border-radius: 0;
+    cursor: pointer;
+    padding: 0 10px;
+    color: var(--md-on-surface-variant);
+    font-size: 11px;
+    line-height: 1;
+    transition: color var(--sidebar-dur) var(--sidebar-ease),
+                background var(--sidebar-dur) var(--sidebar-ease);
+    flex-shrink: 0;
+  }
+  #side-collapse-btn:hover {
+    color: var(--md-on-surface);
+    background: rgba(255,255,255,0.05);
+  }
+  #side-panel.collapsed #side-collapse-btn {
+    justify-content: center;
+    padding: 0;
+  }
+  #side-panel.collapsed:hover #side-collapse-btn {
+    justify-content: flex-end;
+    padding: 0 10px;
+  }
+}
+
+</style>
+<style>
+/* tiers.css — ランキング順位帯カラーバンド & テーブル密度 */
+
+/* === 順位帯カラー変数 === */
+:root {
+  --tier-top10-bg:    color-mix(in srgb, #FFD700 10%, var(--md-surface));
+  --tier-top10-acc:   #FFD700;
+  --tier-top100-bg:   color-mix(in srgb, #C0C0C0 9%, var(--md-surface));
+  --tier-top100-acc:  #C0C0C0;
+  --tier-top500-bg:   color-mix(in srgb, #CD7F32 9%, var(--md-surface));
+  --tier-top500-acc:  #CD7F32;
+  --tier-top1000-bg:  color-mix(in srgb, #4FC3F7 7%, var(--md-surface));
+  --tier-top1000-acc: #4FC3F7;
+  --tier-top2500-bg:  color-mix(in srgb, #81C784 6%, var(--md-surface));
+  --tier-top2500-acc: #81C784;
+}
+
+/* 順位帯背景・アクセントは無効（以前の仕様: 1-3位メダル色 + 交互ストライプ） */
+
+/* === 仮想スクロール用コンテナ (JS で height を動的設定) === */
+#rank-table-wrap {
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* min-height はJSで上書き。フォールバック値 */
+  min-height: 200px;
+}
+/* thead sticky はコンテナ内スクロールに対応 */
+#rank-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+/* === テーブル行 コンパクト密度 === */
+#rank-table td {
+  padding: 5px 10px;
+  font-size: 0.8125rem;
+}
+#rank-table th {
+  padding: 6px 10px;
+}
+#rank-table tr.rank-row {
+  height: 34px;
+}
+
+/* Honor Diff インラインバー */
+.diff-bar-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.diff-bar {
+  display: inline-block;
+  height: 3px;
+  width: var(--bar-w, 0%);
+  max-width: 50px;
+  border-radius: 2px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.diff-bar.up   { background: #60a5fa; }
+.diff-bar.down { background: #f87171; }
+.diff-bar.flat { background: var(--md-outline); }
+
+</style>
+<script>
+// Chart.js 遅延読み込み（グラフ表示時に初めてロード）
+let _chartJsLoaded = false;
+function ensureChartJs() {
+  if (_chartJsLoaded) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    if (typeof Chart !== 'undefined') { _chartJsLoaded = true; resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    s.onload = () => { _chartJsLoaded = true; resolve(); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+<style>
+  :root {
+    /* === Background & Theme Variables (managed by theme-manager.js) === */
+    --theme-bg: #0a0a0a;
+    --theme-surface: #111111;
+    --theme-surface-container: #191919;
+    --theme-surface-container-high: #242424;
+    --theme-outline: #363636;
+    --theme-outline-variant: #202020;
+    --theme-on-surface: #e2e8f0;
+    --theme-on-surface-variant: #8a9ab0;
+    --chart-grid-color: rgba(255,255,255,0.09);
+    /* === Element Color Variables === */
+    --elem-color: #3b82f6;
+    --elem-color-light: #60a5fa99;
+    /* === MD3 Design Tokens === */
+    --md-surface-dim: var(--theme-bg);
+    --md-surface: var(--theme-surface);
+    --md-surface-container: var(--theme-surface-container);
+    --md-surface-container-high: var(--theme-surface-container-high);
+    --md-surface-bright: var(--theme-surface-container-high);
+    --md-on-surface: var(--theme-on-surface);
+    --md-on-surface-variant: var(--theme-on-surface-variant);
+    --md-outline: var(--theme-outline);
+    --md-outline-variant: var(--theme-outline-variant);
+    --md-primary: var(--elem-color);
+    --md-primary-dim: var(--elem-color);
+    --md-primary-container: var(--theme-surface-container-high);
+    --md-on-primary-container: var(--theme-on-surface);
+    --md-secondary: var(--elem-color-light);
+    --md-secondary-container: var(--theme-surface-container-high);
+    --md-success: #4ade80;
+    --md-warning: #fbbf24;
+    --md-error: #f87171;
+    --md-shape-xs: 4px;
+    --md-shape-sm: 8px;
+    --md-shape-md: 12px;
+    --md-shape-lg: 16px;
+    --md-shape-full: 9999px;
+    --md-ease: cubic-bezier(0.2, 0, 0, 1);
+    --md-duration-short: 150ms;
+    --md-duration-medium: 300ms;
+    --md-duration-long: 500ms;
+    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
+    /* 行/オーバーレイ（テーマ追従） */
+    --row-top1-bg: #2a2200;
+    --row-top2-bg: #1e1e2e;
+    --row-top3-bg: #261400;
+    --row-odd-bg: rgba(255,255,255,0.04);
+    --row-hairline: rgba(255,255,255,0.05);
+    --row-hover: rgba(255,255,255,0.05);
+  }
+  /* === ライトモード（data-theme="light" で base 変数を上書き、MD3トークンへ波及） === */
+  html[data-theme="light"] {
+    --theme-bg: #f4f5f7;
+    --theme-surface: #ffffff;
+    --theme-surface-container: #f1f2f4;
+    --theme-surface-container-high: #e7e9ec;
+    --theme-outline: #cfd3da;
+    --theme-outline-variant: #e2e5ea;
+    --theme-on-surface: #1a1d21;
+    --theme-on-surface-variant: #586173;
+    --chart-grid-color: rgba(0,0,0,0.08);
+    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
+    --row-top1-bg: #fdf6cf;
+    --row-top2-bg: #edf1f6;
+    --row-top3-bg: #fce4e4;
+    --row-odd-bg: #eaf2fb;
+    --row-hairline: #e3e6ea;
+    --row-hover: rgba(26,115,232,0.10);
+  }
+  html[data-theme="light"] .type-morning  { background:#fff3d6; color:#92600a; }
+  html[data-theme="light"] .type-daily    { background:#dcf5e3; color:#15803d; }
+  html[data-theme="light"] .type-overnight{ background:color-mix(in srgb,var(--elem-color) 14%, #fff); color:#1d4ed8; }
+  /* ライト: スプレッドシート風（GNは青リンク＋下線、増加量は周囲のセルに合わせて控えめに） */
+  html[data-theme="light"] .gn-clickable:not(.gn-pinned) { color:#1a73e8 !important; text-decoration:underline; }
+  html[data-theme="light"] .honor-bar-bg { opacity:0.30; }
+  html[data-theme="light"] .honor-diff { color:var(--md-on-surface-variant) !important; font-weight:600; }
+  body { background: var(--theme-bg); color: var(--theme-on-surface); font-family: 'Segoe UI', sans-serif; }
+  .header { background: var(--theme-surface); border-bottom: 2px solid var(--elem-color); padding: 12px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+  .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+  .hdr-h1 { font-size: 1.05rem; color: var(--md-primary); font-weight: 500; display: flex; align-items: center; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; letter-spacing: 0.01em; }
+  .hdr-h1 a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .hdr-title-text { overflow: hidden; text-overflow: ellipsis; }
+  .hdr-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .hdr-btn { color: var(--md-on-surface-variant); text-decoration: none; font-size: 0.8125rem; padding: 6px 12px; background: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: var(--md-shape-sm); transition: all var(--md-duration-short) var(--md-ease); cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; position: relative; overflow: hidden; }
+  .hdr-btn::after { content:''; position:absolute; inset:0; background:currentColor; opacity:0; transition:opacity var(--md-duration-short) var(--md-ease); pointer-events:none; }
+  .hdr-btn:hover::after { opacity:0.08; }
+  .hdr-btn:hover { color: var(--md-on-surface); }
+  .hdr-btn:active::after { opacity:0.12; }
+  .hdr-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+  .hdr-btn-blue { color: var(--md-primary); border-color: var(--md-primary-dim); font-weight: 600; }
+  .hdr-btn-blue:hover { color: var(--md-on-primary-container); }
+  .hdr-btn-live { color: #4ade80; border-color: #16a34a; background: rgba(22,163,74,0.12); font-weight: 600; gap: 4px; }
+  .hdr-btn-live:hover { color: #86efac; background: rgba(22,163,74,0.22); text-decoration: underline; }
+  .hdr-btn-live::after { content: ' ↗'; font-size: 0.75em; opacity: 0.8; pointer-events: none; }
+  /* 注目プレイヤー (サイドバー) */
+  .watch-star { background: none; border: none; cursor: pointer; color: var(--md-outline); font-size: 0.6875rem; padding: 0 2px; transition: color var(--md-duration-short) var(--md-ease); line-height: 1; vertical-align: middle; }
+  .watch-star:hover { color: #d97706; }
+  .watch-star.on { color: var(--md-warning); }
+  .side-watch-row { display: flex; align-items: flex-start; gap: 6px; padding: 6px 0; border-bottom: 1px solid var(--md-outline-variant); font-variant-numeric: tabular-nums; }
+  .side-watch-row:last-child { border-bottom: none; }
+  /* 閲覧者数バッジ */
+  .viewer-badge { font-size: 0.6875rem; color: var(--md-on-surface-variant); padding: 2px 8px; background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-full); white-space: nowrap; }
+  @media (max-width: 1023px) { .watch-star { display: none !important; } }
+  /* Compact (モバイル) */
+  @media (max-width: 599px) {
+    .header { padding: 8px 12px; }
+    .header-inner { gap: 6px; }
+    .hdr-h1 { font-size: 0.875rem; }
+    .hdr-btn { font-size: 0.6875rem; padding: 4px 8px; }
+    .viewer-badge { display: none !important; }
+  }
+  @media (max-width: 380px) {
+    .hdr-title-text { display: none; }
+    .hdr-h1 { flex: 0 0 auto; }
+  }
+  .card { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); }
+  .tab-btn { padding: 5px 4px 4px; border-radius: var(--md-shape-sm); cursor: pointer; transition: all var(--md-duration-short) var(--md-ease); font-size: 0.8125rem; font-weight: 600; width: 100%; display:flex; flex-direction:column; align-items:center; gap:1px; line-height:1.2; border: 2px solid transparent; }
+  .tab-btn.active { background: var(--md-surface-container-high); color: var(--md-primary); border-color: var(--md-primary); box-shadow: 0 0 8px color-mix(in srgb, var(--elem-color) 40%, transparent); }
+  .tab-btn:not(.active) { background: var(--md-surface-container-high); color: var(--md-on-surface-variant); }
+  .tab-btn:not(.active):hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
+  .tab-sub { font-size: 0.5625rem; font-weight:400; opacity:0.65; }
+  tr.rank-row:nth-child(even) { background: var(--row-odd-bg); }
+  .rank-row:hover { background: var(--row-hover) !important; }
+  .rank-row.top-1 { border-left: 4px solid var(--md-warning); box-shadow: inset 60px 0 20px -20px rgba(251,191,36,0.12); }
+  .rank-row.top-2 { border-left: 4px solid #c0c0c0; box-shadow: inset 60px 0 20px -20px rgba(192,192,192,0.10); }
+  .rank-row.top-3 { border-left: 4px solid #cd7c32; box-shadow: inset 60px 0 20px -20px rgba(205,124,50,0.10); }
+  @keyframes row-flash { 0%{background-color:var(--md-primary-container)} 100%{background-color:transparent} }
+  .rank-row.flashing { animation: row-flash 1.2s ease-out; }
+  @keyframes md-fade-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { background: var(--md-surface); color: var(--md-on-surface-variant); font-size: 0.6875rem; padding: 8px 12px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; overflow: hidden; position: sticky; top: 0; z-index: 2; user-select: none; white-space: nowrap; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--row-hairline); font-size: 0.8125rem; vertical-align: middle; overflow: hidden; font-variant-numeric: tabular-nums; transition: background var(--md-duration-short) var(--md-ease); }
+  .col-gn { text-overflow: ellipsis; white-space: nowrap; }
+  .modal-body { overflow-x: auto; -webkit-overflow-scrolling: touch; min-width: 0; padding: 12px 8px; }
+  .modal-table { min-width: 760px; }
+  .medal-1 { color: var(--md-warning); }
+  .medal-2 { color: #c0c0c0; }
+  .medal-3 { color: #cd7c32; }
+  .up   { color: #60a5fa; }
+  .down { color: #f87171; }
+  .new  { color: var(--md-success); }
+  .flat { color: var(--md-on-surface-variant); }
+  select, input { background: var(--md-surface-container-high); border: 1px solid var(--md-outline); color: var(--md-on-surface); border-radius: var(--md-shape-sm); padding: 6px 12px; font-size: 0.8125rem; transition: border-color var(--md-duration-short) var(--md-ease); }
+  select:focus, input:focus { border-color: var(--md-primary); outline: 2px solid rgba(96,165,250,0.3); outline-offset: 1px; }
+  .demo-badge { background: var(--md-secondary-container); color: var(--md-on-primary-container); padding: 2px 8px; border-radius: var(--md-shape-full); font-size: 0.6875rem; }
+  .loading { color: var(--md-on-surface-variant); text-align: center; padding: 48px; font-size: 0.875rem; }
+  .no-data { color: var(--md-on-surface-variant); text-align: center; padding: 48px; }
+  a.player-link { color: var(--md-on-primary-container); text-decoration: none; transition: color var(--md-duration-short) var(--md-ease); }
+  a.player-link:hover { text-decoration: underline; color: var(--md-primary); }
+  .stat-bar { background: var(--md-surface-container-high); border-radius: var(--md-shape-sm); padding: 10px 16px; }
+  /* 増加量バー */
+  .honor-cell { position: relative; }
+  .honor-bar-bg { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--md-shape-xs); opacity: 0.15; pointer-events: none; }
+  .honor-diff  { position: relative; font-weight: 700; font-size: 0.875rem; display: block; line-height: 1.3; }
+  /* 日付ナビ */
+  .day-nav-btn { background: var(--md-surface-container-high); border: 1px solid var(--md-outline); color: var(--md-on-surface-variant); border-radius: var(--md-shape-sm); padding: 3px 8px; cursor: pointer; font-size: 0.8125rem; transition: all var(--md-duration-short) var(--md-ease); flex-shrink:0; }
+  .day-nav-btn:hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
+  .day-nav-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+  /* タイプバッジ */
+  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; }
+  .type-20min    { background: var(--md-secondary-container); color: var(--md-on-primary-container); }
+  .type-morning  { background: #3b2f00; color: var(--md-warning); }
+  .type-daily    { background: #1a3020; color: var(--md-success); }
+  .type-overnight{ background: color-mix(in srgb, var(--elem-color) 15%, #1a1a2e); color: var(--elem-color); }
+  /* ソート */
+  th.sortable { cursor: pointer; }
+  th.sortable:hover { color: var(--md-on-surface); }
+  .sort-ind { font-size: 0.5625rem; margin-left: 2px; color: var(--md-on-surface-variant); }
+  .sort-ind.asc  { color: #60a5fa; }
+  .sort-ind.desc { color: #f87171; }
+  /* カラムリサイズ */
+  .col-resize-handle {
+    position: absolute; right: -1px; top: 0; width: 9px; height: 100%;
+    cursor: col-resize; z-index: 2;
+  }
+  .col-resize-handle::after {
+    content: ''; position: absolute;
+    right: 1px; top: 18%; bottom: 18%; width: 2px;
+    background: var(--md-outline); border-radius: 1px;
+    transition: background var(--md-duration-short) var(--md-ease), top var(--md-duration-short) var(--md-ease), bottom var(--md-duration-short) var(--md-ease);
+    pointer-events: none;
+  }
+  .col-resize-handle:hover::after {
+    background: var(--md-surface-bright); top: 5%; bottom: 5%;
+  }
+  body.col-resizing { cursor: col-resize !important; }
+  body.col-resizing * { cursor: col-resize !important; user-select: none !important; }
+  body.col-resizing .col-resize-handle::after {
+    background: var(--md-primary) !important; top: 0 !important; bottom: 0 !important;
+  }
+  /* ドラッグ&ドロップ */
+  th.col-th[draggable="true"] { cursor: grab; }
+  th.col-th.dragging    { opacity: 0.4; cursor: grabbing; }
+  th.col-th.drop-target { background: #1e40af !important; color: #fff; }
+  /* プレイヤーモーダル */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-box {
+    background: var(--md-surface-container); border: 1px solid var(--md-outline); border-radius: var(--md-shape-lg);
+    width: min(98vw, 820px); max-height: 82vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: var(--md-elevation-3);
+    animation: md-dialog-in var(--md-duration-medium) var(--md-ease) both;
+  }
+  @keyframes md-dialog-in { from{opacity:0;transform:scale(0.92) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .modal-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+    border-bottom: 1px solid var(--md-outline-variant); background: var(--md-surface-dim); flex-shrink: 0;
+  }
+  .modal-body { overflow-x: auto; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; flex: 1; min-height: 0; }
+  .modal-table { border-collapse: collapse; font-size: 0.75rem; table-layout: auto; width: auto; }
+  .modal-table td, .modal-table th { overflow: visible; }
+  .modal-table th {
+    background: var(--md-surface); color: var(--md-on-surface-variant); padding: 8px 12px;
+    text-align: right; white-space: nowrap; position: sticky; top: 0; z-index: 1; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .modal-table th:first-child { text-align: left; }
+  .modal-table th:nth-child(2),
+  .modal-table td:nth-child(2) { min-width: 100px; }
+  .modal-table th:nth-child(6),
+  .modal-table td:nth-child(6) { min-width: 115px; }
+  .modal-table th:nth-child(7),
+  .modal-table td:nth-child(7) { min-width: 140px; }
+  .modal-table td { padding: 6px 12px; border-bottom: 1px solid var(--row-hairline); text-align: right; vertical-align: middle; white-space: nowrap; transition: background var(--md-duration-short) var(--md-ease); }
+  .modal-table td:first-child { text-align: left; font-size: 0.6875rem; color: var(--md-on-surface-variant); font-family: monospace; white-space: nowrap; }
+  .modal-table tr:hover td { background: var(--row-hover); }
+  /* GN クリッカブル */
+  .gn-clickable { cursor: pointer; color: var(--md-on-primary-container); }
+  .gn-clickable:hover { text-decoration: underline; }
+  .gn-profile-link { color: var(--md-on-surface-variant); font-size: 0.625rem; text-decoration: none; margin-left: 4px; transition: color var(--md-duration-short) var(--md-ease); }
+  .gn-profile-link:hover { color: var(--md-primary); }
+  /* 検索バー */
+  .search-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .search-bar input { width: 200px; font-size: 0.75rem; }
+  .search-hit { color: var(--md-success); font-size: 0.6875rem; }
+  .search-miss { color: var(--md-error); font-size: 0.6875rem; }
+  /* バトルバー */
+  .battle-bar { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--md-surface-dim); border:1px solid var(--md-outline); border-radius:var(--md-shape-md); flex-wrap:wrap; }
+  .battle-tag { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:var(--md-shape-full); font-size:0.75rem; font-weight:700; color:var(--md-surface-dim); }
+  .battle-tag .bt-close { cursor:pointer; opacity:0.6; margin-left:4px; font-size:0.625rem; line-height:1; transition: opacity var(--md-duration-short) var(--md-ease); }
+  .battle-tag .bt-close:hover { opacity:1; }
+  .battle-filter-btn { padding:6px 14px; border-radius:var(--md-shape-sm); font-size:0.75rem; cursor:pointer; background:var(--md-secondary-container); color:var(--md-on-primary-container); border:1px solid rgba(96,165,250,0.3); transition:all var(--md-duration-short) var(--md-ease); }
+  .battle-filter-btn.active { background:#1e40af; color:#fff; border-color:#1e40af; box-shadow:var(--md-elevation-1); }
+  .battle-filter-btn:hover { filter:brightness(1.15); }
+  .gn-pinned { font-weight:800; text-decoration:underline dotted; }
+  .battle-row-mark { display:inline-block; width:3px; height:13px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+  .solo-mark { display:inline-block; font-size:9px; font-weight:700; color:#ef4444; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); border-radius:3px; padding:0 3px; margin-right:3px; vertical-align:middle; line-height:15px; letter-spacing:0.03em; }
+  /* 使い方ガイド */
+  .help-tab { padding:6px 14px; border-radius:var(--md-shape-sm) var(--md-shape-sm) 0 0; font-size:0.75rem; cursor:pointer; background:var(--md-surface-container); color:var(--md-on-surface-variant); border:1px solid var(--md-outline); border-bottom:1px solid var(--md-outline); margin-bottom:-1px; transition:all var(--md-duration-short) var(--md-ease); }
+  .help-tab.active { background:var(--md-surface-container); color:var(--md-on-surface); border-bottom-color:var(--md-surface-container); }
+  .help-panel-desc { color:var(--md-on-surface-variant); font-size:0.8125rem; margin-bottom:12px; line-height:1.7; }
+  .help-tip { background:var(--md-surface-dim); border-radius:var(--md-shape-sm); padding:12px; font-size:0.75rem; color:var(--md-on-surface-variant); margin-top:12px; line-height:1.7; }
+  .help-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.75rem; margin-top:12px; }
+  .help-grid-item { background:var(--md-surface-dim); border-radius:var(--md-shape-sm); padding:10px 12px; border:1px solid var(--md-outline-variant); transition:border-color var(--md-duration-short) var(--md-ease); }
+  .help-grid-item:hover { border-color:var(--md-outline); }
+  /* コントロールエリア */
+  #ctrl-area { display:flex; flex-direction:column; gap:2px; margin:2px 0; }
+  #event-row { display:flex; align-items:center; gap:8px; }
+  #event-select { max-width: 260px; }
+  #snap-selector { display:grid; grid-template-columns:auto 1fr auto auto; row-gap:2px; column-gap:4px; }
+  #snap-selector > div { display:grid; grid-template-columns:subgrid; grid-column:1/-1; align-items:center; }
+  #period-day-selector > div { display:flex; align-items:center; gap:4px; }
+  /* 全体レイアウト（ページスクロール方式） */
+  html, body { min-height: 100%; }
+  body { display: flex; flex-direction: column; }
+  .main-wrap { flex: 1; display: flex; flex-direction: column; }
+  .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #rank-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #site-footer { flex-shrink: 0; }
+  #stat-bar { flex-shrink:0; padding:6px 12px; border-bottom:1px solid var(--md-outline-variant); font-size:0.75rem; }
+  .search-bar { margin-bottom: 4px; }
+  /* タブ+コントロール縦積みラッパー */
+  #tab-ctrl-wrap { display:flex; flex-direction:column; gap:2px; }
+  /* コントロール列 + 広告列 横並び（広告が3行分の高さを占有） */
+  #ctrl-ad-wrap { display:flex; gap:8px; align-items:stretch; }
+  #ctrl-left { flex:0 0 auto; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  /* タブエリア広告スロット（728x90・PCのみ・コントロール右・全高span） */
+  #tab-ad-slot { display:none; flex:1; min-width:0; align-items:center; justify-content:center; overflow:hidden; }
+  @media (min-width:768px) { #tab-ad-slot { display:flex; } }
+  /* コントロール折りたたみ */
+  #ctrl-toggle-bar { display:flex; justify-content:flex-end; align-items:center; padding:3px 6px 3px 8px; background:var(--md-surface-dim); border-bottom:1px solid var(--md-outline-variant); gap:6px; }
+  #ctrl-toggle-btn { background:none; border:none; cursor:pointer; color:var(--md-on-surface-variant); font-size:11px; padding:3px 8px; border-radius:var(--md-shape-sm); display:flex; align-items:center; gap:4px; transition:all var(--md-duration-short) var(--md-ease); }
+  #ctrl-toggle-btn:hover { background:var(--row-hover); color:var(--md-on-surface); }
+  #ctrl-toggle-arrow { display:inline-block; transition:transform 0.3s var(--md-ease); }
+  #main-content.ctrl-collapsed #ctrl-toggle-arrow { transform:rotate(180deg); }
+  /* アコーディオン: grid-template-rows で高さをスムーズに変化させる */
+  #ctrl-collapsible { display:grid; grid-template-rows:1fr; transition:grid-template-rows 0.3s var(--md-ease); }
+  #ctrl-collapsible > .ctrl-inner { min-height:0; overflow:hidden; opacity:1; transition:opacity 0.25s var(--md-ease); }
+  #main-content.ctrl-collapsed #ctrl-collapsible { grid-template-rows:0fr; }
+  #main-content.ctrl-collapsed #ctrl-collapsible > .ctrl-inner { opacity:0; }
+  /* Compact (モバイル) */
+  @media (max-width:599px) {
+    .tab-sub { display: none; }
+    .tab-btn { padding: 5px 2px; font-size: 0.75rem; }
+    .mobile-only-menu { display: block !important; }
+  }
+  @media (min-width:600px) {
+    .mobile-only-menu { display: none !important; }
+  }
+  /* ===== グラフモーダル ===== */
+  .gchart-type-btn { padding:6px 12px; border-radius:var(--md-shape-sm); font-size:0.75rem; cursor:pointer; background:var(--md-surface-container-high); border:1px solid var(--md-outline); color:var(--md-on-surface-variant); transition:all var(--md-duration-short) var(--md-ease); }
+  .gchart-type-btn.active { background:#1e40af; color:#fff; border-color:#1e40af; box-shadow:var(--md-elevation-1); }
+  .gchart-type-btn:hover:not(.active) { background:var(--md-surface-bright); }
+  .graph-player-tag { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:var(--md-shape-full); font-size:0.75rem; cursor:pointer; border:1px solid; font-weight:600; transition:all var(--md-duration-short) var(--md-ease); white-space:nowrap; }
+  .graph-player-tag.dimmed { opacity:0.3; }
+  .graph-player-tag:hover { opacity:0.7; }
+  .graph-sub-btn { padding:4px 12px; border-radius:var(--md-shape-sm); font-size:0.6875rem; cursor:pointer; background:var(--md-surface-container-high); border:1px solid var(--md-outline); color:var(--md-on-surface-variant); white-space:nowrap; transition:all var(--md-duration-short) var(--md-ease); }
+  .graph-sub-btn:hover { border-color:var(--md-primary); color:var(--md-primary); }
+  .graph-suggest-item { padding:8px 14px; cursor:pointer; font-size:0.75rem; color:var(--md-on-surface); border-bottom:1px solid var(--md-outline-variant); transition:background var(--md-duration-short) var(--md-ease); }
+  .graph-suggest-item:hover { background:var(--row-hover); }
+  .graph-search-wrap { position:relative; display:inline-block; }
+  /* ===== PC サイドバー ===== */
+  #main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  #main-content > div:not(.table-card) { flex-shrink: 0; }
+  @media (min-width: 1024px) {
+    .main-wrap { flex-direction: row !important; align-items: flex-start; }
+    #side-panel { width: 218px; flex-shrink: 0; display: flex !important; flex-direction: column; gap: 8px; padding: 4px 0 4px 8px; transition: width 0.25s var(--md-ease); position: sticky; top: 52px; max-height: calc(100vh - 52px); overflow-y: auto; }
+    #side-panel.collapsed { width: 28px; padding: 4px 0; }
+    #side-panel.collapsed .side-card { display: none; }
+    #side-collapse-btn { display: flex !important; }
+  }
+  @media (max-width: 1023px) {
+    #side-panel { display: none !important; }
+    #side-collapse-btn { display: none !important; }
+  }
+  #side-collapse-btn { display: none; width: 100%; height: 28px; background: transparent; border: none; border-bottom: 1px solid var(--md-outline-variant); border-radius: 0; cursor: pointer; padding: 0 10px; color: var(--md-on-surface-variant); font-size: 11px; line-height: 1; transition: all var(--md-duration-short) var(--md-ease); flex-shrink: 0; align-items: center; justify-content: flex-end; gap: 4px; }
+  #side-collapse-btn:hover { color: var(--md-on-surface); background: var(--row-hover); }
+  #side-panel.collapsed #side-collapse-btn { justify-content: center; padding: 0; }
+  .side-card { background: var(--md-surface-container); border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); padding: 12px; transition: border-color var(--md-duration-short) var(--md-ease); }
+  .side-card:hover { border-color: var(--md-outline); }
+  .side-card-title { font-size: 0.625rem; color: var(--md-on-surface-variant); font-weight: 500; letter-spacing: 0.06em; margin-bottom: 6px; text-transform: uppercase; }
+  .side-card-value { font-size: 0.8125rem; font-weight: 700; color: var(--md-on-surface); font-variant-numeric: tabular-nums; }
+  .side-card-sub { font-size: 0.6875rem; color: var(--md-on-surface-variant); margin-top: 4px; }
+  .side-elem-badge { display: inline-block; padding: 2px 8px; border-radius: var(--md-shape-full); font-size: 0.6875rem; font-weight: 700; margin-top: 4px; }
+  .cell-r { text-align: right }
+  .cell-rank { text-align: right; color: var(--md-on-surface-variant); font-size: 0.6875rem }
+  .cell-kill { text-align: right; color: var(--md-on-surface-variant); font-size: 0.75rem }
+  .cell-total { font-size: 0.8125rem; color: var(--md-on-surface-variant) }
+  /* アクセシビリティ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+  :focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
+  /* 広告スロット */
+  .ad-inline-wrap { text-align:center; padding:8px 0 4px; min-height:0; overflow:hidden; }
+  /* ランキング保存モーダル */
+  #save-modal .modal-box { max-width: min(96vw, 480px); }
+  #save-modal .save-section { margin-bottom: 14px; }
+  #save-modal .save-label { font-size: 11px; color: var(--md-on-surface-variant); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+  #save-modal .col-check-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  #save-modal .col-check-item { display: flex; align-items: center; gap: 4px; background: var(--md-surface-container-high); border: 1px solid var(--md-outline); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+  #save-modal .col-check-item input { accent-color: var(--md-primary); }
+  #save-modal .range-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--md-on-surface-variant); }
+  #save-modal .range-row input[type=number] { width: 60px; font-size: 12px; padding: 3px 6px; background: var(--md-surface-container-high); border: 1px solid var(--md-outline); border-radius: 4px; color: var(--md-on-surface); text-align: right; }
+  #save-modal select.save-select { font-size: 12px; padding: 4px 8px; background: var(--md-surface-container-high); border: 1px solid var(--md-outline); border-radius: 4px; color: var(--md-on-surface); }
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6139585433722718" crossorigin="anonymous"></script>
+<script>
+/**
+ * Element Color System for GBF Ranking App
+ * theme-manager.js - Manages element accent colors only (single dark theme)
+ */
+
+// === Element Accent Colors ===
+const ELEMENT_COLORS = {
+  '火': '#ef4444',
+  '水': '#3b82f6',
+  '土': '#d97706',
+  '風': '#22c55e',
+  '光': '#eab308',
+  '闇': '#7c3aed'
+};
+
+/**
+ * Extract element character from event name
+ */
+function getEventElement(eventName) {
+  if (!eventName) return null;
+  for (const elem of Object.keys(ELEMENT_COLORS)) {
+    if (eventName.includes(elem)) return elem;
+  }
+  return null;
+}
+
+/**
+ * Apply element accent color based on event name
+ */
+function applyElementTheme(eventName) {
+  const element = getEventElement(eventName);
+  const color = (element && ELEMENT_COLORS[element]) ? ELEMENT_COLORS[element] : '#3b82f6';
+  document.documentElement.style.setProperty('--elem-color', color);
+  document.documentElement.style.setProperty('--elem-color-light', color + '99');
+}
+
+/**
+ * Open help/howto modal — works for both dashboard (#help-modal) and border (#howto-modal)
+ */
+function openHowto() {
+  const modal = document.getElementById('howto-modal') || document.getElementById('help-modal');
+  if (!modal) return;
+  if (modal.classList.contains('modal-backdrop')) {
+    modal.classList.add('open');
+  } else {
+    modal.style.display = 'flex';
+  }
+}
+
+/* ─── Color Mode (light / dark) ──────────────── */
+
+const COLOR_MODE_KEY = 'gbf_color_mode';
+
+function getColorMode() {
+  try {
+    const saved = localStorage.getItem(COLOR_MODE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch {}
+  return 'dark'; // 既定はダーク（既存挙動）
+}
+
+// 添付アイコン: ライト時は太陽（グレー）、ダーク時は月（ブルー）。背景に対して常に視認可能
+const SUN_SVG  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"/><g stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/></g></svg>';
+const MOON_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#6366f1"/><path d="M20.5 13.2A8 8 0 1 1 10.8 3.5 6.3 6.3 0 0 0 20.5 13.2Z" fill="#fff"/></svg>';
+
+function applyColorMode(mode) {
+  const m = mode === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', m);
+  try { localStorage.setItem(COLOR_MODE_KEY, m); } catch {}
+  // トグルボタンのアイコンを更新（存在すれば）。現在のモードを表示
+  document.querySelectorAll('.color-mode-toggle').forEach(btn => {
+    btn.innerHTML = m === 'light' ? SUN_SVG : MOON_SVG;
+    btn.title = m === 'light' ? 'ダークモードに切替' : 'ライトモードに切替';
+  });
+}
+
+function toggleColorMode() {
+  const cur = document.documentElement.getAttribute('data-theme') || getColorMode();
+  applyColorMode(cur === 'light' ? 'dark' : 'light');
+}
+
+// FOUC回避のため即時適用（DOMContentLoaded を待たない）
+applyColorMode(getColorMode());
+
+/* ─── Init ───────────────────────────────────── */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Clear any stored background theme (legacy)
+  localStorage.removeItem('gbf_bg_theme');
+  // 保存済みカラーモードを再適用（ボタンアイコン同期のため）
+  applyColorMode(getColorMode());
+});
+
+</script>
+<script>
+/**
+ * VirtualScroll — センチネル行方式テーブル仮想スクロール
+ *
+ * 使い方:
+ *   const vs = new VirtualScroll({
+ *     container: document.getElementById('rank-table-wrap'),
+ *     tbody: document.getElementById('ranking-body'),
+ *     colCount: 7,            // colspan for pad rows
+ *     rowHeight: 34,          // CSS と合わせる (tiers.css: tr { height: 34px })
+ *     overscan: 6,            // 上下に余分に描画する行数
+ *     rowFactory: (item, idx) => '<tr>...</tr>',
+ *   });
+ *   vs.setData(myArray);      // データをセットして描画
+ *   vs.refresh();             // colCount 変更時など強制再描画
+ *   vs.destroy();             // イベント解除
+ */
+class VirtualScroll {
+  constructor({ container, tbody, colCount, rowHeight, overscan, rowFactory }) {
+    this._container  = container;
+    this._tbody      = tbody;
+    this._colCount   = colCount;
+    this._rowHeight  = rowHeight || 34;
+    this._overscan   = overscan  || 6;
+    this._rowFactory = rowFactory;
+    this._data       = [];
+    this._raf        = null;
+
+    // センチネル行（上下のパディング維持用）
+    this._padTop = this._makePad();
+    this._padBot = this._makePad();
+
+    this._onScroll = () => {
+      if (this._raf) return;
+      this._raf = requestAnimationFrame(() => {
+        this._raf = null;
+        this._render();
+      });
+    };
+    container.addEventListener('scroll', this._onScroll, { passive: true });
+  }
+
+  _makePad() {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = this._colCount;
+    td.style.cssText = 'height:0;padding:0;border:none;';
+    tr.appendChild(td);
+    return tr;
+  }
+
+  _updateColSpan() {
+    this._padTop.firstChild.colSpan = this._colCount;
+    this._padBot.firstChild.colSpan = this._colCount;
+  }
+
+  _render() {
+    const { _container: c, _rowHeight: rh, _overscan: ov, _data: data } = this;
+    const total    = data.length;
+    const scrollTop = c.scrollTop;
+    const viewH    = c.clientHeight;
+
+    const rawStart = Math.floor(scrollTop / rh) - ov;
+    const rawEnd   = Math.ceil((scrollTop + viewH) / rh) + ov;
+    const start    = Math.max(0, rawStart);
+    const end      = Math.min(total, rawEnd);
+
+    const padTopH = start * rh;
+    const padBotH = Math.max(0, (total - end) * rh);
+
+    this._padTop.firstChild.style.height = padTopH + 'px';
+    this._padBot.firstChild.style.height = padBotH + 'px';
+
+    const frag = document.createDocumentFragment();
+    frag.appendChild(this._padTop);
+    for (let i = start; i < end; i++) {
+      const row = this._rowFactory(data[i], i);
+      if (typeof row === 'string') {
+        const tmp = document.createElement('template');
+        tmp.innerHTML = row;
+        frag.appendChild(tmp.content);
+      } else {
+        frag.appendChild(row);
+      }
+    }
+    frag.appendChild(this._padBot);
+
+    this._tbody.replaceChildren(frag);
+  }
+
+  /** データをセットして先頭にスクロール後に描画 */
+  setData(data, keepScroll = false) {
+    this._data = data;
+    if (!keepScroll) this._container.scrollTop = 0;
+    this._render();
+  }
+
+  /** colCount 変更時などに呼ぶ */
+  setColCount(n) {
+    this._colCount = n;
+    this._updateColSpan();
+  }
+
+  /** 強制再描画（同じデータでレイアウトが変わった場合） */
+  refresh() {
+    this._render();
+  }
+
+  destroy() {
+    this._container.removeEventListener('scroll', this._onScroll);
+    if (this._raf) cancelAnimationFrame(this._raf);
+  }
+}
+
+</script>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-inner">
+    <h1 class="hdr-h1">
+      <a id="header-home-link" href="/" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-width:0;overflow:hidden">
+        <img src="/favicon-custom.png" width="22" height="22" style="object-fit:cover;border-radius:3px;flex-shrink:0;margin-right:6px" onerror="this.style.display='none'">
+        <span class="hdr-title-text">GBF古戦場ランキング</span>
+      </a>
+    </h1>
+    <input id="date-select" type="date" onchange="onDateChange()" style="display:none">
+    <span id="demo-badge" class="demo-badge" style="display:none">DEMO</span>
+    <div class="hdr-right">
+      <span id="viewer-badge" class="viewer-badge" style="display:none"></span>
+      <button class="hdr-btn color-mode-toggle" onclick="toggleColorMode()" aria-label="カラーモード切替" style="padding:4px 8px;line-height:0"></button>
+<a href="/border" class="hdr-btn hdr-btn-blue" id="border-header-link">ボーダー</a>
+      <a href="/guild" class="hdr-btn hdr-btn-blue" id="guild-header-link">団ランキング</a>
+      <a id="live-header-link" class="hdr-btn hdr-btn-live" href="#" style="display:none" target="_blank" rel="noopener">LIVE</a>
+      <button class="hdr-btn" onclick="openHelpModal()">使い方</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="main-wrap" style="padding:4px 10px 4px;max-width:1536px;margin:0 auto;width:100%;box-sizing:border-box">
+
+<div id="main-content">
+  <!-- コントロール折りたたみバー -->
+  <div id="ctrl-toggle-bar">
+    <span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.6">タブ・設定</span>
+    <button id="ctrl-toggle-btn" onclick="toggleControls()" title="タブ・設定を収納/展開">
+      <span id="ctrl-toggle-text">収納</span><span id="ctrl-toggle-arrow">▲</span>
+    </button>
+  </div>
+  <div id="ctrl-collapsible">
+  <div class="ctrl-inner">
+  <!-- タブ+コントロール縦積みラッパー -->
+  <div id="tab-ctrl-wrap">
+
+    <!-- ① タブ: 4列1行（全幅） -->
+    <div id="tab-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
+      <button class="tab-btn active" id="tab-20min" onclick="switchTab('20min')">20分速<span class="tab-sub">直前→最新</span></button>
+      <button class="tab-btn" id="tab-morning" onclick="switchTab('morning')">朝活<span class="tab-sub" id="tab-morning-sub">7:00→8:00</span></button>
+      <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">日速<span class="tab-sub" id="tab-daily-sub">7:00→最新</span></button>
+      <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub">0:00→7:00</span></button>
+    </div>
+
+    <!-- ② コントロール列（左）+ 広告列（右・全高span） -->
+    <div id="ctrl-ad-wrap">
+
+      <!-- 左列: 古戦場選択 → 日付 → 時間 の3行 -->
+      <div id="ctrl-left">
+
+        <!-- 行1: 古戦場選択 -->
+        <div id="event-row">
+          <select id="event-select" onchange="onEventChange()" style="flex:1;min-width:0;font-size:12px">
+            <option value="">イベント選択</option>
+          </select>
+        </div>
+
+        <!-- 行2-3: 20分速 スナップショット選択 -->
+        <div id="snap-selector">
+          <!-- 日付行 -->
+          <div>
+            <button class="day-nav-btn" onclick="shiftSnapDay(-1)" title="前日">◀</button>
+            <select id="snap-day-select" onchange="onSnapDayChange()" style="width:100%;min-width:0;font-size:12px">
+              <option value="" id="snap-day-auto-label">-- 全日（最新自動） --</option>
+            </select>
+            <button class="day-nav-btn" onclick="shiftSnapDay(1)" title="翌日">▶</button>
+          </div>
+          <!-- 時間行 -->
+          <div>
+            <button class="day-nav-btn" onclick="shiftSnap(-1)" title="前のスナップ (←)">◀</button>
+            <select id="snap-time-select" onchange="onSnapTimeChange()" style="width:100%;min-width:0;font-size:12px">
+              <option value="" id="snap-time-auto-label">-- 最新（自動） --</option>
+            </select>
+            <button class="day-nav-btn" onclick="shiftSnap(1)" title="次のスナップ (→)">▶</button>
+            <button class="day-nav-btn" onclick="clearSnapSelect()" id="snap-clear-btn" title="最新自動に戻す">✕</button>
+          </div>
+        </div>
+
+        <!-- 行2: 朝活/日速/残業 期間日付プルダウン -->
+        <div id="period-day-selector" style="display:none">
+          <div style="display:flex;align-items:center;gap:4px">
+            <button class="day-nav-btn" onclick="shiftDate(-1)" title="前日">◀</button>
+            <select id="event-day-select" onchange="onEventDayChange()" style="flex:1;min-width:0;font-size:12px">
+              <option value="">-- 日付を選択 --</option>
+            </select>
+            <button class="day-nav-btn" onclick="shiftDate(1)" title="翌日">▶</button>
+            <button class="day-nav-btn" onclick="jumpToToday()" title="今日" style="flex-shrink:0">今日</button>
+          </div>
+        </div>
+
+      </div><!-- /ctrl-left -->
+
+      <!-- 右列: 728×90 広告（PCのみ・左列全高にspan） -->
+      <div id="tab-ad-slot">
+        <!-- admax -->
+        <script src="https://adm.shinobi.jp/s/1ef61e7be0d4a5ab7939b953e7b95fbb"></script>
+        <!-- admax -->
+      </div>
+
+    </div><!-- /ctrl-ad-wrap -->
+
+  </div><!-- /tab-ctrl-wrap -->
+
+  <!-- バトルバー -->
+  <div id="battle-bar" class="battle-bar mt-2" style="display:none">
+    <span class="text-xs text-gray-400">バトル:</span>
+    <div id="battle-tags" class="flex gap-2 flex-wrap"></div>
+    <button id="battle-filter-btn" class="battle-filter-btn" onclick="toggleBattleFilter()">この人たちだけ表示</button>
+    <button class="text-xs text-gray-500 hover:text-red-400 ml-1" onclick="clearAllBattle()">✕ 全解除</button>
+    <span id="battle-count" class="text-xs text-gray-500 ml-1"></span>
+  </div>
+
+  <!-- GN / ID 検索バー -->
+  <div class="search-bar mt-1">
+    <input id="player-search" type="text" placeholder="GN / ID で絞り込み..."
+           oninput="onSearchInput()" autocomplete="off" spellcheck="false">
+    <button onclick="openGraphModal()" style="padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;font-size:12px;flex-shrink:0;transition:all var(--md-duration-short) var(--md-ease);align-self:stretch" title="グラフ分析">グラフ</button>
+    <button class="day-nav-btn" onclick="clearSearch()" title="検索クリア">✕</button>
+    <span id="search-count" class="text-xs text-gray-600"></span>
+  </div>
+
+  <!-- 推定ソロ設定 -->
+  <div id="solo-bar" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11px;padding:2px 0;margin-top:2px">
+    <label style="display:flex;align-items:center;gap:3px;color:var(--md-on-surface-variant);cursor:pointer;white-space:nowrap">
+      <input type="checkbox" id="solo-enabled" onchange="onSoloSettingChange()">
+      <span class="solo-mark" style="pointer-events:none">S</span>推定ソロ
+    </label>
+    <div id="solo-options" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+      <span id="solo-pct-label" style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.7;white-space:nowrap">貢献度割合が98%〜101%　かつ　討伐数</span>
+      <input id="solo-max-kills" type="number" min="1" style="width:42px;font-size:11px;padding:2px 4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);border-radius:4px;color:var(--md-on-surface);text-align:right" onchange="onSoloSettingChange()">
+      <span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.7">以下</span>
+    </div>
+  </div>
+
+  </div><!-- /ctrl-inner -->
+  </div><!-- /ctrl-collapsible -->
+
+  <!-- ランキングテーブル -->
+  <div class="card table-card overflow-hidden">
+    <!-- 統計バー（テーブルカード内ヘッダー） -->
+    <div id="stat-bar" style="display:none;align-items:center;gap:10px">
+      <span id="type-badge-label" class="type-badge type-20min">20分速</span>
+      <span class="text-gray-400">期間:</span>
+      <span id="stat-range" class="text-blue-300 font-mono text-xs"></span>
+      <button onclick="openSaveModal()" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;flex-shrink:0" title="PNG保存">保存</button>
+    </div>
+    <div id="updating-badge" style="display:none;font-size:11px;text-align:center;padding:3px 12px;background:#78350f;border-bottom:1px solid #d97706;color:#fbbf24;animation:pulse-badge 1.5s ease-in-out infinite;letter-spacing:0.02em"></div>
+    <div id="rank-table-wrap" style="overflow:auto;-webkit-overflow-scrolling:touch">
+    <table id="rank-table" style="min-width:636px">
+      <colgroup id="col-group"></colgroup>
+      <thead><tr id="col-headers"></tr></thead>
+      <tbody id="ranking-body">
+        <tr><td colspan="7" class="loading">読み込み中...</td></tr>
+      </tbody>
+    </table>
+    </div><!-- /overflow-x:auto -->
+  </div>
+
+  <!-- 広告スロット（テーブル直下） -->
+  
+
+</div><!-- /main-content -->
+
+<!-- PC サイドバー -->
+<div id="side-panel">
+  <button id="side-collapse-btn" onclick="toggleSidePanel()" title="サイドバーを折りたたむ"><span id="side-collapse-label" style="font-size:10px;letter-spacing:0.04em">サイド</span><span id="side-collapse-arrow">◀</span></button>
+  <div class="side-card" id="side-event-card">
+    <div class="side-card-title">開催中イベント</div>
+    <div class="side-card-value" id="side-event-name" style="font-size:12px;line-height:1.4">-</div>
+    <div id="side-elem-wrap"></div>
+  </div>
+  <div class="side-card" id="side-top-card">
+    <div class="side-card-title">トップ貢献度</div>
+    <div class="side-card-value" id="side-top-honor">-</div>
+    <div class="side-card-sub" id="side-top-name">-</div>
+    <div class="side-card-sub" id="side-top-diff" style="color:var(--md-success)"></div>
+  </div>
+  <div class="side-card" id="side-watch-card" style="display:none">
+    <div class="side-card-title" style="display:flex;align-items:center;justify-content:space-between">
+      注目プレイヤー
+      <span style="font-size:9px;color:var(--md-on-surface-variant);font-weight:400">★ で追加/解除</span>
+    </div>
+    <div id="side-watch-list"></div>
+  </div>
+</div>
+
+</div><!-- /main-wrap -->
+
+
+<!-- ========== グラフモーダル ========== -->
+<div id="graph-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeGraphModal()">
+  <div class="modal-box" style="width:min(98vw,920px);max-height:92vh">
+    <div class="modal-header">
+      <span class="text-blue-300 font-bold" style="font-size:15px">グラフ分析</span>
+      <button onclick="closeGraphModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:18px;line-height:1;padding:2px 6px" class="hover:text-white">✕</button>
+    </div>
+    <div class="modal-body" style="overflow-y:auto;padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:10px">
+
+      <!-- コントロール行 -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <!-- グラフ種別 -->
+        <div style="display:flex;gap:3px">
+          <button id="gchart-speed-btn" class="gchart-type-btn active" onclick="setGraphChartType('speed')">20分速</button>
+          <button id="gchart-honor-btn" class="gchart-type-btn" onclick="setGraphChartType('honor')">累計貢献度</button>
+          <button id="gchart-rank-btn"  class="gchart-type-btn" onclick="setGraphChartType('rank')">順位変遷</button>
+        </div>
+        <!-- 期間 -->
+        <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant)">
+          <span>期間:</span>
+          <select id="graph-from-select" onchange="renderGraph()" style="font-size:12px"></select>
+          <span>〜</span>
+          <select id="graph-to-select" onchange="renderGraph()" style="font-size:12px"></select>
+        </div>
+        <!-- 累計表示モード（累計貢献度のみ表示） -->
+        <div id="honor-origin-ctrl" style="display:none;display:flex;gap:3px">
+          <button id="honor-abs-btn" class="gchart-type-btn active" onclick="setHonorOrigin('abs')">実数</button>
+          <button id="honor-rel-btn" class="gchart-type-btn" onclick="setHonorOrigin('rel')">期間増加</button>
+        </div>
+        <!-- 予測線 -->
+        <label id="graph-predict-wrap" style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
+          <input type="checkbox" id="graph-predict-chk" onchange="renderGraph()"> 予測線
+        </label>
+        <!-- ボーダーライン -->
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant)">
+          <span style="color:var(--md-on-surface-variant)">ボーダー:</span>
+          <select id="graph-border-select" onchange="renderGraph()" style="font-size:12px;padding:2px 6px">
+            <option value="">なし</option>
+            <option value="1">1位</option>
+            <option value="10">10位</option>
+            <option value="50">50位</option>
+            <option value="100">100位</option>
+            <option value="500">500位</option>
+            <option value="1000">1,000位</option>
+            <option value="2000">2,000位</option>
+            <option value="100000">10万位</option>
+            <option value="150000">15万位</option>
+            <option value="200000">20万位</option>
+          </select>
+        </label>
+        <!-- 共有ボタン -->
+        <button onclick="shareGraph()" style="margin-left:auto;padding:4px 10px;border-radius:5px;background:#1e40af;border:1px solid #1e40af;color:#fff;cursor:pointer;font-size:12px;flex-shrink:0;transition:all var(--md-duration-short) var(--md-ease)" title="画像として保存">保存</button>
+      </div>
+
+      <!-- プレイヤー管理：操作ボタン行 -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:4px">
+        <button class="graph-sub-btn" onclick="addBattlePlayersToGraph()">バトルから追加</button>
+        <button class="graph-sub-btn" onclick="addWatchedPlayersToGraph()">注目から追加</button>
+        <div class="graph-search-wrap">
+          <input id="graph-player-search" type="text" placeholder="プレイヤー名..." style="font-size:12px;width:130px"
+                 oninput="onGraphPlayerSearch()" onblur="setTimeout(()=>hideGraphSuggest(),200)" autocomplete="off">
+          <div id="graph-player-suggest" style="display:none;position:absolute;top:100%;left:0;z-index:300;background:var(--md-surface-container);border:1px solid var(--md-outline);border-radius:var(--md-shape-sm);max-height:160px;overflow-y:auto;min-width:180px;box-shadow:var(--md-elevation-3)"></div>
+        </div>
+        <button class="graph-sub-btn" onclick="clearGraphPlayers()" style="border-color:var(--md-error);color:var(--md-error)">✕ クリア</button>
+      </div>
+      <!-- プレイヤータグ行 -->
+      <div id="graph-player-tags" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:24px"></div>
+
+      <!-- ローディング -->
+      <div id="graph-loading" style="display:none;text-align:center;color:var(--md-on-surface-variant);font-size:13px;padding:12px">データ読み込み中...</div>
+
+      <!-- チャートエリア -->
+      <div id="graph-chart-area" style="position:relative;height:260px;flex-shrink:0">
+        <div id="graph-empty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--md-on-surface-variant);font-size:13px;z-index:1;pointer-events:none">プレイヤーを選択してください</div>
+        <canvas id="ranking-chart" style="display:block"></canvas>
+      </div>
+
+      <!-- 予測情報 -->
+      <div id="graph-predict-info" style="font-size:11px;color:var(--md-on-surface-variant);min-height:16px;text-align:right"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 使い方ガイドモーダル ========== -->
+<div id="help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeHelpModal()">
+  <div class="modal-box" style="width:min(96vw,640px);max-height:90vh">
+    <div class="modal-header">
+      <span class="text-blue-300 font-bold" style="font-size:15px">使い方ガイド</span>
+      <button onclick="closeHelpModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:18px;line-height:1;padding:2px 6px" class="hover:text-white">✕</button>
+    </div>
+    <!-- タブ -->
+    <div style="display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--md-outline-variant);flex-wrap:wrap;background:var(--md-surface-dim)">
+      <button class="help-tab active" id="htab-ranking" onclick="switchHelpTab('ranking')">ランキング種別</button>
+      <button class="help-tab" id="htab-snap" onclick="switchHelpTab('snap')">スナップ選択</button>
+      <button class="help-tab" id="htab-battle" onclick="switchHelpTab('battle')">バトルモード</button>
+      <button class="help-tab" id="htab-history" onclick="switchHelpTab('history')">プレイヤー履歴</button>
+      <button class="help-tab" id="htab-graph" onclick="switchHelpTab('graph')">グラフ</button>
+      <button class="help-tab" id="htab-legend" onclick="switchHelpTab('legend')">表示の見方</button>
+    </div>
+    <div class="modal-body" style="padding:16px 18px;overflow-y:auto;min-height:420px">
+
+      <!-- ===== ランキング種別 ===== -->
+      <div id="hpanel-ranking" class="help-panel">
+        <p class="help-panel-desc">タブを切り替えると4種類のランキングが表示されます。それぞれ集計期間が異なります。<br><strong style="color:#4ade80">残業・朝活・日速</strong> は集計期間中に新しいスナップが届くたび <strong style="color:var(--md-on-surface)">最新までの累計</strong>でライブ更新され、ステータスバーに <span style="color:#4ade80;font-weight:700">(進行中)</span> バッジが表示されます。</p>
+        <svg viewBox="0 0 520 170" style="width:100%;max-width:520px;display:block;margin:0 auto;overflow:visible">
+          <line x1="40" y1="88" x2="490" y2="88" stroke="#2d2d5e" stroke-width="2"/>
+          <line x1="40"  y1="82" x2="40"  y2="94" stroke="#4b5563" stroke-width="1.5"/>
+          <line x1="185" y1="82" x2="185" y2="94" stroke="#4b5563" stroke-width="1.5"/>
+          <line x1="255" y1="82" x2="255" y2="94" stroke="#4b5563" stroke-width="1.5"/>
+          <line x1="490" y1="82" x2="490" y2="94" stroke="#4b5563" stroke-width="1.5"/>
+          <text x="40"  y="108" fill="#64748b" font-size="11" text-anchor="middle">0:00</text>
+          <text x="185" y="108" fill="#64748b" font-size="11" text-anchor="middle">7:00</text>
+          <text x="255" y="108" fill="#64748b" font-size="11" text-anchor="middle">8:00</text>
+          <text x="490" y="108" fill="#64748b" font-size="11" text-anchor="middle">0:00</text>
+          <rect x="40" y="62" width="145" height="18" rx="3" fill="var(--elem-color)" fill-opacity="0.12" opacity="0.85"/>
+          <line x1="40" y1="71" x2="182" y2="71" stroke="var(--elem-color)" stroke-width="2.5"/>
+          <polygon points="182,66 182,76 190,71" fill="var(--elem-color)"/>
+          <text x="112" y="55" fill="var(--elem-color)" font-size="12" text-anchor="middle" font-weight="bold">残業</text>
+          <line x1="112" y1="57" x2="112" y2="62" stroke="var(--elem-color)" stroke-width="1" opacity="0.5"/>
+          <rect x="185" y="115" width="70" height="18" rx="3" fill="#3b2f00" opacity="0.85"/>
+          <line x1="185" y1="124" x2="252" y2="124" stroke="#fbbf24" stroke-width="2.5"/>
+          <polygon points="252,119 252,129 260,124" fill="#fbbf24"/>
+          <text x="220" y="152" fill="#fbbf24" font-size="12" text-anchor="middle" font-weight="bold">朝活</text>
+          <line x1="220" y1="133" x2="220" y2="148" stroke="#fbbf24" stroke-width="1" opacity="0.5"/>
+          <rect x="185" y="40" width="305" height="18" rx="3" fill="#1a3020" opacity="0.85"/>
+          <line x1="185" y1="49" x2="487" y2="49" stroke="#4ade80" stroke-width="2.5"/>
+          <polygon points="487,44 487,54 495,49" fill="#4ade80"/>
+          <text x="337" y="33" fill="#4ade80" font-size="12" text-anchor="middle" font-weight="bold">日速</text>
+          <line x1="337" y1="35" x2="337" y2="40" stroke="#4ade80" stroke-width="1" opacity="0.5"/>
+          <circle cx="410" cy="88" r="5" fill="#1e3a5f" stroke="#93c5fd" stroke-width="1.5"/>
+          <circle cx="455" cy="88" r="5" fill="#2563eb" stroke="#60a5fa" stroke-width="1.5"/>
+          <line x1="415" y1="88" x2="450" y2="88" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="432" y="163" fill="#93c5fd" font-size="11" text-anchor="middle" font-weight="bold">20分速</text>
+          <text x="432" y="173" fill="#4b5563" font-size="9" text-anchor="middle">直前→最新スナップ</text>
+          <line x1="432" y1="94" x2="432" y2="158" stroke="#374151" stroke-width="1" stroke-dasharray="2,2"/>
+        </svg>
+        <div class="help-grid">
+          <div class="help-grid-item" style="border-left:3px solid var(--elem-color)">
+            <div style="color:var(--elem-color);font-weight:700">残業</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">0:00 → 7:00（深夜帯）の累計増加量。期間中は最新スナップまでライブ更新、7:00 到達で確定。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #fbbf24">
+            <div style="color:#fbbf24;font-weight:700">朝活</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">7:00 → 8:00（朝の1時間）の累計増加量。期間中はライブ更新、8:00 到達で確定。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #4ade80">
+            <div style="color:#4ade80;font-weight:700">日速</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">7:00 → 翌0:00（1日全体）の累計増加量。期間中はライブ更新、翌0:00 到達で確定。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #93c5fd">
+            <div style="color:#93c5fd;font-weight:700">20分速</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">直前スナップから最新スナップまでの差分。スナップは約20分間隔で収集されます。</div>
+          </div>
+        </div>
+        <div class="help-tip" style="margin-top:12px"><strong style="color:#4ade80">(進行中)</strong> バッジ：その期間がまだ確定していないことを示します。新しいスナップが届くたびに「開始時刻 → 最新スナップ」の累計で再計算されます。集計の終了時刻スナップが揃うと自動的にバッジが消え、固定表示に切り替わります。</div>
+        <div class="help-tip" style="margin-top:8px">いずれのランキングも、ページ上部の古戦場イベント選択と連動しています。</div>
+      </div>
+
+      <!-- ===== スナップ選択 ===== -->
+      <div id="hpanel-snap" class="help-panel" style="display:none">
+        <p class="help-panel-desc"><strong style="color:#93c5fd">20分速タブ専用</strong>の機能です。スナップショット（収集時刻）を手動で選んで過去の任意時点のデータを確認できます。<br>残業・朝活・日速タブは時刻選択不要・自動でライブ更新されます。</p>
+        <svg viewBox="0 0 480 150" style="width:100%;max-width:480px;display:block;margin:0 auto">
+          <rect x="8" y="8" width="464" height="40" rx="5" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="18" y="32" fill="#64748b" font-size="11">日付:</text>
+          <rect x="72" y="14" width="24" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="84" y="30" fill="#94a3b8" font-size="13" text-anchor="middle">◀</text>
+          <rect x="100" y="14" width="188" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="194" y="30" fill="#e2e8f0" font-size="10" text-anchor="middle">[予選2日目]  2026-03-12  (8件)</text>
+          <rect x="292" y="14" width="24" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="304" y="30" fill="#94a3b8" font-size="13" text-anchor="middle">▶</text>
+          <text x="325" y="30" fill="#4b5563" font-size="10">← GBF日付単位で選択</text>
+          <rect x="8" y="58" width="464" height="40" rx="5" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="18" y="82" fill="#64748b" font-size="11">時間:</text>
+          <rect x="72" y="64" width="24" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="84" y="80" fill="#94a3b8" font-size="13" text-anchor="middle">◀</text>
+          <rect x="100" y="64" width="156" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="178" y="80" fill="#e2e8f0" font-size="10" text-anchor="middle">22:02:30  (2000件)</text>
+          <rect x="260" y="64" width="24" height="24" rx="3" fill="#1e1e3f" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="272" y="80" fill="#94a3b8" font-size="13" text-anchor="middle">▶</text>
+          <text x="293" y="80" fill="#4b5563" font-size="10">← 収集時刻を選択</text>
+          <line x1="240" y1="104" x2="240" y2="118" stroke="#374151" stroke-width="2"/>
+          <polygon points="235,114 245,114 240,122" fill="#374151"/>
+          <rect x="60" y="124" width="360" height="22" rx="4" fill="#111127" stroke="#1e3a5f" stroke-width="1"/>
+          <text x="240" y="139" fill="#93c5fd" font-size="10" text-anchor="middle">選択スナップ と 直前スナップ の貢献度差分を表示</text>
+        </svg>
+        <div class="help-grid" style="margin-top:12px">
+          <div class="help-grid-item">
+            <div style="color:#93c5fd;font-weight:700;margin-bottom:4px">日付選択</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">GBF日付（予選1日目・本戦2日目など）の単位で切り替えます。カッコ内の数字は収集件数です。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">時間選択</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">同日内の収集時刻を選びます。選択した時刻のスナップと、その直前スナップとの差分がランキングに反映されます。</div>
+          </div>
+        </div>
+        <div class="help-tip" style="margin-top:8px"><strong style="color:var(--md-on-surface)">キーボード操作:</strong> 時間選択は ← → キーで1スナップずつ移動できます。入力欄にフォーカスしていない状態で有効です。</div>
+        <div class="help-tip" style="margin-top:8px"><strong style="color:var(--md-on-surface)">他のタブでは:</strong> 残業・朝活・日速タブにはこの時刻ナビは表示されません。各期間の開始スナップから最新スナップまでの累計が常に自動表示されます。</div>
+      </div>
+
+      <!-- ===== バトルモード ===== -->
+      <div id="hpanel-battle" class="help-panel" style="display:none">
+        <p class="help-panel-desc">プレイヤー名をクリックするとバトルメンバーとして登録され、色付きマーカーで複数人を同時に追跡できます。</p>
+        <svg viewBox="0 0 480 178" style="width:100%;max-width:480px;display:block;margin:0 auto">
+          <rect x="8" y="8" width="464" height="20" rx="2" fill="#0f0f25"/>
+          <text x="55"  y="22" fill="#64748b" font-size="9" text-anchor="middle">順位</text>
+          <text x="130" y="22" fill="#64748b" font-size="9" text-anchor="middle">GN</text>
+          <text x="380" y="22" fill="#64748b" font-size="9">増加量</text>
+          <rect x="8" y="28" width="464" height="26" rx="2" fill="#1a1a35"/>
+          <text x="55" y="45" fill="#fbbf24" font-size="12" font-weight="700" text-anchor="middle">1</text>
+          <rect x="96" y="32" width="80" height="18" rx="3" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="136" y="45" fill="#93c5fd" font-size="11" text-anchor="middle">PlayerA</text>
+          <text x="195" y="45" fill="#94a3b8" font-size="11">→</text>
+          <text x="215" y="45" fill="#64748b" font-size="9">クリック</text>
+          <text x="380" y="45" fill="#fbbf24" font-size="11">+1,234,567</text>
+          <line x1="240" y1="60" x2="240" y2="74" stroke="#374151" stroke-width="2"/>
+          <polygon points="235,70 245,70 240,78" fill="#374151"/>
+          <rect x="8" y="80" width="464" height="36" rx="5" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="20" y="102" fill="#64748b" font-size="10">バトル:</text>
+          <rect x="80" y="88" width="72" height="20" rx="10" fill="#60a5fa"/>
+          <text x="116" y="102" fill="#0a0a14" font-size="10" font-weight="700" text-anchor="middle">PlayerA  ✕</text>
+          <rect x="162" y="90" width="110" height="16" rx="4" fill="#1e3a5f" stroke="#2d5a8e" stroke-width="1"/>
+          <text x="217" y="101" fill="#93c5fd" font-size="9" text-anchor="middle">この人たちだけ表示</text>
+          <line x1="240" y1="122" x2="240" y2="136" stroke="#374151" stroke-width="2"/>
+          <polygon points="235,132 245,132 240,140" fill="#374151"/>
+          <rect x="8" y="142" width="464" height="28" rx="2" fill="#1a1a35"/>
+          <rect x="8" y="142" width="3" height="28" fill="#60a5fa" rx="1"/>
+          <text x="55" y="160" fill="#fbbf24" font-size="12" font-weight="700" text-anchor="middle">1</text>
+          <text x="136" y="160" fill="#60a5fa" font-size="11" text-anchor="middle" font-weight="800" text-decoration="underline">PlayerA</text>
+          <text x="380" y="160" fill="#fbbf24" font-size="11">+1,234,567</text>
+          <text x="300" y="174" fill="#4b5563" font-size="9" text-anchor="middle">← 色付きマーカーで追跡される</text>
+        </svg>
+        <div class="help-grid" style="margin-top:12px">
+          <div class="help-grid-item">
+            <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">メンバー登録</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">ランキング内のプレイヤー名をクリックするとバトルバーに追加されます。同じ色で行が強調表示されます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">絞り込み表示</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">「この人たちだけ表示」でバトルメンバーのみのランキングに切り替えられます。もう一度押すと全員表示に戻ります。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#f87171;font-weight:700;margin-bottom:4px">解除</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">バトルバーのメンバー名横の ✕ で個別解除。「全解除」で一括クリアできます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#a78bfa;font-weight:700;margin-bottom:4px">グラフ連携</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">バトルメンバーをグラフに一括追加できます。検索欄横の「グラフ」ボタンから開いてください。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== プレイヤー履歴 ===== -->
+      <div id="hpanel-history" class="help-panel" style="display:none">
+        <p class="help-panel-desc">ランキング行の詳細ボタンをクリックすると、そのプレイヤーの全スナップショット貢献度履歴が表示されます。</p>
+        <svg viewBox="0 0 480 168" style="width:100%;max-width:480px;display:block;margin:0 auto">
+          <rect x="8" y="8" width="464" height="30" rx="3" fill="#111127" stroke="#1e1e3f" stroke-width="1"/>
+          <circle cx="32" cy="23" r="11" fill="#1e1e3f" stroke="#374151" stroke-width="1"/>
+          <text x="32" y="28" fill="#94a3b8" font-size="11" text-anchor="middle">詳細</text>
+          <text x="54" y="22" fill="#64748b" font-size="9">← クリック</text>
+          <rect x="8" y="8" width="3" height="30" fill="#60a5fa" opacity="0.4" rx="1"/>
+          <text x="130" y="27" fill="#93c5fd" font-size="12">PlayerName</text>
+          <text x="380" y="27" fill="#e2e8f0" font-size="11">+987,654</text>
+          <line x1="240" y1="44" x2="240" y2="58" stroke="#374151" stroke-width="2"/>
+          <polygon points="235,54 245,54 240,62" fill="#374151"/>
+          <rect x="28" y="64" width="424" height="96" rx="6" fill="#111127" stroke="#2d2d5e" stroke-width="1.5"/>
+          <rect x="28" y="64" width="424" height="24" rx="6" fill="#0d0d22"/>
+          <rect x="28" y="76" width="424" height="12" fill="#0d0d22"/>
+          <text x="44" y="80" fill="#93c5fd" font-size="11" font-weight="bold">PlayerName</text>
+          <text x="420" y="80" fill="#64748b" font-size="12">✕</text>
+          <rect x="28" y="88" width="424" height="16" fill="#0f0f25"/>
+          <text x="44"  y="99" fill="#64748b" font-size="8">取得日時</text>
+          <text x="164" y="99" fill="#64748b" font-size="8">全体順位</text>
+          <text x="218" y="99" fill="#64748b" font-size="8">20分速</text>
+          <text x="272" y="99" fill="#64748b" font-size="8">貢献度増加</text>
+          <text x="378" y="99" fill="#64748b" font-size="8">累計貢献度</text>
+          <rect x="28" y="104" width="424" height="14" fill="#111127"/>
+          <text x="44"  y="114" fill="#94a3b8" font-size="8">2026-03-12 22:02:30</text>
+          <text x="175" y="114" fill="#94a3b8" font-size="8">52</text>
+          <text x="225" y="114" fill="#facc15" font-size="8" font-weight="bold">3</text>
+          <text x="272" y="114" fill="#4ade80" font-size="8">+1,234,567</text>
+          <text x="378" y="114" fill="#94a3b8" font-size="8">98,765,432</text>
+          <rect x="28" y="118" width="424" height="14" fill="#0f0f20"/>
+          <text x="44"  y="128" fill="#94a3b8" font-size="8">2026-03-12 20:02:30</text>
+          <text x="175" y="128" fill="#94a3b8" font-size="8">48</text>
+          <text x="225" y="128" fill="#94a3b8" font-size="8">12</text>
+          <text x="272" y="128" fill="#4ade80" font-size="8">+876,543</text>
+          <text x="378" y="128" fill="#94a3b8" font-size="8">97,530,865</text>
+          <rect x="28" y="132" width="424" height="14" fill="#111127"/>
+          <text x="44"  y="142" fill="#94a3b8" font-size="8">2026-03-12 18:02:30</text>
+          <text x="175" y="142" fill="#94a3b8" font-size="8">55</text>
+          <text x="225" y="142" fill="#94a3b8" font-size="8">—</text>
+          <text x="272" y="142" fill="#4ade80" font-size="8">+654,321</text>
+          <text x="378" y="142" fill="#94a3b8" font-size="8">96,654,322</text>
+          <text x="240" y="158" fill="#4b5563" font-size="9" text-anchor="middle">・・・（全スナップショット分表示）</text>
+        </svg>
+        <div class="help-grid" style="margin-top:12px">
+          <div class="help-grid-item">
+            <div style="color:#facc15;font-weight:700;margin-bottom:4px">20分速順位</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">各スナップの20分速が上位10位以内の場合、黄色で強調表示されます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">貢献度増加</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">前スナップからの増加量を示します。イベント開始直後の最初のスナップは比較対象がないため「—」で表示されます。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== グラフ ===== -->
+      <div id="hpanel-graph" class="help-panel" style="display:none">
+        <p class="help-panel-desc">複数プレイヤーの20分速・累計貢献度・順位の推移を折れ線グラフで比較できます。</p>
+        <svg viewBox="0 0 480 110" style="width:100%;max-width:480px;display:block;margin:0 auto 12px">
+          <rect x="4" y="10" width="120" height="90" rx="6" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="64" y="28" fill="#64748b" font-size="9" text-anchor="middle">プレイヤー名クリック</text>
+          <rect x="14" y="34" width="100" height="20" rx="3" fill="#111127" stroke="#1e1e3f"/>
+          <rect x="14" y="34" width="3" height="20" fill="#60a5fa" rx="1"/>
+          <text x="70" y="48" fill="#93c5fd" font-size="10" text-anchor="middle">PlayerName</text>
+          <rect x="14" y="60" width="100" height="18" rx="8" fill="#1e3a5f" stroke="#2d5a8e"/>
+          <text x="64" y="73" fill="#93c5fd" font-size="9" text-anchor="middle">バトルバーに追加</text>
+          <text x="64" y="96" fill="#4b5563" font-size="8" text-anchor="middle">（複数人可）</text>
+          <line x1="130" y1="55" x2="148" y2="55" stroke="#374151" stroke-width="2"/>
+          <polygon points="144,50 154,55 144,60" fill="#374151"/>
+          <rect x="154" y="10" width="120" height="90" rx="6" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="214" y="28" fill="#64748b" font-size="9" text-anchor="middle">検索欄横の</text>
+          <rect x="169" y="34" width="90" height="22" rx="5" fill="#0f172a" stroke="#3b4d6b"/>
+          <text x="214" y="49" fill="#93c5fd" font-size="11" text-anchor="middle">グラフ</text>
+          <text x="214" y="72" fill="#4b5563" font-size="8" text-anchor="middle">をクリック</text>
+          <line x1="280" y1="55" x2="298" y2="55" stroke="#374151" stroke-width="2"/>
+          <polygon points="294,50 304,55 294,60" fill="#374151"/>
+          <rect x="304" y="10" width="172" height="90" rx="6" fill="#0d0d22" stroke="#2d2d5e" stroke-width="1"/>
+          <text x="390" y="28" fill="#64748b" font-size="9" text-anchor="middle">グラフ表示</text>
+          <polyline points="318,75 338,55 358,60 378,40 398,45 418,30 438,35 458,25"
+            fill="none" stroke="#60a5fa" stroke-width="2" stroke-linejoin="round"/>
+          <polyline points="318,80 338,72 358,68 378,65 398,70 418,60 438,62 458,55"
+            fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round"/>
+          <line x1="318" y1="85" x2="458" y2="85" stroke="#1a1a30" stroke-width="1"/>
+        </svg>
+        <div class="help-grid">
+          <div class="help-grid-item">
+            <div style="color:#93c5fd;font-weight:700;margin-bottom:4px">グラフ種別</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px"><strong style="color:var(--md-on-surface)">20分速</strong> ― スナップごとの貢献度増加量<br><strong style="color:var(--md-on-surface)">累計貢献度</strong> ― 総貢献度の推移<br><strong style="color:var(--md-on-surface)">順位変遷</strong> ― 全体順位の推移</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">予測線</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">累計貢献度モードで「予測線」をONにすると、直近8スナップの線形回帰から2時間先の推移を破線で表示します。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">期間絞り込み</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">日付のFrom〜Toで表示するスナップ範囲を限定できます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#a78bfa;font-weight:700;margin-bottom:4px">プレイヤー追加</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">グラフモーダル内の検索欄からも個別追加できます。タグの「✕」で削除。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#fb923c;font-weight:700;margin-bottom:4px">画像保存</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">「保存」ボタンでグラフをPNG画像としてダウンロードできます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#38bdf8;font-weight:700;margin-bottom:4px">ハイライト</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">プレイヤー名にカーソルを合わせると、そのプレイヤーの線が強調されます。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 表示の見方（色凡例） ===== -->
+      <div id="hpanel-legend" class="help-panel" style="display:none">
+        <p class="help-panel-desc">テーブルの記号や色の意味です。順位変動の <strong style="color:#60a5fa">▲</strong>/<strong style="color:#f87171">▼</strong> はイベント属性色（火・水など）に関わらず常に同じ色で表示されます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item" style="border-left:3px solid #60a5fa">
+            <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">▲ 青 / NEW</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位上昇（前回比で上がった）。<strong style="color:#4ade80">NEW</strong> は前スナップに存在しなかった新規ランクイン。テーブルヘッダのソート ▲（昇順）も同じ青色。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #f87171">
+            <div style="color:#f87171;font-weight:700;margin-bottom:4px">▼ 赤</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位下降（前回比で下がった）。テーブルヘッダのソート ▼（降順）も同じ赤色。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #94a3b8">
+            <div style="color:#94a3b8;font-weight:700;margin-bottom:4px">→ グレー</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位変動なし（前回と同じ）。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid var(--elem-color)">
+            <div style="color:var(--elem-color);font-weight:700;margin-bottom:4px">イベント属性色</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">ヘッダ・タブ等の装飾色は古戦場の属性（火/水/風/土/光/闇）で変わりますが、データの読み取りには影響しません。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #fbbf24">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">トップ3</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">表示順位 1〜3 位はメダル色（金・銀・銅）でハイライト。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #4ade80">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">(進行中) バッジ</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">残業/朝活/日速の集計期間中に表示。終了スナップが揃うと自動で消えます。</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--md-outline-variant);margin-top:16px;padding-top:12px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <a id="modal-privacy-link" href="/privacy.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none" class="hover:underline">プライバシーポリシー</a>
+        <a id="modal-contact-link" href="/contact.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none" class="hover:underline">お問い合わせ</a>
+        <a id="modal-about-link" href="/about.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none" class="hover:underline">サイトについて</a>
+      </div>
+    </div><!-- /modal-body -->
+  </div><!-- /modal-box -->
+</div><!-- /help-modal -->
+
+<!-- ========== ランキング保存モーダル ========== -->
+<div id="save-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeSaveModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span style="font-size:14px;font-weight:700;color:var(--md-on-surface)">ランキングをPNG保存</span>
+      <button onclick="closeSaveModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:18px;line-height:1;padding:2px 6px">✕</button>
+    </div>
+    <div style="padding:14px 16px 16px">
+      <!-- 行範囲 -->
+      <div class="save-section">
+        <div class="save-label">行範囲（表示順位）</div>
+        <div class="range-row">
+          <input type="number" id="save-range-from" value="1" min="1" max="9999"> 位
+          <span>〜</span>
+          <input type="number" id="save-range-to" value="100" min="1" max="9999"> 位
+          <button onclick="document.getElementById('save-range-from').value=1;document.getElementById('save-range-to').value=2000" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">全件</button>
+        </div>
+      </div>
+      <!-- ソート -->
+      <div class="save-section">
+        <div class="save-label">ソート</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="save-sort-key" class="save-select">
+            <option value="honorDiff">増加量</option>
+            <option value="honor">累計貢献度</option>
+            <option value="rank">全体順位</option>
+            <option value="rankChange">変動</option>
+            <option value="killDiff">討伐数</option>
+            <option value="username">GN</option>
+          </select>
+          <select id="save-sort-dir" class="save-select">
+            <option value="-1">降順</option>
+            <option value="1">昇順</option>
+          </select>
+          <button onclick="applyCurrSort()" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">現在と同じ</button>
+        </div>
+      </div>
+      <!-- 列選択 -->
+      <div class="save-section">
+        <div class="save-label">出力項目</div>
+        <div class="col-check-grid" id="save-col-checks"></div>
+      </div>
+      <!-- オプション -->
+      <div id="save-solo-section" class="save-section" style="display:none">
+        <div class="save-label">オプション</div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
+          <input type="checkbox" id="save-solo-icon">
+          <span class="solo-mark" style="pointer-events:none;font-size:9px">S</span>推定ソロアイコンを表示
+        </label>
+      </div>
+      <!-- 実行 -->
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button onclick="closeSaveModal()" style="font-size:13px;padding:6px 16px;border-radius:var(--md-shape-md);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">キャンセル</button>
+        <button onclick="execSavePNG()" style="font-size:13px;padding:6px 18px;border-radius:var(--md-shape-md);background:var(--md-primary);border:none;color:#fff;cursor:pointer;font-weight:600">ダウンロード</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== プレイヤー詳細モーダル ========== -->
+<div id="player-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePlayerModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="modal-player-name" class="text-blue-300 font-bold" style="font-size:15px"></span>
+      <a id="modal-profile-link" href="#" target="_blank" rel="noopener"
+         style="font-size:11px;color:var(--md-on-surface-variant);text-decoration:none;display:none"
+         class="hover:text-blue-400">↗ GBFプロフィール</a>
+      <div id="modal-summary" class="text-xs text-gray-500 ml-2"></div>
+      <button onclick="closePlayerModal()" title="閉じる"
+        style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:18px;line-height:1;padding:2px 6px"
+        class="hover:text-white">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-loading" class="text-gray-500 text-center py-10">読み込み中...</div>
+      <div id="modal-table-wrap" style="display:none;width:100%">
+        <table id="modal-table" class="modal-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">取得時間</th>
+              <th>20分速</th>
+              <th>全体順位</th>
+              <th>討伐増加数</th>
+              <th>累計討伐数</th>
+              <th>増加貢献度</th>
+              <th>累計貢献度</th>
+            </tr>
+          </thead>
+          <tbody id="modal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako_inflate.min.js"></script>
+<script>
+window.__STATIC_MODE__=true;
+window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/"};
+window.__STATIC_INDEX_URL__='https://gbfranking.com/';
+window.__STATIC_BORDER_URL__='https://border.gbfranking.com/';
+window.__STATIC_LIVE_URL__='';
+window.__STATIC_HAS_GUILD__=false;
+window.__STATIC_GUILD_LATEST_URL__='https://ev083.gbfranking.com/guild';
+window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild","7":"https://ev000.gbfranking.com/guild","10":"https://ev083.gbfranking.com/guild"};
+window.__STATIC_CACHE__=null;
+window.__STATIC_CACHE_PROMISE__=fetch('./data.json.gz')
+  .then(function(r){return r.ok?r.arrayBuffer():Promise.reject('HTTP '+r.status);})
+  .then(function(buf){
+    window.__STATIC_CACHE__=JSON.parse(pako.inflate(new Uint8Array(buf),{to:'string'}));
+  })
+  .catch(function(e){window.__STATIC_CACHE__={};console.warn('GBF: データ読み込み失敗',e);});
+</script>
+<script>
+
+let currentTab         = '20min';
+let currentEventId     = null;
+let _vsRanking         = null; // VirtualScroll instance
+let currentDate        = null;
+let autoTimer          = null;
+let liveSSE            = null;
+let loadedEvents       = [];
+let currentEventIsDemo = false;
+let currentEventDates  = { start: null, end: null };
+let playerSearchTerm   = '';
+let flashOnRender      = false;
+
+// 推定ソロ設定
+const _soloSaved = (() => { try { return JSON.parse(localStorage.getItem('gbf_solo') || '{}'); } catch { return {}; } })();
+let soloEnabled  = _soloSaved.enabled !== false; // デフォルトON
+let soloMaxKills = _soloSaved.maxKills ?? 5;
+
+const BATTLE_COLORS    = ['#60a5fa','#fb923c','#4ade80','#c084fc','#f472b6','#facc15'];
+let battlePlayers      = [];
+let battleFilterActive = false;
+
+let allSnaps    = [];
+let snapGroups  = {};
+let snapDayList = [];
+
+const _apiCache = new Map();
+const API_CACHE_TTL = 5 * 60 * 1000;
+function getStaticPageEventId() {
+  if (!window.__STATIC_MODE__) return null;
+  // URLからev番号を抽出（例: ev078.gbfranking.com → "078", -ev078/ → "078"）
+  let urlId = null;
+  const hostM = window.location.hostname.match(/^ev(\d+)\./);
+  if (hostM) urlId = hostM[1];
+  else {
+    const pathM = window.location.pathname.match(/-ev(\d+)\//);
+    if (pathM) urlId = pathM[1];
+  }
+  if (!urlId) return null;
+  // __STATIC_EVENT_URLS__ の値URLからDB event IDを逆引き
+  if (window.__STATIC_EVENT_URLS__) {
+    for (const [dbId, url] of Object.entries(window.__STATIC_EVENT_URLS__)) {
+      if (url.includes(`/ev${urlId}.`) || url.includes(`-ev${urlId}/`)) {
+        return Number(dbId);
+      }
+    }
+  }
+  // フォールバック: URLの数字をそのままDB IDとして使用（旧形式互換）
+  return Number(urlId);
+}
+async function apiFetch(url) {
+  if (window.__STATIC_MODE__) {
+    if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
+    if (window.__STATIC_CACHE_PROMISE__) { try { await window.__STATIC_CACHE_PROMISE__; } catch {} }
+    if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
+    return null;
+  }
+  if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
+  const entry = _apiCache.get(url);
+  if (entry && Date.now() - entry.ts < API_CACHE_TTL) return entry.data;
+  const data = await fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+  if (data != null) _apiCache.set(url, { data, ts: Date.now() });
+  return data;
+}
+// 静的モード: 日別20分速ファイルを遅延ロード（snap-YYYY-MM-DD.json.gz）
+const _snapDayLoading = new Map();
+async function ensureSnapDayLoaded(gbfDay) {
+  if (!window.__STATIC_MODE__ || !gbfDay) return;
+  const daySnaps = snapGroups[gbfDay] || [];
+  if (daySnaps.length === 0) return;
+  const firstKey = `/api/ranking/20min?snapshot_id=${daySnaps[0].id}`;
+  if (window.__STATIC_CACHE__ && firstKey in window.__STATIC_CACHE__) return;
+  if (_snapDayLoading.has(gbfDay)) { await _snapDayLoading.get(gbfDay); return; }
+  const p = fetch(`./snap-${gbfDay}.json.gz`)
+    .then(r => r.ok ? r.arrayBuffer() : null)
+    .then(buf => {
+      if (!buf) return;
+      const dayCache = JSON.parse(pako.inflate(new Uint8Array(buf), { to: 'string' }));
+      window.__STATIC_CACHE__ = window.__STATIC_CACHE__ || {};
+      Object.assign(window.__STATIC_CACHE__, dayCache);
+    })
+    .catch(() => {})
+    .finally(() => _snapDayLoading.delete(gbfDay));
+  _snapDayLoading.set(gbfDay, p);
+  await p;
+}
+function apiCacheInvalidate(prefix) {
+  for (const key of _apiCache.keys()) {
+    if (!prefix || key.startsWith(prefix)) _apiCache.delete(key);
+  }
+}
+
+function getSnapGBFDay(capturedAt) {
+  const dt = capturedAt.substring(0, 10);
+  const hh = parseInt(capturedAt.substring(11, 13));
+  // GBF日は7:00始まり。0:00〜6:59は前日のGBF日扱い
+  if (hh < 7) {
+    const [y, m, d] = dt.split('-').map(Number);
+    const prev = new Date(y, m - 1, d - 1);
+    return prev.toLocaleDateString('sv-SE');
+  }
+  return dt;
+}
+
+function currentEventStartDate() {
+  return loadedEvents.find(e => String(e.id) === String(currentEventId))?.start_date || null;
+}
+
+function buildSnapGroups() {
+  snapGroups = {};
+  allSnaps.forEach(s => {
+    const gbfDay = getSnapGBFDay(s.captured_at);
+    if (!snapGroups[gbfDay]) snapGroups[gbfDay] = [];
+    snapGroups[gbfDay].push(s);
+  });
+  snapDayList = Object.keys(snapGroups).sort();
+}
+
+const GBF_PERIOD_NAMES = ['予選1日目','予選2日目','インターバル','本戦1日目','本戦2日目','本戦3日目','本戦4日目'];
+
+function getGBFPeriodName(capturedAt, eventStartDate) {
+  if (!eventStartDate) return capturedAt.substring(0, 10);
+
+  const dt = capturedAt.substring(0, 10);
+  const hh = parseInt(capturedAt.substring(11, 13));
+  const time = capturedAt.substring(11, 19);
+
+  function dateToSerialDay(ymd) {
+    const [y, m, d] = ymd.split('-').map(Number);
+    return Math.floor(new Date(y, m - 1, d).getTime() / 86400000);
+  }
+
+  let snapSerial = dateToSerialDay(dt);
+  if (hh < 7) snapSerial -= 1;
+
+  const startSerial = dateToSerialDay(eventStartDate);
+  const dayIdx      = snapSerial - startSerial;
+
+  const period = dayIdx < 0 ? '開始前'
+    : dayIdx < GBF_PERIOD_NAMES.length ? GBF_PERIOD_NAMES[dayIdx]
+    : `${dayIdx + 1}日目`;
+
+  return period;
+}
+
+// 推定ソロ判定
+// 各難易度のソロ時1体あたり貢献度（サーバー設定またはフォールバック）
+const SOLO_DIFFICULTIES_DEFAULT = [
+  { name: 'EX+',     honor: 126000 },
+  { name: '90HELL',  honor: 305000 },
+  { name: '95HELL',  honor: 910000 },
+  { name: '100HELL', honor: 2680000 },
+  { name: '150HELL', honor: 4100000 },
+  { name: '200HELL', honor: 20000000 },
+  { name: '250HELL', honor: 75000000 },
+];
+let SOLO_DIFFICULTIES = SOLO_DIFFICULTIES_DEFAULT.slice();
+let soloPctMin = 98;  // 貢献度一致範囲 下限（%）
+let soloPctMax = 101; // 貢献度一致範囲 上限（%）
+
+async function loadSoloDifficulties() {
+  if (window.__STATIC_MODE__) return;
+  try {
+    const r = await fetch('/api/ranking/solo-difficulties');
+    if (r.ok) {
+      const data = await r.json();
+      // 新形式 { difficulties, matchMinPct, matchMaxPct }
+      if (data && Array.isArray(data.difficulties) && data.difficulties.length) {
+        SOLO_DIFFICULTIES = data.difficulties;
+        soloPctMin = Number(data.matchMinPct) || 98;
+        soloPctMax = Number(data.matchMaxPct) || 101;
+      } else if (Array.isArray(data) && data.length) {
+        // 旧形式（配列）後方互換
+        SOLO_DIFFICULTIES = data;
+      }
+    }
+    updateSoloPctLabel();
+  } catch {}
+}
+
+// タブごとの計測時間（分）
+const TAB_DURATION_MIN = { '20min': 20, 'morning': 60, 'daily': 1020, 'overnight': 420 };
+
+// 貢献度/討伐数 がいずれかの難易度値の設定範囲内に収まる場合、難易度名を返す
+// 討伐数は「20分あたり」に換算してから閾値と比較（朝活・日速は時間が長い分、討伐数が増えるため）
+function getSoloMatch(p) {
+  if (!soloEnabled) return null;
+  if (currentTab === 'overnight') return null; // 残業はソロ不可
+  if (p.honorDiff == null || p.killDiff == null || p.killDiff < 1) return null;
+  const durationMin = TAB_DURATION_MIN[currentTab] ?? 20;
+  const killsPer20  = p.killDiff / (durationMin / 20);
+  if (killsPer20 > soloMaxKills) return null;
+  const perKill = p.honorDiff / p.killDiff;
+  const lo = soloPctMin / 100;
+  const hi = soloPctMax / 100;
+  for (const d of SOLO_DIFFICULTIES) {
+    if (perKill >= d.honor * lo && perKill <= d.honor * hi) return d.name;
+  }
+  return null;
+}
+function isSoloEstimate(p) { return getSoloMatch(p) !== null; }
+function updateSoloPctLabel() {
+  const el = document.getElementById('solo-pct-label');
+  if (el) el.textContent = `貢献度割合が${soloPctMin}%〜${soloPctMax}%　かつ　討伐数`;
+}
+function onSoloSettingChange() {
+  soloEnabled  = document.getElementById('solo-enabled').checked;
+  soloMaxKills = Number(document.getElementById('solo-max-kills').value) || 5;
+  document.getElementById('solo-options').style.display = soloEnabled ? 'flex' : 'none';
+  updateSoloPctLabel();
+  try { localStorage.setItem('gbf_solo', JSON.stringify({ enabled: soloEnabled, maxKills: soloMaxKills })); } catch {}
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+// ===== コントロール折りたたみ =====
+function toggleControls() {
+  const mc       = document.getElementById('main-content');
+  const text     = document.getElementById('ctrl-toggle-text');
+  const collapsed = mc.classList.toggle('ctrl-collapsed');
+  if (text) text.textContent = collapsed ? '展開' : '収納';
+  try { localStorage.setItem('gbf_ctrl_collapsed', collapsed ? '1' : '0'); } catch {}
+  // コントロール折りたたみアニメーション後に高さを再計算
+  setTimeout(updateTableHeight, 320);
+}
+function initControlsState() {
+  try {
+    if (localStorage.getItem('gbf_ctrl_collapsed') === '1') {
+      const mc   = document.getElementById('main-content');
+      const text = document.getElementById('ctrl-toggle-text');
+      // アニメーションなしで初期状態を適用
+      if (mc) {
+        mc.classList.add('ctrl-collapsed');
+        // 初回はトランジションを一時停止して瞬時に閉じる
+        const c = document.getElementById('ctrl-collapsible');
+        const i = c?.querySelector('.ctrl-inner');
+        if (c) c.style.transition = 'none';
+        if (i) i.style.transition = 'none';
+        requestAnimationFrame(() => {
+          if (c) c.style.transition = '';
+          if (i) i.style.transition = '';
+        });
+      }
+      if (text) text.textContent = '展開';
+    }
+  } catch {}
+}
+
+function initSoloUI() {
+  document.getElementById('solo-enabled').checked = soloEnabled;
+  document.getElementById('solo-max-kills').value = soloMaxKills;
+  document.getElementById('solo-options').style.display = soloEnabled ? 'flex' : 'none';
+  updateSoloPctLabel();
+}
+
+let _searchTimer = null;
+function onSearchInput() {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => {
+    playerSearchTerm = (document.getElementById('player-search').value || '').trim().toLowerCase();
+    if (currentRenderData) renderRanking(currentRenderData);
+  }, 150);
+}
+
+// =====================
+// ランキング保存 (CSV)
+// =====================
+function openSaveModal() {
+  const players = currentRenderData && currentRenderData.players;
+  if (!players || !players.length) return;
+  // ソートを現在と同期
+  applyCurrSort();
+  // 列チェックボックスを生成
+  const grid = document.getElementById('save-col-checks');
+  grid.innerHTML = colOrder.map(k => {
+    const def = COL_DEFS[k];
+    if (!def) return '';
+    return `<label class="col-check-item">
+      <input type="checkbox" value="${k}" checked>
+      ${def.label}
+    </label>`;
+  }).join('');
+  document.getElementById('save-range-to').value = Math.min(players.length, 100);
+  // 推定ソロセクション（ソロ有効時のみ表示）
+  const soloSec = document.getElementById('save-solo-section');
+  if (soloSec) {
+    soloSec.style.display = soloEnabled ? '' : 'none';
+    const soloIconEl = document.getElementById('save-solo-icon');
+    if (soloIconEl) soloIconEl.checked = soloEnabled;
+  }
+  document.getElementById('save-modal').style.display = 'flex';
+}
+
+function closeSaveModal() {
+  document.getElementById('save-modal').style.display = 'none';
+}
+
+function applyCurrSort() {
+  document.getElementById('save-sort-key').value = sortKey;
+  document.getElementById('save-sort-dir').value = String(sortDir);
+}
+
+function execSavePNG() {
+  const players = currentRenderData && currentRenderData.players;
+  if (!players || !players.length) return;
+
+  const fromRank = Math.max(1, parseInt(document.getElementById('save-range-from').value) || 1);
+  const toRank   = Math.max(fromRank, parseInt(document.getElementById('save-range-to').value) || 100);
+  const sk       = document.getElementById('save-sort-key').value;
+  const sd       = parseInt(document.getElementById('save-sort-dir').value) || -1;
+  const selectedCols = [...document.querySelectorAll('#save-col-checks input:checked')].map(el => el.value);
+  if (!selectedCols.length) return;
+
+  const showSoloIcon = soloEnabled && document.getElementById('save-solo-icon')?.checked;
+
+  // ソート
+  const sorted = [...players].map(p => ({
+    ...p,
+    rankChange: p.prevRank != null ? p.prevRank - p.rank : null,
+  })).sort((a, b) => {
+    if (sk === 'username') return sd * String(a.username || '').localeCompare(String(b.username || ''), 'ja');
+    const av = a[sk] ?? 0;
+    const bv = b[sk] ?? 0;
+    return sd === -1 ? bv - av : av - bv;
+  });
+
+  const sliced = sorted.slice(fromRank - 1, toRank);
+
+  // 列定義
+  const addRank = !selectedCols.includes('honorRank');
+  const allCols = addRank ? ['_rank', ...selectedCols] : selectedCols;
+  const colLabels = allCols.map(k => k === '_rank' ? '順位' : (COL_DEFS[k]?.label || k));
+
+  const colWidths = allCols.map(k => {
+    if (k === '_rank' || k === 'honorRank') return 56;
+    if (k === 'rank') return 72;
+    if (k === 'rankChange') return 64;
+    if (k === 'username') return showSoloIcon ? 210 : 190;
+    if (k === 'killDiff') return 88;
+    if (k === 'honorDiff') return 130;
+    if (k === 'honor') return 140;
+    return 100;
+  });
+
+  // Canvas設計
+  const dpr      = Math.min(window.devicePixelRatio || 1, 2);
+  const padX     = 14;
+  const padY     = 12;
+  const titleH   = 36;
+  const headerH  = 30;
+  const rowH     = 26;
+  const footerH  = 22;
+  const font     = '13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
+  const fontBold = 'bold 13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
+  const fontSm   = '10px sans-serif';
+
+  const totalW = colWidths.reduce((a, b) => a + b, 0) + padX * 2;
+  const totalH = padY + titleH + headerH + rowH * sliced.length + footerH + padY;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = totalW * dpr;
+  canvas.height = totalH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // ---- 画像出力専用カラーパレット（視認性・コントラスト優先）----
+  const cs        = getComputedStyle(document.documentElement);
+  const elemColor = cs.getPropertyValue('--elem-color').trim() || '#3b82f6';
+
+  const bgMain      = '#111827';   // 全体背景（slate-900）
+  const bgDim       = '#1e2a3d';   // タイトルバー（やや青みがかった濃紺）
+  const bgContHigh  = '#1a2438';   // ヘッダー行
+  const outlineVar  = '#2e3f58';   // 区切り線（より明確に）
+  const textMain    = '#e8edf4';   // メインテキスト（明るい白系）
+  const textMuted   = '#8fa8c8';   // サブテキスト（青みがかったグレー）
+  const colorSuccess= '#4ade80';
+  const colorWarn   = '#fbbf24';
+  const colorErr    = '#f87171';
+  const colorGN     = textMain;
+  const colorUp     = '#60a5fa';
+  const colorDown   = colorErr;
+  // top3 行背景：くっきり視認できる彩度
+  const bg1         = '#3d2c00';   // 金：深みのある琥珀
+  const bg2         = '#1c2540';   // 銀：ミッドナイトブルー
+  const bg3         = '#3a1e00';   // 銅：深みのある橙褐色
+
+  // 全体背景
+  ctx.fillStyle = bgMain;
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  // タイトル背景（surface-dim）
+  ctx.fillStyle = bgDim;
+  ctx.fillRect(0, 0, totalW, padY + titleH);
+
+  // 左アクセントライン（属性カラー）
+  ctx.fillStyle = elemColor;
+  ctx.fillRect(0, padY, 4, titleH - 2);
+
+  // タイトルテキスト
+  const tabLabel  = document.getElementById('type-badge-label')?.textContent || 'ランキング';
+  const rangeStr  = document.getElementById('stat-range')?.textContent || '';
+  const ev        = typeof loadedEvents !== 'undefined' ? loadedEvents?.find(e => String(e.id) === String(currentEventId)) : null;
+  const eventName = ev?.name || '';
+
+  ctx.font = 'bold 14px sans-serif';
+  ctx.fillStyle = elemColor;
+  ctx.fillText(tabLabel, padX + 8, padY + titleH / 2 + 5);
+  const tabW = ctx.measureText(tabLabel).width;
+  ctx.font = '12px sans-serif';
+  ctx.fillStyle = textMuted;
+  const sub = [eventName, rangeStr, `${fromRank}〜${toRank}位`].filter(Boolean).join('  ');
+  ctx.fillText('  |  ' + sub, padX + 8 + tabW, padY + titleH / 2 + 5);
+
+  // テーブルヘッダー行
+  let baseY = padY + titleH;
+  ctx.fillStyle = bgContHigh;
+  ctx.fillRect(0, baseY, totalW, headerH);
+  ctx.font = fontBold;
+  ctx.fillStyle = textMuted;
+  let cx = padX;
+  allCols.forEach((k, ci) => {
+    ctx.fillText(colLabels[ci], cx + 4, baseY + headerH / 2 + 5);
+    cx += colWidths[ci];
+  });
+  ctx.strokeStyle = outlineVar;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, baseY + headerH); ctx.lineTo(totalW, baseY + headerH); ctx.stroke();
+
+  // ---- データ行 ----
+  baseY += headerH;
+  sliced.forEach((p, i) => {
+    const rowY  = baseY + i * rowH;
+    const textY = rowY + rowH / 2 + 5;
+    const hr    = p.honorRank ?? 999; // 増加量順位
+
+    // 行背景（サイトの rowBg と同じ）
+    ctx.fillStyle = hr === 1 ? bg1 : hr === 2 ? bg2 : hr === 3 ? bg3 : bgMain;
+    ctx.fillRect(0, rowY, totalW, rowH);
+    // rank4以降: 奇数行に白オーバーレイ（サイトの rgba(255,255,255,0.04) と同じ）
+    if (hr > 3 && (fromRank - 1 + i) % 2 === 1) {
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillRect(0, rowY, totalW, rowH);
+    }
+
+    ctx.font = font;
+    let rx = padX;
+
+    allCols.forEach((k, ci) => {
+      const tx = rx + 4;
+
+      if (k === '_rank') {
+        // 表示順位（連番）— .cell-rank は --md-on-surface-variant (textMuted)
+        ctx.fillStyle = textMuted;
+        ctx.fillText(String(fromRank + i), tx, textY);
+
+      } else if (k === 'honorRank') {
+        // 増加量順位：top3はメダル色
+        ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32' : textMain;
+        ctx.fillText(String(hr < 999 ? hr : fromRank + i), tx, textY);
+
+      } else if (k === 'rank') {
+        // .cell-rank は --md-on-surface-variant (textMuted)
+        ctx.fillStyle = textMuted;
+        ctx.fillText(String(p.rank ?? '-'), tx, textY);
+
+      } else if (k === 'rankChange') {
+        // ▲▼→NEW — サイトの formatChange と完全一致
+        if (p.prevRank == null) {
+          ctx.fillStyle = colorSuccess;
+          ctx.fillText('NEW', tx, textY);
+        } else {
+          const rc = p.rankChange ?? 0;
+          if (rc > 0) {
+            ctx.fillStyle = colorUp; // .up = --md-primary = elemColor
+            ctx.fillText(`▲${rc}`, tx, textY);
+          } else if (rc < 0) {
+            ctx.fillStyle = colorDown;
+            ctx.fillText(`▼${Math.abs(rc)}`, tx, textY);
+          } else {
+            ctx.fillStyle = textMuted;
+            ctx.fillText('→', tx, textY);
+          }
+        }
+
+      } else if (k === 'username') {
+        const isSolo = showSoloIcon && getSoloMatch(p) != null;
+        if (isSolo) {
+          ctx.fillStyle = colorErr;
+          const tag = '[S] ';
+          ctx.fillText(tag, tx, textY);
+          ctx.fillStyle = colorGN;
+          ctx.fillText(p.username ?? '', tx + ctx.measureText(tag).width, textY);
+        } else {
+          ctx.fillStyle = colorGN;
+          ctx.fillText(p.username ?? '', tx, textY);
+        }
+
+      } else if (k === 'killDiff') {
+        // .cell-kill は --md-on-surface-variant (textMuted)
+        const kv = p.killDiff ?? 0;
+        ctx.fillStyle = textMuted;
+        ctx.fillText(kv > 0 ? '+' + numFmt(kv) : kv === 0 ? '-' : numFmt(kv), tx, textY);
+
+      } else if (k === 'honorDiff') {
+        // diffColor と同じロジック（サイトの renderRanking と一致）
+        ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32'
+                      : (p.honorDiff ?? 0) > 0 ? textMain : textMuted;
+        const sign = (p.honorDiff ?? 0) > 0 ? '+' : '';
+        ctx.fillText(sign + numFmt(p.honorDiff ?? 0), tx, textY);
+
+      } else if (k === 'honor') {
+        ctx.fillStyle = textMain;
+        ctx.fillText(p.honor != null ? numFmt(p.honor) : '-', tx, textY);
+
+      } else {
+        ctx.fillStyle = textMain;
+        ctx.fillText(p[k] != null ? String(p[k]) : '', tx, textY);
+      }
+
+      rx += colWidths[ci];
+    });
+
+    // 行区切り
+    ctx.strokeStyle = outlineVar;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(0, rowY + rowH); ctx.lineTo(totalW, rowY + rowH); ctx.stroke();
+  });
+
+  // 縦区切り線
+  cx = padX;
+  for (let ci = 0; ci < allCols.length - 1; ci++) {
+    cx += colWidths[ci];
+    ctx.strokeStyle = outlineVar;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(cx, padY + titleH); ctx.lineTo(cx, totalH - footerH - padY); ctx.stroke();
+  }
+
+  // ---- フッター ----
+  const footerY = totalH - padY / 2 - 2;
+  // gbfranking.com（左下 — shareGraph と同じ位置）
+  ctx.font = fontSm;
+  ctx.fillStyle = textMuted;
+  ctx.fillText('gbfranking.com', padX, footerY);
+  // [S] 凡例（右側）— showSoloIcon 時のみ
+  if (showSoloIcon) {
+    const legend = ` = 推定ソロ（貢献度割合 ${soloPctMin}%〜${soloPctMax}%）`;
+    const legW   = ctx.measureText('[S]' + legend).width;
+    let lx = totalW - padX - legW;
+    ctx.fillStyle = colorErr;
+    ctx.fillText('[S]', lx, footerY);
+    lx += ctx.measureText('[S]').width;
+    ctx.fillStyle = textMuted;
+    ctx.fillText(legend, lx, footerY);
+  }
+
+  // ダウンロード
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `gbf_${tabLabel}_${rangeStr.replace(/[^\d]/g, '-')}_${fromRank}-${toRank}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
+
+  closeSaveModal();
+}
+
+function clearSearch() {
+  document.getElementById('player-search').value = '';
+  playerSearchTerm = '';
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function getBattleInfo(player_id, username) {
+  if (player_id != null)
+    return battlePlayers.find(b => b.player_id != null && String(b.player_id) === String(player_id)) || null;
+  return battlePlayers.find(b => b.player_id == null && b.username === username) || null;
+}
+
+function toggleBattlePlayer(player_id, username) {
+  const existing = getBattleInfo(player_id, username);
+  if (existing) {
+    battlePlayers = battlePlayers.filter(b => b !== existing);
+    if (battlePlayers.length === 0) battleFilterActive = false;
+  } else {
+    const usedColors = new Set(battlePlayers.map(b => b.color));
+    const color = BATTLE_COLORS.find(c => !usedColors.has(c)) || BATTLE_COLORS[battlePlayers.length % BATTLE_COLORS.length];
+    battlePlayers.push({ player_id: player_id ?? null, username, color });
+  }
+  renderBattleBar();
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function removeBattlePlayer(idx) {
+  battlePlayers.splice(idx, 1);
+  if (battlePlayers.length === 0) battleFilterActive = false;
+  renderBattleBar();
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function clearAllBattle() {
+  battlePlayers = [];
+  battleFilterActive = false;
+  renderBattleBar();
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function toggleBattleFilter() {
+  if (battlePlayers.length === 0) return;
+  battleFilterActive = !battleFilterActive;
+  document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function renderBattleBar() {
+  const bar = document.getElementById('battle-bar');
+  if (!bar) return;
+  if (battlePlayers.length === 0) {
+    bar.style.display = 'none';
+    return;
+  }
+  bar.style.display = '';
+  document.getElementById('battle-tags').innerHTML = battlePlayers.map((b, i) =>
+    `<span class="battle-tag" style="background:${b.color}">${escHtml(b.username)}<span class="bt-close" onclick="removeBattlePlayer(${i})" title="解除">✕</span></span>`
+  ).join('');
+  document.getElementById('battle-count').textContent = `${battlePlayers.length}人`;
+  document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
+}
+
+function buildEventDateList() {
+  const { start, end } = currentEventDates;
+  if (!start || !end) return [];
+  const dates = [];
+  let cur = new Date(start + 'T12:00:00');
+  const endDt = new Date(end + 'T12:00:00');
+  while (cur <= endDt) {
+    dates.push(cur.toLocaleDateString('sv-SE'));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
+}
+
+function updateEventDaySelect(selectedDate) {
+  const sel = document.getElementById('event-day-select');
+  if (!sel) return;
+  const startDate = currentEventStartDate();
+  const dates = buildEventDateList();
+  sel.innerHTML = '<option value="">-- 日付を選択 --</option>';
+  const isMobileDaySel = window.innerWidth < 640;
+  dates.forEach(d => {
+    const period = getGBFPeriodName(d + ' 12:00:00', startDate);
+    const shortD = d.substring(5).replace('-', '/');
+    const label = isMobileDaySel ? shortD : `[${period}] ${d}`;
+    sel.innerHTML += `<option value="${d}"${d === selectedDate ? ' selected' : ''}>${label}</option>`;
+  });
+}
+
+function onEventDayChange() {
+  const sel = document.getElementById('event-day-select');
+  const d = sel.value;
+  if (!d) return;
+  document.getElementById('date-select').value = d;
+  currentDate = d;
+  reload();
+}
+
+const COL_DEFS = {
+  honorRank:  { label: '順位',          width: 44,   align: 'right', sortKey: 'honorDiff' },
+  rank:       { label: '全体順位',      width: 50,   align: 'right', sortKey: 'rank' },
+  rankChange: { label: '変動',           width: 46,   align: 'right', sortKey: 'rankChange' },
+  username:   { label: 'GN',             width: null, align: 'left',  sortKey: 'username', flex: true },
+  killDiff:   { label: '討伐数',         width: 68,   align: 'right', sortKey: 'killDiff' },
+  honorDiff:  { label: '増加量',         width: 148,  align: 'right', sortKey: 'honorDiff' },
+  honor:      { label: '累計貢献度',     width: 130,  align: 'right', sortKey: 'honor' },
+};
+const DEFAULT_COL_ORDER = ['honorRank','rank','rankChange','username','killDiff','honorDiff','honor'];
+
+function loadPref(key, def) {
+  try { const v = JSON.parse(localStorage.getItem(key)); return v || def; }
+  catch { return def; }
+}
+function validateColOrder(order) {
+  const valid = Object.keys(COL_DEFS);
+  const filtered = (Array.isArray(order) ? order : []).filter(k => valid.includes(k));
+  const missing  = valid.filter(k => !filtered.includes(k));
+  return [...filtered, ...missing];
+}
+
+let colOrder  = validateColOrder(loadPref('gbf-col-order',  [...DEFAULT_COL_ORDER]));
+let colWidths = loadPref('gbf-col-widths', {});
+
+function saveColPrefs() {
+  localStorage.setItem('gbf-col-order',  JSON.stringify(colOrder));
+  localStorage.setItem('gbf-col-widths', JSON.stringify(colWidths));
+}
+
+function renderColgroup() {
+  const cg = document.getElementById('col-group');
+  cg.innerHTML = colOrder.map(key => {
+    const def = COL_DEFS[key];
+    const w = colWidths[key] != null ? colWidths[key] : (def.width ?? 150);
+    return `<col id="col-${key}" style="width:${w}px">`;
+  }).join('');
+}
+
+function renderThead() {
+  const tr = document.getElementById('col-headers');
+  tr.innerHTML = colOrder.map((key, i) => {
+    const def = COL_DEFS[key];
+    const isActive = def.sortKey === sortKey;
+    const siText = isActive ? (sortDir === -1 ? '▼' : '▲') : '⇅';
+    const siCls  = isActive ? (sortDir === -1 ? 'sort-ind desc' : 'sort-ind asc') : 'sort-ind';
+    const alignSt = def.align === 'right' ? 'text-align:right;' : '';
+    return `<th class="sortable col-th" style="${alignSt}" data-col="${key}" data-colidx="${i}" draggable="true">${def.label}<span id="si-${key}" class="${siCls}">${siText}</span><div class="col-resize-handle"></div></th>`;
+  }).join('');
+
+  tr.querySelectorAll('th.col-th').forEach(th => {
+    const key = th.dataset.col;
+    const def = COL_DEFS[key];
+    th.addEventListener('click',     (e) => { if (e.target.closest('.col-resize-handle') || dragOccurred) return; sortBy(def.sortKey); });
+    th.addEventListener('dragstart', onColDragStart);
+    th.addEventListener('dragover',  onColDragOver);
+    th.addEventListener('dragleave', onColDragLeave);
+    th.addEventListener('drop',      onColDrop);
+    th.addEventListener('dragend',   onColDragEnd);
+    const handle = th.querySelector('.col-resize-handle');
+    handle.addEventListener('mousedown', (e) => { e.stopPropagation(); startColResize(e, key); });
+    handle.addEventListener('click',     (e) => e.stopPropagation());
+  });
+}
+
+let resizingCol = null, resizeStartX = 0, resizeStartWidth = 0;
+
+function startColResize(e, key) {
+  e.preventDefault();
+  resizingCol = key;
+  resizeStartX = e.clientX;
+  const colEl = document.getElementById(`col-${key}`);
+  resizeStartWidth = colEl ? colEl.offsetWidth : (COL_DEFS[key].width || 100);
+  document.body.classList.add('col-resizing');
+  document.addEventListener('mousemove', onColResizeMove);
+  document.addEventListener('mouseup',   stopColResize);
+}
+function onColResizeMove(e) {
+  if (!resizingCol) return;
+  const newW = Math.max(30, resizeStartWidth + (e.clientX - resizeStartX));
+  colWidths[resizingCol] = Math.round(newW);
+  const colEl = document.getElementById(`col-${resizingCol}`);
+  if (colEl) colEl.style.width = newW + 'px';
+}
+function stopColResize() {
+  if (resizingCol) saveColPrefs();
+  resizingCol = null;
+  document.body.classList.remove('col-resizing');
+  document.removeEventListener('mousemove', onColResizeMove);
+  document.removeEventListener('mouseup',   stopColResize);
+}
+
+let dragSrcIdx   = null;
+let dragOccurred = false;
+
+function onColDragStart(e) {
+  dragSrcIdx = parseInt(e.currentTarget.dataset.colidx);
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+function onColDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('#col-headers th').forEach(th => th.classList.remove('drop-target'));
+  e.currentTarget.classList.add('drop-target');
+}
+function onColDragLeave(e) {
+  e.currentTarget.classList.remove('drop-target');
+}
+function onColDrop(e) {
+  e.preventDefault();
+  const targetIdx = parseInt(e.currentTarget.dataset.colidx);
+  document.querySelectorAll('#col-headers th').forEach(th => { th.classList.remove('drop-target'); th.classList.remove('dragging'); });
+  if (dragSrcIdx != null && dragSrcIdx !== targetIdx) {
+    const newOrder = [...colOrder];
+    const [moved] = newOrder.splice(dragSrcIdx, 1);
+    newOrder.splice(targetIdx, 0, moved);
+    colOrder = newOrder;
+    saveColPrefs();
+    renderColgroup();
+    renderThead();
+    if (currentRenderData) renderRanking(currentRenderData);
+  }
+  dragSrcIdx = null;
+}
+function onColDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('#col-headers th').forEach(th => th.classList.remove('drop-target'));
+  dragOccurred = true;
+  setTimeout(() => { dragOccurred = false; }, 200);
+  dragSrcIdx = null;
+}
+
+let sortKey  = 'honorDiff';
+let sortDir  = -1;
+let currentRenderData = null;
+
+function sortBy(key) {
+  if (sortKey === key) { sortDir = -sortDir; }
+  else { sortKey = key; sortDir = (key === 'username' || key === 'rank') ? 1 : -1; }
+  if (currentRenderData) renderRanking(currentRenderData);
+}
+
+function sortPlayers(players) {
+  const withChange = players.map(p => ({
+    ...p,
+    rankChange: (p.prevRank != null ? p.prevRank - p.rank : -99999),
+  }));
+  return withChange.sort((a, b) => {
+    if (sortKey === 'honorDiff') return sortDir === -1 ? b.honorDiff - a.honorDiff : a.honorDiff - b.honorDiff;
+    if (sortKey === 'username')  return sortDir * String(a.username || '').localeCompare(String(b.username || ''), 'ja');
+    const av = a[sortKey] ?? 0;
+    const bv = b[sortKey] ?? 0;
+    return sortDir === -1 ? bv - av : av - bv;
+  });
+}
+
+function updateSortIndicators() {
+  for (const [key, def] of Object.entries(COL_DEFS)) {
+    const el = document.getElementById(`si-${key}`);
+    if (!el) continue;
+    const isActive = def.sortKey === sortKey;
+    el.className   = isActive ? (sortDir === -1 ? 'sort-ind desc' : 'sort-ind asc') : 'sort-ind';
+    el.textContent = isActive ? (sortDir === -1 ? '▼' : '▲') : '⇅';
+  }
+}
+
+async function init() {
+  // 静的モード: 外部 data.json.gz の読み込みを待機
+  if (window.__STATIC_MODE__ && window.__STATIC_CACHE_PROMISE__) {
+    try { await window.__STATIC_CACHE_PROMISE__; } catch {}
+  }
+  await loadSoloDifficulties();
+  renderColgroup();
+  renderThead();
+  initSoloUI();
+  initControlsState();
+
+  // 静的モード: ヘッダーホームリンク（タイトル → gbfranking.com）+ サブページリンクを更新
+  if (window.__STATIC_MODE__) {
+    const hl = document.getElementById('header-home-link');
+    if (hl) hl.href = 'https://gbfranking.com';
+  }
+  if (window.__STATIC_INDEX_URL__) {
+    const base = window.__STATIC_INDEX_URL__;
+    const idMap = { 'modal-privacy-link': 'privacy.html', 'modal-contact-link': 'contact.html', 'modal-about-link': 'about.html' };
+    for (const [id, file] of Object.entries(idMap)) {
+      const el = document.getElementById(id);
+      if (el) el.href = base + file;
+    }
+  }
+
+  await loadEvents();
+
+  const demoEvent   = loadedEvents.find(e => e.is_demo);
+  const activeEvent = loadedEvents.find(e => e.active) || loadedEvents[0];
+  // 静的モード: URLパス(-ev{id})からこのページのイベントIDを特定して最優先選択
+  const pageEventId = getStaticPageEventId();
+  const urlEvent = pageEventId ? loadedEvents.find(e => e.id === pageEventId) : null;
+  const cachedEvent = !urlEvent && window.__STATIC_MODE__
+    ? loadedEvents.find(e => window.__STATIC_CACHE__ && (`/api/ranking/snapshots?event_id=${e.id}` in window.__STATIC_CACHE__))
+    : null;
+  // ページリロード時: localStorageで保存した前回選択を復元
+  const savedEventId = (() => { try { return localStorage.getItem('gbf_rankEventId'); } catch { return null; } })();
+  const savedEvent = !window.__STATIC_MODE__ && savedEventId
+    ? loadedEvents.find(e => String(e.id) === savedEventId) : null;
+  // アクティブイベントがまだ開始していない場合は直近の過去イベントをデフォルト選択
+  const todayStr = new Date().toLocaleDateString('sv-SE');
+  const isFutureActive = !savedEvent && !demoEvent && !urlEvent &&
+    activeEvent?.start_date && activeEvent.start_date > todayStr;
+  const pastFallback = isFutureActive
+    ? loadedEvents.find(e => !e.start_date || e.start_date <= todayStr)
+    : null;
+  // 静的モードではURL判定を最優先（demoEventより上位）
+  const defaultEvent = window.__STATIC_MODE__
+    ? (urlEvent || cachedEvent || activeEvent)
+    : (urlEvent || demoEvent || savedEvent || pastFallback || activeEvent);
+
+  if (defaultEvent) {
+    document.getElementById('event-select').value = defaultEvent.id;
+    currentEventId = defaultEvent.id;
+    applyEventDateRange(defaultEvent);
+    updateDemoState(defaultEvent);
+    applyElementTheme(defaultEvent.name || '');
+  }
+
+  const today       = new Date().toLocaleDateString('sv-SE');
+  const clamped     = clampDate(today);
+  document.getElementById('date-select').value = clamped;
+  currentDate = clamped;
+
+  updateTabUI();
+  await reload();
+  if (currentTab === '20min') await updateSnapList();
+  startAutoRefresh();
+  connectLiveSSE();
+if (window.__STATIC_MODE__) {
+    const _el = (id) => document.getElementById(id);
+    if (_el('snap-day-auto-label'))  _el('snap-day-auto-label').textContent  = '-- 全日 --';
+    if (_el('snap-time-auto-label')) _el('snap-time-auto-label').textContent = '-- 最新 --';
+    if (_el('snap-clear-btn'))       _el('snap-clear-btn').title             = '最新に戻す';
+    if (_el('border-header-link') && window.__STATIC_BORDER_URL__) {
+      _el('border-header-link').href = window.__STATIC_BORDER_URL__;
+    }
+    // 静的モード: 「団ランキング」リンク → 常に最新団イベントへ
+    const guildLink = _el('guild-header-link');
+    if (guildLink) {
+      if (window.__STATIC_GUILD_LATEST_URL__) {
+        guildLink.href = window.__STATIC_GUILD_LATEST_URL__;
+      } else {
+        guildLink.style.display = 'none';
+      }
+    }
+    if (_el('live-header-link') && window.__STATIC_LIVE_URL__) {
+      _el('live-header-link').href = window.__STATIC_LIVE_URL__;
+      _el('live-header-link').style.display = '';
+    }
+  }
+}
+
+async function loadEvents() {
+  loadedEvents = await apiFetch('/api/ranking/events') || [];
+
+  // 静的モード: インデックスの events.json から最新イベント一覧を動的取得
+  if (window.__STATIC_MODE__ && window.__STATIC_INDEX_URL__) {
+    try {
+      const fresh = await fetch(window.__STATIC_INDEX_URL__ + 'events.json', { cache: 'no-cache' })
+        .then(r => r.ok ? r.json() : null);
+      if (Array.isArray(fresh) && fresh.length > 0) {
+        loadedEvents = fresh;
+        // __STATIC_EVENT_URLS__ を最新データで上書き
+        window.__STATIC_EVENT_URLS__ = window.__STATIC_EVENT_URLS__ || {};
+        fresh.forEach(e => { if (e.url) window.__STATIC_EVENT_URLS__[e.id] = e.url; });
+      }
+    } catch {}
+    // meta.json からボーダー/団ランキング URL を動的上書き（古いエクスポートのリンク修正）
+    try {
+      const meta = await fetch(window.__STATIC_INDEX_URL__ + 'meta.json', { cache: 'no-cache' })
+        .then(r => r.ok ? r.json() : null);
+      if (meta) {
+        const bEl = document.getElementById('border-header-link');
+        const gEl = document.getElementById('guild-header-link');
+        if (bEl && meta.border_url)       bEl.href = meta.border_url;
+        if (gEl && meta.guild_latest_url) gEl.href = meta.guild_latest_url;
+      }
+    } catch {}
+  }
+
+  const sel = document.getElementById('event-select');
+  sel.innerHTML = '<option value="">イベント選択</option>';
+  loadedEvents.forEach(e => {
+    const mark = e.is_demo ? ' [DEMO]' : '';
+    sel.innerHTML += `<option value="${e.id}">${escHtml(e.name)}${mark}</option>`;
+  });
+}
+
+
+const ELEMENT_THEMES = {
+  '火': { color: '#ef4444', light: '#f87171' },
+  '水': { color: '#3b82f6', light: '#60a5fa' },
+  '土': { color: '#d97706', light: '#f59e0b' },
+  '風': { color: '#22c55e', light: '#4ade80' },
+  '光': { color: '#eab308', light: '#fbbf24' },
+  '闇': { color: '#7c3aed', light: '#a78bfa' },
+};
+function getEventElement(name) {
+  if (!name) return null;
+  for (const ch of Object.keys(ELEMENT_THEMES)) {
+    if (name.includes(ch)) return ch;
+  }
+  return null;
+}
+function applyElementTheme(eventName) {
+  const elem = getEventElement(eventName);
+  const theme = elem ? ELEMENT_THEMES[elem] : { color: '#3b82f6', light: '#60a5fa' };
+  document.documentElement.style.setProperty('--elem-color', theme.color);
+  document.documentElement.style.setProperty('--elem-color-light', theme.light);
+  const nameEl = document.getElementById('side-event-name');
+  if (nameEl) nameEl.textContent = eventName || '-';
+  const wrap = document.getElementById('side-elem-wrap');
+  if (wrap) {
+    if (elem) {
+      wrap.innerHTML = `<span class="side-elem-badge" style="background:${theme.color}20;color:${theme.light};border:1px solid ${theme.color}50">${elem}古戦場</span>`;
+    } else {
+      wrap.innerHTML = '';
+    }
+  }
+}
+
+// ===== 注目プレイヤー =====
+const watchedNames = (() => {
+  try { return new Set(JSON.parse(localStorage.getItem('gbf_watched') || '[]')); }
+  catch { return new Set(); }
+})();
+
+function saveWatched() {
+  try { localStorage.setItem('gbf_watched', JSON.stringify([...watchedNames])); } catch {}
+}
+
+function toggleWatch(e, username) {
+  e.stopPropagation();
+  if (watchedNames.has(username)) watchedNames.delete(username);
+  else watchedNames.add(username);
+  saveWatched();
+  // 全行の★更新
+  document.querySelectorAll('.watch-star').forEach(btn => {
+    const un = btn.dataset.un;
+    if (un) { btn.classList.toggle('on', watchedNames.has(un)); }
+  });
+  updateWatchPanel(currentRenderData);
+}
+
+function updateWatchPanel(data) {
+  const card  = document.getElementById('side-watch-card');
+  const listEl = document.getElementById('side-watch-list');
+  if (!card || !listEl) return;
+  if (watchedNames.size === 0) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  const players = (data && data.players) ? data.players : [];
+
+  // 選択タブの速度順位で昇順ソート（圏外は末尾）
+  const sortedNames = [...watchedNames].sort((a, b) => {
+    const pa = players.find(pl => pl.username === a);
+    const pb = players.find(pl => pl.username === b);
+    return (pa?.honorRank ?? Infinity) - (pb?.honorRank ?? Infinity);
+  });
+
+  const html = sortedNames.map(name => {
+    const p = players.find(pl => pl.username === name);
+    if (!p) return `<div class="side-watch-row" style="flex-direction:column;padding:4px 0"><div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0"><span style="flex:1;font-size:12px;color:var(--md-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span><span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.5">圏外</span><button onclick="removeWatchedPlayer(event,'${escHtml(name)}')" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button></div></div>`;
+
+    // 速度順位（ラベルなし）
+    const spd = p.honorRank != null ? `${p.honorRank}位` : '';
+    // 全体順位 + 変動矢印
+    let rankStr = '';
+    if (p.rank != null) {
+      let arrow = '';
+      if (p.prevRank && p.rank) {
+        const d = p.prevRank - p.rank;
+        if (d > 0)      arrow = `<span style="color:#60a5fa">▲</span>`;
+        else if (d < 0) arrow = `<span style="color:#f87171">▼</span>`;
+      }
+      rankStr = `全体${p.rank}位${arrow}`;
+    }
+    // 討伐数（ラベルなし）
+    const killStr = p.killDiff > 0 ? `${p.killDiff}体` : '';
+
+    const statsLine = [spd, rankStr, killStr].filter(Boolean).join('　');
+
+    return `<div class="side-watch-row" style="flex-direction:column;align-items:flex-start;gap:2px;padding:5px 0">
+      <div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0">
+        <span style="flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span>
+        ${p.honorDiff > 0 ? `<span style="color:#4ade80;font-size:11px;flex-shrink:0">+${numFmt(p.honorDiff)}</span>` : ''}
+        <button onclick="removeWatchedPlayer(event,'${escHtml(name)}')" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button>
+      </div>
+      <div style="font-size:10px;color:var(--md-on-surface-variant);line-height:1.5">${statsLine}</div>
+    </div>`;
+  }).join('');
+  listEl.innerHTML = html;
+}
+
+function removeWatchedPlayer(e, username) {
+  e.stopPropagation();
+  watchedNames.delete(username);
+  saveWatched();
+  // テーブル内の★も連動して更新
+  document.querySelectorAll('.watch-star').forEach(btn => {
+    const un = btn.dataset.un;
+    if (un) btn.classList.toggle('on', watchedNames.has(un));
+  });
+  const row = e.target.closest('.side-watch-row');
+  if (row) {
+    row.style.opacity = '0';
+    row.style.transform = 'translateX(20px)';
+    row.style.transition = 'opacity var(--md-duration-short) var(--md-ease), transform var(--md-duration-short) var(--md-ease)';
+    setTimeout(() => {
+      updateWatchPanel(currentRenderData);
+    }, 150);
+  }
+}
+
+function updateSidePanel(data) {
+  if (!data || !data.players || !data.players.length) return;
+  const top = data.players.reduce((a, b) => (b.honorDiff || 0) > (a.honorDiff || 0) ? b : a, data.players[0]);
+  const honorEl = document.getElementById('side-top-honor');
+  const nameEl  = document.getElementById('side-top-name');
+  const diffEl  = document.getElementById('side-top-diff');
+  if (honorEl) honorEl.textContent = top.honor != null ? numFmt(top.honor) : '-';
+  if (nameEl)  nameEl.textContent  = top.username || '-';
+  if (diffEl)  diffEl.textContent  = top.honorDiff > 0 ? `+${numFmt(top.honorDiff)} / 20分` : '';
+  updateWatchPanel(data);
+}
+
+function updateDemoState(event) {
+  currentEventIsDemo = !!(event?.is_demo);
+  document.getElementById('demo-badge').style.display = currentEventIsDemo ? '' : 'none';
+}
+
+function applyEventDateRange(event) {
+  currentEventDates = { start: event?.start_date || null, end: event?.end_date || null };
+  const inp = document.getElementById('date-select');
+  inp.min = currentEventDates.start || '';
+  inp.max = currentEventDates.end   || '';
+  if (currentDate) {
+    const c = clampDate(currentDate);
+    if (c !== currentDate) { currentDate = c; inp.value = c; }
+  }
+}
+
+function clampDate(d) {
+  if (!d) return d;
+  const { start, end } = currentEventDates;
+  if (start && d < start) return start;
+  if (end   && d > end)   return end;
+  return d;
+}
+
+let _viewerPollTimer = null;
+
+function updateViewerBadge(count) {
+  const el = document.getElementById('viewer-badge');
+  if (el) { el.textContent = `閲覧中 ${count}人`; el.style.display = ''; }
+}
+
+function fetchViewerCount() {
+  if (window.__STATIC_MODE__) return;
+  fetch('/api/viewers').then(r => r.ok ? r.json() : null).then(d => {
+    if (d && d.count != null) updateViewerBadge(d.count);
+  }).catch(() => {});
+}
+
+function startViewerPoll() {
+  if (_viewerPollTimer) return;
+  fetchViewerCount();
+  _viewerPollTimer = setInterval(fetchViewerCount, 30000);
+}
+
+function stopViewerPoll() {
+  if (_viewerPollTimer) { clearInterval(_viewerPollTimer); _viewerPollTimer = null; }
+}
+
+function connectLiveSSE() {
+  if (currentEventIsDemo || window.__STATIC_MODE__) return;
+  // 即時ポーリングで同接数を取得（SSEが遅延・失敗した場合のフォールバック）
+  fetchViewerCount();
+  if (liveSSE) liveSSE.close();
+  liveSSE = new EventSource('/api/ranking/updates');
+  liveSSE.onopen = () => { stopViewerPoll(); };
+  liveSSE.onmessage = (e) => {
+    try {
+      const info = JSON.parse(e.data);
+      if (info.type === 'viewers') {
+        updateViewerBadge(info.count);
+        return;
+      }
+      if (currentEventId && String(info.eventId) !== String(currentEventId)) return;
+      apiCacheInvalidate('/api/ranking/latest');
+      apiCacheInvalidate('/api/ranking/snapshots');
+      apiCacheInvalidate('/api/ranking/20min');
+      apiCacheInvalidate('/api/ranking/daily');
+      flashOnRender = true;
+      reload();
+      if (currentTab === '20min') updateSnapList();
+    } catch {}
+  };
+  liveSSE.onerror = () => {
+    // SSE失敗時はポーリングにフォールバック
+    startViewerPoll();
+    setTimeout(connectLiveSSE, 10000);
+  };
+}
+
+function shiftDate(days) {
+  const inp = document.getElementById('date-select');
+  const dt  = new Date(inp.value || new Date().toLocaleDateString('sv-SE'));
+  dt.setDate(dt.getDate() + days);
+  const c = clampDate(dt.toLocaleDateString('sv-SE'));
+  inp.value   = c;
+  currentDate = c;
+  const eDS = document.getElementById('event-day-select');
+  if (eDS) eDS.value = c;
+  reload();
+}
+
+function onDateChange() {
+  const raw = document.getElementById('date-select').value;
+  currentDate = clampDate(raw);
+  document.getElementById('date-select').value = currentDate;
+  const eDS = document.getElementById('event-day-select');
+  if (eDS) eDS.value = currentDate;
+  reload();
+  if (currentTab === '20min') updateSnapList();
+}
+
+function jumpToToday() {
+  // GBF日は7:00始まりなので、JST7:00未満は前日のGBF日
+  const now = new Date();
+  const jstNow = new Date(now.getTime() + 9 * 3600 * 1000);
+  if (jstNow.getUTCHours() < 7) jstNow.setUTCDate(jstNow.getUTCDate() - 1);
+  const today = jstNow.toISOString().substring(0, 10);
+  const c = clampDate(today);
+  const inp = document.getElementById('date-select');
+  inp.value   = c;
+  currentDate = c;
+  const eDS = document.getElementById('event-day-select');
+  if (eDS) eDS.value = c;
+  reload();
+  if (currentTab === '20min') updateSnapList();
+}
+
+function renderDaySelect(selectedDay) {
+  const sel = document.getElementById('snap-day-select');
+  if (!sel) return;
+  const startDate = currentEventStartDate();
+  sel.innerHTML = '<option value="">-- 全日（最新自動） --</option>';
+  const isMobile = window.innerWidth < 640;
+  snapDayList.forEach(day => {
+    const cnt    = (snapGroups[day] || []).length;
+    const period = getGBFPeriodName(day + ' 12:00:00', startDate);
+    const shortDay = day.substring(5).replace('-', '/'); // "06/24"
+    const label = isMobile ? `${shortDay}(${cnt})` : `[${period}] ${day} (${cnt}件)`;
+    sel.innerHTML += `<option value="${day}"${day === selectedDay ? ' selected' : ''}>${label}</option>`;
+  });
+}
+
+function renderTimeSelect(gbfDay, selectedSnapId) {
+  const sel = document.getElementById('snap-time-select');
+  if (!sel) return;
+  if (!gbfDay) {
+    sel.innerHTML = '<option value="">-- 最新（自動） --</option>';
+    sel.disabled  = true;
+    sel.style.opacity = '0.45';
+    return;
+  }
+  sel.disabled = false;
+  sel.style.opacity = '';
+  sel.innerHTML = '<option value="">-- この日の最新 --</option>';
+  (snapGroups[gbfDay] || []).forEach(s => {
+    const time = s.captured_at.substring(11, 19);
+    sel.innerHTML += `<option value="${s.id}"${String(s.id) === String(selectedSnapId) ? ' selected' : ''}>${time} (${s.player_count}件)</option>`;
+  });
+}
+
+function onSnapDayChange() {
+  const gbfDay = document.getElementById('snap-day-select').value;
+  renderTimeSelect(gbfDay, '');
+  if (window.__STATIC_MODE__ && gbfDay) {
+    ensureSnapDayLoaded(gbfDay).then(() => loadCurrentSnap());
+  } else {
+    loadCurrentSnap();
+  }
+}
+
+function onSnapTimeChange() {
+  loadCurrentSnap();
+}
+
+async function loadCurrentSnap() {
+  if (currentTab !== '20min') return;
+  const gbfDay = document.getElementById('snap-day-select')?.value || '';
+  const snapId = document.getElementById('snap-time-select')?.value || '';
+  showLoading();
+  if (gbfDay) await ensureSnapDayLoaded(gbfDay);
+  let data = null;
+  if (snapId) {
+    data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
+  } else if (gbfDay) {
+    const daySnaps = snapGroups[gbfDay] || [];
+    if (daySnaps.length > 0) {
+      data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
+    } else {
+      showNoData('この日のスナップがありません'); return;
+    }
+  } else {
+    data = await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
+  }
+  renderRanking(data);
+}
+
+function shiftSnapDay(dir) {
+  if (snapDayList.length === 0) return;
+  const curDay = document.getElementById('snap-day-select').value;
+  const curIdx = snapDayList.indexOf(curDay);
+  let nextIdx;
+  if (curIdx === -1) {
+    nextIdx = snapDayList.length - 1;
+  } else {
+    nextIdx = Math.max(0, Math.min(snapDayList.length - 1, curIdx + dir));
+  }
+  const nextDay = snapDayList[nextIdx];
+  document.getElementById('snap-day-select').value = nextDay;
+  renderTimeSelect(nextDay, '');
+  loadCurrentSnap();
+}
+
+function shiftSnap(dir) {
+  if (allSnaps.length === 0) return;
+  const gbfDay = document.getElementById('snap-day-select').value || '';
+  const snapId = document.getElementById('snap-time-select').value || '';
+
+  let curGlobalIdx = -1;
+  if (snapId) {
+    curGlobalIdx = allSnaps.findIndex(s => String(s.id) === String(snapId));
+  } else if (gbfDay) {
+    const daySnaps = snapGroups[gbfDay] || [];
+    if (daySnaps.length > 0) {
+      curGlobalIdx = allSnaps.findIndex(s => s.id === daySnaps[0].id);
+    }
+  }
+
+  if (dir === -1) {
+    if (curGlobalIdx === -1) {
+      syncSnapshotSelection(0);
+    } else if (curGlobalIdx < allSnaps.length - 1) {
+      syncSnapshotSelection(curGlobalIdx + 1);
+    }
+  } else {
+    if (curGlobalIdx <= 0) {
+      clearSnapSelect();
+    } else {
+      syncSnapshotSelection(curGlobalIdx - 1);
+    }
+  }
+}
+
+function syncSnapshotSelection(globalIdx) {
+  if (globalIdx < 0 || globalIdx >= allSnaps.length) return;
+  const snap   = allSnaps[globalIdx];
+  const gbfDay = getSnapGBFDay(snap.captured_at);
+  document.getElementById('snap-day-select').value = gbfDay;
+  renderTimeSelect(gbfDay, snap.id);
+  showLoading();
+  ensureSnapDayLoaded(gbfDay)
+    .then(() => apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`))
+    .then(data => renderRanking(data))
+    .catch(() => renderRanking(null));
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  updateTabUI();
+  reload();
+  if (tab === '20min') updateSnapList();
+}
+
+function updateTabUI() {
+  const is20min = currentTab === '20min';
+  document.getElementById('snap-selector').style.display = is20min ? '' : 'none';
+  document.getElementById('period-day-selector').style.display = is20min ? 'none' : '';
+  if (!is20min) updateEventDaySelect(currentDate);
+}
+
+function onEventChange() {
+  const sel = document.getElementById('event-select');
+  currentEventId = sel.value;
+  graphBorderCache = null; // ボーダーキャッシュクリア
+  // 選択イベントを記憶（ページリロード時に復元）
+  try { if (currentEventId) localStorage.setItem('gbf_rankEventId', String(currentEventId)); } catch {}
+
+  // 静的モード: 選択イベントがこのページと異なる場合は専用ページへ遷移
+  if (window.__STATIC_MODE__ && currentEventId && window.__STATIC_EVENT_URLS__) {
+    const pageEventId = getStaticPageEventId();
+    if (pageEventId && Number(currentEventId) !== pageEventId) {
+      const targetUrl = window.__STATIC_EVENT_URLS__[currentEventId];
+      if (targetUrl) { window.location.href = targetUrl; return; }
+    }
+  }
+
+  const event = loadedEvents.find(e => String(e.id) === String(currentEventId));
+  if (event) {
+    applyEventDateRange(event);
+    updateDemoState(event);
+    applyElementTheme(event.name || '');
+  }
+  if (liveSSE) { liveSSE.close(); liveSSE = null; }
+  if (!currentEventIsDemo) connectLiveSSE();
+  updateEventDaySelect(currentDate);
+  reload();
+  if (currentTab === '20min') updateSnapList();
+}
+
+async function updateSnapList() {
+  if (!currentEventId) return;
+  const daySelEl = document.getElementById('snap-day-select');
+  if (daySelEl) daySelEl.innerHTML = '<option value="">読み込み中...</option>';
+  allSnaps = await apiFetch(`/api/ranking/snapshots?event_id=${currentEventId}`) ?? [];
+
+  buildSnapGroups();
+
+  const curDay  = document.getElementById('snap-day-select')?.value || '';
+  const curTime = document.getElementById('snap-time-select')?.value || '';
+  const validDay  = snapDayList.includes(curDay) ? curDay : '';
+  const validTime = validDay && (snapGroups[validDay] || []).some(s => String(s.id) === String(curTime))
+    ? curTime : '';
+
+  renderDaySelect(validDay);
+  renderTimeSelect(validDay, validTime);
+}
+
+function clearSnapSelect() {
+  document.getElementById('snap-day-select').value = '';
+  renderTimeSelect('', '');
+  reload();
+}
+
+async function reload() {
+  currentDate = document.getElementById('date-select').value;
+  if (!currentEventId) { showNoData('イベントを選択してください'); return; }
+  showLoading();
+  let data = null;
+  try {
+    if (currentTab === '20min') {
+      const gbfDay = document.getElementById('snap-day-select')?.value || '';
+      const snapId = document.getElementById('snap-time-select')?.value || '';
+      if (gbfDay) await ensureSnapDayLoaded(gbfDay);
+      if (snapId) {
+        data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
+      } else if (gbfDay) {
+        const daySnaps = snapGroups[gbfDay] || [];
+        if (daySnaps.length > 0) {
+          data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
+        }
+      } else {
+        data = await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
+      }
+    } else {
+      const ep = { morning: 'morning', daily: 'daily', overnight: 'overnight' }[currentTab];
+      if (ep) {
+        // 集計タブは日別ファイル(snap-DATE.json.gz)へ分離済み → 静的モードでは当日分を遅延ロード
+        const aggDay = currentDate || snapDayList[snapDayList.length - 1] || '';
+        if (aggDay) await ensureSnapDayLoaded(aggDay);
+        const url = `/api/ranking/${ep}?event_id=${currentEventId}${currentDate ? `&date=${currentDate}` : ''}`;
+        data = await apiFetch(url);
+      }
+    }
+  } catch (err) {
+    console.error('[reload]', err);
+  }
+  try { renderRanking(data); } catch (e) {
+    console.error('[renderRanking]', e);
+    showNoData('表示エラー: ' + (e.message || e));
+  }
+}
+
+const TYPE_META = {
+  '20分速':       { label: '20分速', cls: 'type-20min',     desc: '直前 → 最新スナップ' },
+  '朝活':         { label: '朝活',   cls: 'type-morning',   desc: '7:00 → 8:00' },
+  '朝活(進行中)': { label: '朝活',   cls: 'type-morning',   desc: '7:00 → 最新' },
+  '日速':         { label: '日速',   cls: 'type-daily',     desc: '7:00 → 0:00' },
+  '日速(進行中)': { label: '日速',   cls: 'type-daily',     desc: '7:00 → 最新' },
+  '残業':         { label: '残業',   cls: 'type-overnight', desc: '0:00 → 7:00' },
+  '残業(進行中)': { label: '残業',   cls: 'type-overnight', desc: '0:00 → 最新' },
+};
+
+function renderRanking(data) {
+  const tbody   = document.getElementById('ranking-body');
+  const statBar = document.getElementById('stat-bar');
+  currentRenderData = data;
+
+  if (!data || !data.players || data.players.length === 0) {
+    const hint = currentTab !== '20min'
+      ? `<br><span style="font-size:11px;color:var(--md-on-surface-variant)">◀ ▶ で日付を変えると過去のデータが見られます</span>` : '';
+    tbody.innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">データがありません（スナップショットが2件以上必要です）${hint}</td></tr>`;
+    statBar.style.display = 'none';
+    updateSearchCount(0, 0);
+    return;
+  }
+
+  let filteredPlayers = data.players;
+  if (battleFilterActive && battlePlayers.length > 0) {
+    filteredPlayers = filteredPlayers.filter(p => getBattleInfo(p.player_id, p.username) !== null);
+  }
+  if (playerSearchTerm) {
+    const t = playerSearchTerm;
+    filteredPlayers = filteredPlayers.filter(p =>
+      String(p.username  || '').toLowerCase().includes(t) ||
+      String(p.player_id || '').includes(t)
+    );
+  }
+  updateSearchCount(filteredPlayers.length, data.players.length);
+
+  const byHonorDiff = [...data.players].sort((a, b) => (b.honorDiff || 0) - (a.honorDiff || 0));
+  const honorRankMap = new Map();
+  byHonorDiff.forEach((p, i) => {
+    honorRankMap.set(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`, i + 1);
+  });
+  // サイドカード（注目プレイヤー）で参照できるよう各プレイヤーに速度順位を付与
+  data.players.forEach(p => {
+    p.honorRank = honorRankMap.get(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`) ?? null;
+  });
+  const getHonorRank = (p) =>
+    honorRankMap.get(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`) || 999;
+
+  statBar.style.display = 'flex';
+  const bef = data.before ? data.before.substring(0, 16) : '?';
+  const aft = data.after  ? data.after.substring(0, 16)  : '?';
+  document.getElementById('stat-range').textContent = `${bef} → ${aft}`;
+  const active   = data.players.filter(p => p.honorDiff > 0);
+  const topHonor = Math.max(0, ...active.map(p => p.honorDiff));
+  // isLive 対応: タブサブテキストとバッジを動的切替（日速/朝活/残業 共通）
+  const metaKey = data.isLive ? `${data.type}(進行中)` : data.type;
+  const meta    = TYPE_META[metaKey] || { label: data.type || '', cls: 'type-20min' };
+  const badgeEl = document.getElementById('type-badge-label');
+  badgeEl.textContent = meta.label;
+  badgeEl.className   = `type-badge ${meta.cls}`;
+  // タブのサブテキストを更新（日速・朝活）
+  const dailySubEl = document.getElementById('tab-daily-sub');
+  if (dailySubEl && data.type === '日速') dailySubEl.textContent = data.isLive ? '7:00→最新' : '7:00→0:00';
+  const morningSubEl = document.getElementById('tab-morning-sub');
+  if (morningSubEl && data.type === '朝活') morningSubEl.textContent = data.isLive ? '7:00→最新' : '7:00→8:00';
+
+  // 更新中バッジ: afterPlayerCount が 2000未満なら表示
+  const updBadge = document.getElementById('updating-badge');
+  if (updBadge) {
+    const cnt = data.afterPlayerCount ?? data.players.length;
+    const afterMs = data.after ? new Date(data.after).getTime() : 0;
+    const isRecent = afterMs > 0 && (Date.now() - afterMs) < 30 * 60 * 1000;
+    if (isRecent && cnt > 0 && cnt < 1900) {
+      const phase = cnt < 200 ? '1/3' : cnt < 1100 ? '2/3' : '3/3';
+      updBadge.textContent = `更新中 ${cnt}→2000件 (Phase ${phase})`;
+      updBadge.style.display = '';
+    } else {
+      updBadge.style.display = 'none';
+    }
+  }
+
+  const sorted = sortPlayers(filteredPlayers).slice(0, 2000);
+  saveRankingPlayersForGraph(data.players); // グラフ検索用
+  updateSortIndicators();
+
+  // rowFactory: renderRanking スコープの変数をクローズオーバー
+  function buildRow(p, displayIdx) {
+    const honorRank = getHonorRank(p);
+    const pct       = topHonor > 0 ? (p.honorDiff / topHonor * 100).toFixed(1) : 0;
+    const barColor  = honorRank === 1 ? '#fbbf24' : honorRank <= 3 ? '#60a5fa' : honorRank <= 10 ? '#4ade80' : '#6366f1';
+    // 増加貢献度は本文色（バー非表示のライトでは黒太字、ダークでは白）
+    const diffColor = 'var(--md-on-surface)';
+    const diffSign  = p.honorDiff > 0 ? '+' : '';
+    const totalFmt  = p.honor != null ? numFmt(p.honor) : '-';
+    const bg        = rowBg(honorRank, displayIdx);
+
+    const profileUrl = p.player_id
+      ? `https://game.granbluefantasy.jp/#profile/${p.player_id}` : null;
+    const profileLink = profileUrl
+      ? ` <a class="gn-profile-link" href="${profileUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="GBFプロフィール">↗</a>`
+      : '';
+    const bInfo  = getBattleInfo(p.player_id, p.username);
+    const markEl = bInfo ? `<span class="battle-row-mark" style="background:${bInfo.color}"></span>` : '';
+    const gnCls  = bInfo ? ' gn-pinned' : '';
+    const gnCol  = bInfo ? ` style="color:${bInfo.color}"` : '';
+    const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
+    const starBtn = `<button class="watch-star${watchedNames.has(p.username)?' on':''}" data-un="${escHtml(p.username)}" onclick="toggleWatch(event,${escHtml(JSON.stringify(p.username))})" title="${watchedNames.has(p.username)?'注目解除':'注目に追加'}">★</button>`;
+    const _soloMatch = getSoloMatch(p);
+    const soloMark = _soloMatch ? `<span class="solo-mark" title="推定ソロ: ${_soloMatch}">S</span>` : '';
+    const gnCell = `${markEl}${soloMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattlePlayer(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))})">${escHtml(p.username)}</span>${profileLink}${starBtn}`;
+
+    const cells = {
+      honorRank:  `<td class="cell-r">${honorRank <= 3 ? `<span class="medal-${honorRank}">${honorRank}</span>` : honorRank}</td>`,
+      rank:       `<td class="cell-rank">${p.rank || '-'}</td>`,
+      rankChange: `<td class="cell-r">${formatChange(p.prevRank, p.rank)}</td>`,
+      username:   `<td class="col-gn">${gnCell}</td>`,
+      killDiff:   `<td class="cell-kill">${p.killDiff > 0 ? '+'+numFmt(p.killDiff) : p.killDiff === 0 ? '-' : numFmt(p.killDiff)}</td>`,
+      honorDiff:  `<td class="honor-cell cell-r"><div class="honor-bar-bg" style="width:${pct}%;background:${barColor}"></div><span class="honor-diff" style="color:${diffColor}">${diffSign}${numFmt(p.honorDiff)}</span></td>`,
+      honor:      `<td class="cell-r"><span class="cell-total">${totalFmt}</span></td>`,
+    };
+
+    const rowStyle = bInfo ? `background:${bg};border-left:5px solid ${bInfo.color}` : `background:${bg}`;
+    const topCls = !bInfo && honorRank <= 3 ? ` top-${honorRank}` : '';
+    const tierCls = !bInfo ? ` ${getTierClass(p.rank)}` : '';
+    return `<tr class="rank-row${topCls}${tierCls}" style="${rowStyle}">${colOrder.map(k => cells[k]).join('')}</tr>`;
+  }
+
+  // VirtualScroll: 初回作成 or rowFactory・colCount 更新
+  if (typeof VirtualScroll === 'undefined') {
+    tbody.innerHTML = sorted.slice(0, 200).map((p, i) => buildRow(p, i)).join('');
+    updateSidePanel(data);
+    return;
+  }
+  const wrap = document.getElementById('rank-table-wrap');
+  if (!_vsRanking) {
+    fitTableHeight();
+    _vsRanking = new VirtualScroll({
+      container: wrap,
+      tbody: tbody,
+      colCount: colOrder.length,
+      rowHeight: 34,
+      rowFactory: buildRow,
+    });
+  } else {
+    _vsRanking._rowFactory = buildRow;
+    _vsRanking.setColCount(colOrder.length);
+  }
+  _vsRanking.setData(sorted);
+  updateSidePanel(data);
+  if (flashOnRender) {
+    flashOnRender = false;
+    tbody.querySelectorAll('.rank-row').forEach(r => {
+      r.classList.remove('flashing');
+      void r.offsetWidth;
+      r.classList.add('flashing');
+    });
+  }
+}
+
+function formatChange(prevRank, rank) {
+  if (prevRank === null || prevRank === undefined) return '<span class="new">NEW</span>';
+  const d = prevRank - rank;
+  if (d > 0) return `<span class="up">▲${d}</span>`;
+  if (d < 0) return `<span class="down">▼${Math.abs(d)}</span>`;
+  return '<span class="flat">→</span>';
+}
+
+function rowBg(honorRank, displayIdx) {
+  if (honorRank === 1) return 'var(--row-top1-bg)';
+  if (honorRank === 2) return 'var(--row-top2-bg)';
+  if (honorRank === 3) return 'var(--row-top3-bg)';
+  if (displayIdx % 2 === 0) return 'transparent';
+  return 'var(--row-odd-bg)';
+}
+
+function getTierClass(rank) {
+  if (!rank || rank <= 0) return '';
+  if (rank <= 10)   return 'tier-top10';
+  if (rank <= 100)  return 'tier-top100';
+  if (rank <= 500)  return 'tier-top500';
+  if (rank <= 1000) return 'tier-top1000';
+  if (rank <= 2500) return 'tier-top2500';
+  return '';
+}
+
+function numFmt(n) {
+  if (n == null) return '-';
+  return Number(n).toLocaleString('ja-JP');
+}
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showLoading() {
+  document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="loading">読み込み中...</td></tr>`;
+  document.getElementById('stat-bar').style.display = 'none';
+}
+function showNoData(msg) {
+  document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">${escHtml(msg)}</td></tr>`;
+  document.getElementById('stat-bar').style.display = 'none';
+}
+
+function updateSearchCount(filtered, total) {
+  const el = document.getElementById('search-count');
+  if (!el) return;
+  const hasFilter = playerSearchTerm || battleFilterActive;
+  if (!hasFilter || total === 0) { el.textContent = ''; el.className = 'text-xs text-gray-600'; return; }
+  el.textContent = `${filtered} / ${total} 件`;
+  el.className   = `text-xs ${filtered > 0 ? 'search-hit' : 'search-miss'}`;
+}
+
+function startAutoRefresh() {
+  if (autoTimer) clearInterval(autoTimer);
+  if (currentEventIsDemo || window.__STATIC_MODE__) return;
+  autoTimer = setInterval(() => {
+    apiCacheInvalidate();
+    reload();
+  }, 5 * 60 * 1000);
+}
+
+async function openPlayerModal(playerId, username, eventId) {
+  const modal = document.getElementById('player-modal');
+  modal.style.display = 'flex';
+
+  document.getElementById('modal-player-name').textContent = username || '(不明)';
+  document.getElementById('modal-summary').textContent = '';
+  document.getElementById('modal-loading').style.display = '';
+  document.getElementById('modal-table-wrap').style.display = 'none';
+
+  const linkEl = document.getElementById('modal-profile-link');
+  if (playerId != null) {
+    linkEl.href = `https://game.granbluefantasy.jp/#profile/${playerId}`;
+    linkEl.style.display = '';
+  } else {
+    linkEl.style.display = 'none';
+  }
+
+  let history = [];
+  if (window.__STATIC_MODE__) {
+    // 静的モード: キャッシュ済み20分速データからプレイヤー履歴を再構築
+    const snaps = (await apiFetch(`/api/ranking/snapshots?event_id=${eventId}`) || [])
+      .slice().reverse(); // captured_at ASC
+    for (const snap of snaps) {
+      const data = await apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`);
+      if (!data || !data.players) continue;
+      const p = playerId != null
+        ? data.players.find(p => p.player_id === Number(playerId))
+        : data.players.find(p => p.username === username);
+      if (!p) continue;
+      history.push({
+        captured_at: snap.captured_at,
+        snapshot_id: snap.id,
+        rank:        p.rank,
+        rank_20min:  p.displayRank,
+        honor:       p.honor,
+        honor_diff:  p.honorDiff,
+        kill_count:  p.kill_count ?? null,
+        kill_diff:   p.killDiff,
+      });
+    }
+    // ※ 20分速データは既に前スナップとの差分を持つため追加計算不要
+    // ※ 最初のスナップショット（20分速データなし）は自動的にスキップ済み
+  } else {
+    const params = new URLSearchParams({ event_id: eventId });
+    if (playerId != null) params.set('player_id', String(playerId));
+    else                   params.set('username',  username || '');
+    history = await fetch(`/api/ranking/player?${params}`)
+      .then(r => r.ok ? r.json() : []).catch(() => []);
+  }
+
+  document.getElementById('modal-loading').style.display = 'none';
+
+  if (!history.length) {
+    document.getElementById('modal-tbody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;color:var(--md-on-surface-variant);padding:24px">データがありません</td></tr>';
+    document.getElementById('modal-table-wrap').style.display = '';
+    return;
+  }
+
+  const totalHonor = history[history.length - 1]?.honor ?? 0;
+  const totalDiff  = history.reduce((s, h) => s + (h.honor_diff || 0), 0);
+  document.getElementById('modal-summary').textContent =
+    `累計貢献度: ${numFmt(totalHonor)}  /  期間合計増加: +${numFmt(totalDiff)}  /  ${history.length}スナップ`;
+
+  const rows = [...history].reverse().map(h => {
+    const diff     = h.honor_diff;
+    const killDiff = h.kill_diff;
+    const diffStr   = diff     != null ? (diff     > 0 ? `+${numFmt(diff)}`     : numFmt(diff))     : '-';
+    const killStr   = killDiff != null ? (killDiff > 0 ? `+${numFmt(killDiff)}` : numFmt(killDiff)) : '-';
+    const diffColor = diff     > 0 ? '#4ade80' : diff     < 0 ? '#f87171' : '#4b5563';
+    const killColor = killDiff > 0 ? '#60a5fa' : '#4b5563';
+    const diffWt    = diff > 0 ? 700 : 400;
+    const rank20    = h.rank_20min ?? '-';
+    const rank20Clr = h.rank_20min != null && h.rank_20min <= 10 ? '#facc15' : '#94a3b8';
+    const rank20Wt  = h.rank_20min != null && h.rank_20min <= 3  ? 700 : 400;
+    const timeStr   = escHtml((h.captured_at || '').substring(0, 16)); // 秒数削除
+    return `<tr>
+      <td>${timeStr}</td>
+      <td style="color:${rank20Clr};font-weight:${rank20Wt}">${rank20}</td>
+      <td>${h.rank || '-'}</td>
+      <td style="color:${killColor}">${killStr}</td>
+      <td style="color:var(--md-on-surface-variant)">${numFmt(h.kill_count)}</td>
+      <td style="color:${diffColor};font-weight:${diffWt}">${diffStr}</td>
+      <td style="color:var(--md-on-surface-variant)">${numFmt(h.honor)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('modal-tbody').innerHTML = rows.join('');
+  document.getElementById('modal-table-wrap').style.display = '';
+}
+
+function closePlayerModal() {
+  document.getElementById('player-modal').style.display = 'none';
+}
+
+function toggleSiteMenu() {
+  const m = document.getElementById('site-menu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('site-menu-btn')?.contains(e.target)) {
+    const m = document.getElementById('site-menu');
+    if (m) m.style.display = 'none';
+  }
+});
+function openHelpModal() {
+  document.getElementById('help-modal').style.display = 'flex';
+}
+function closeHelpModal() {
+  document.getElementById('help-modal').style.display = 'none';
+}
+function switchHelpTab(tab) {
+  document.querySelectorAll('.help-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(`htab-${tab}`).classList.add('active');
+  document.querySelectorAll('.help-panel').forEach(p => p.style.display = 'none');
+  document.getElementById(`hpanel-${tab}`).style.display = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('graph-modal').style.display !== 'none') {
+    if (e.key === 'Escape') closeGraphModal();
+    return;
+  }
+  if (document.getElementById('help-modal').style.display !== 'none') {
+    if (e.key === 'Escape') closeHelpModal();
+    return;
+  }
+  if (document.getElementById('player-modal').style.display !== 'none') {
+    if (e.key === 'Escape') closePlayerModal();
+    return;
+  }
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    const dir = e.key === 'ArrowLeft' ? -1 : 1;
+    if (currentTab === '20min') {
+      shiftSnap(dir);
+    } else {
+      shiftDate(dir);
+    }
+  }
+});
+
+// =====================================================================
+// ===== グラフモード ====================================================
+// =====================================================================
+const GRAPH_COLORS = ['#60a5fa','#f87171','#4ade80','#fbbf24','#a78bfa','#fb923c','#34d399','#f472b6','#38bdf8','#e879f9'];
+let graphPlayers  = []; // [{id, name, color}]
+let graphChartType = 'speed'; // 'speed' | 'honor'
+let honorOrigin    = 'abs';   // 'abs' | 'rel'
+let chartInstance  = null;
+let graphLoading   = false;
+let graphDayCount  = 1; // 現在グラフに表示中の日数（点サイズ計算用）
+let graphBorderCache = null; // ボーダーデータキャッシュ { eventId, data }
+
+function openGraphModal() {
+  document.getElementById('graph-modal').style.display = 'flex';
+  updateGraphDaySelects();
+  // グラフが空ならバトルプレイヤーを自動追加
+  if (graphPlayers.length === 0 && battlePlayers.length > 0) {
+    addBattlePlayersToGraph();
+  } else {
+    updateGraphPlayerTags();
+    renderGraph();
+  }
+}
+function closeGraphModal() {
+  document.getElementById('graph-modal').style.display = 'none';
+}
+
+function setGraphChartType(type) {
+  graphChartType = type;
+  document.querySelectorAll('.gchart-type-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`gchart-${type}-btn`).classList.add('active');
+  // 累計貢献度のときのみ表示
+  const originCtrl = document.getElementById('honor-origin-ctrl');
+  if (originCtrl) originCtrl.style.display = type === 'honor' ? 'flex' : 'none';
+  // 予測線は累計貢献度のみ
+  const predWrap = document.getElementById('graph-predict-wrap');
+  if (predWrap) predWrap.style.display = type === 'honor' ? '' : 'none';
+  renderGraph();
+}
+
+function setHonorOrigin(mode) {
+  honorOrigin = mode;
+  document.getElementById('honor-abs-btn').classList.toggle('active', mode === 'abs');
+  document.getElementById('honor-rel-btn').classList.toggle('active', mode === 'rel');
+  renderGraph();
+}
+
+// ---- プレイヤー管理 ----
+function toggleGraphPlayer(playerId, username) {
+  const key = String(playerId ?? username);
+  const idx = graphPlayers.findIndex(p => String(p.id ?? p.name) === key);
+  if (idx >= 0) {
+    graphPlayers.splice(idx, 1);
+  } else {
+    const color = GRAPH_COLORS[graphPlayers.length % GRAPH_COLORS.length];
+    graphPlayers.push({ id: playerId, name: username, color });
+  }
+  updateGraphPlayerTags();
+  if (document.getElementById('graph-modal').style.display !== 'none') renderGraph();
+}
+
+function addBattlePlayersToGraph() {
+  for (const bp of (battlePlayers || [])) {
+    const key = String(bp.player_id ?? bp.username);
+    if (!graphPlayers.find(p => String(p.id ?? p.name) === key)) {
+      const color = GRAPH_COLORS[graphPlayers.length % GRAPH_COLORS.length];
+      graphPlayers.push({ id: bp.player_id ?? null, name: bp.username, color });
+    }
+  }
+  updateGraphPlayerTags();
+  renderGraph();
+}
+
+function addWatchedPlayersToGraph() {
+  const pool = currentRenderData?.players || window._lastRankingPlayers || [];
+  for (const username of watchedNames) {
+    const key = String(username);
+    if (graphPlayers.find(p => String(p.id ?? p.name) === key || p.name === username)) continue;
+    const found = pool.find(p => p.username === username);
+    const color = GRAPH_COLORS[graphPlayers.length % GRAPH_COLORS.length];
+    graphPlayers.push({ id: found?.player_id ?? null, name: username, color });
+  }
+  updateGraphPlayerTags();
+  renderGraph();
+}
+
+function clearGraphPlayers() {
+  graphPlayers = [];
+  if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+  updateGraphPlayerTags();
+  document.getElementById('graph-empty').style.display = '';
+  document.getElementById('graph-predict-info').textContent = '';
+}
+
+function highlightGraphLine(name) {
+  if (!chartInstance) return;
+  const hiPt = graphDayCount <= 2 ? 5 : 3;
+  chartInstance.data.datasets.forEach(ds => {
+    const isTarget = ds._playerName === name;
+    if (ds._isBorder) return; // ボーダー線はフォーカス時も常に通常表示
+    if (ds._isPred) {
+      // 予測線: 対象プレイヤーは通常表示、それ以外は暗転
+      ds.borderWidth = 1.5;
+      ds.borderColor = isTarget ? ds._origColor : (ds._origColor || ds.borderColor) + '44';
+      return;
+    }
+    ds.borderWidth     = isTarget ? 3.5 : 0.7;
+    ds.borderColor     = isTarget ? ds._origColor : (ds._origColor || ds.borderColor) + '44';
+    ds.pointRadius     = isTarget ? hiPt : 0;
+    ds.pointBorderColor     = isTarget ? ds._origColor : 'transparent';
+    ds.pointBackgroundColor = isTarget ? ds._origColor : 'transparent';
+  });
+  chartInstance.update('none');
+  document.querySelectorAll('.graph-player-tag').forEach(el => {
+    el.classList.toggle('dimmed', el.onmouseenter && !el.getAttribute('onmouseenter').includes(`'${name.replace(/'/g,"\\'")}' `));
+  });
+}
+
+function unhighlightGraphLine() {
+  if (!chartInstance) return;
+  const n = chartInstance.data.labels?.length || 0;
+  const basePt = (graphChartType === 'speed' && graphDayCount === 1) ? 2 : 0;
+  chartInstance.data.datasets.forEach(ds => {
+    const isPred = ds.label?.endsWith('(予測)');
+    ds.borderWidth = isPred ? 1.5 : 2;
+    ds.borderColor = ds._origColor || ds.borderColor;
+    ds.pointRadius = isPred ? 0 : basePt;
+    ds.pointBorderColor     = ds._origColor || ds.borderColor;
+    ds.pointBackgroundColor = ds._origColor || ds.borderColor;
+  });
+  chartInstance.update('none');
+  document.querySelectorAll('.graph-player-tag').forEach(el => el.classList.remove('dimmed'));
+}
+
+function updateGraphPlayerTags() {
+  const el = document.getElementById('graph-player-tags');
+  if (!el) return;
+  if (!graphPlayers.length) {
+    el.innerHTML = '<span style="font-size:11px;color:var(--md-on-surface-variant)">バトルバーまたは下の検索からプレイヤーを追加</span>';
+    return;
+  }
+  el.innerHTML = graphPlayers.map(p =>
+    `<span class="graph-player-tag" style="color:${p.color};border-color:${p.color};background:${p.color}18"
+      onmouseenter="highlightGraphLine('${escHtml(p.name)}')"
+      onmouseleave="unhighlightGraphLine()"
+      ontouchstart="highlightGraphLine('${escHtml(p.name)}')"
+      ontouchend="unhighlightGraphLine()"
+    ><span style="pointer-events:none">${escHtml(p.name)}</span
+    ><span onclick="event.stopPropagation();toggleGraphPlayer(${p.id != null ? p.id : 'null'},'${escHtml(p.name)}')"
+      style="margin-left:5px;opacity:0.7;font-size:11px;cursor:pointer;padding:0 2px">✕</span></span>`
+  ).join('');
+}
+
+// ---- 期間セレクト ----
+function updateGraphDaySelects() {
+  const days = Object.keys(snapGroups || {}).sort();
+  const fromSel = document.getElementById('graph-from-select');
+  const toSel   = document.getElementById('graph-to-select');
+  if (!fromSel) return;
+  const pFrom = fromSel.value, pTo = toSel.value;
+  const opts = days.map(d => `<option value="${d}">${d}</option>`).join('');
+  fromSel.innerHTML = opts; toSel.innerHTML = opts;
+  if (days.includes(pFrom)) fromSel.value = pFrom; else if (days.length) fromSel.value = days[0];
+  if (days.includes(pTo))   toSel.value   = pTo;   else if (days.length) toSel.value   = days[days.length - 1];
+}
+
+// ---- プレイヤー名検索サジェスト ----
+function onGraphPlayerSearch() {
+  const q = (document.getElementById('graph-player-search').value || '').trim().toLowerCase();
+  const sug = document.getElementById('graph-player-suggest');
+  if (!q) { sug.style.display = 'none'; return; }
+  // 現在のランキングデータからプレイヤー名を検索
+  const all = window._lastRankingPlayers || [];
+  const hits = all.filter(p => (p.username || '').toLowerCase().includes(q)).slice(0, 10);
+  if (!hits.length) { sug.style.display = 'none'; return; }
+  sug.innerHTML = hits.map(p =>
+    `<div class="graph-suggest-item" onmousedown="addGraphPlayerFromSuggest(${p.player_id ?? 'null'},'${escHtml(p.username)}')">${escHtml(p.username)}</div>`
+  ).join('');
+  sug.style.display = '';
+}
+function addGraphPlayerFromSuggest(id, name) {
+  document.getElementById('graph-player-search').value = '';
+  hideGraphSuggest();
+  const key = String(id ?? name);
+  if (!graphPlayers.find(p => String(p.id ?? p.name) === key)) {
+    const color = GRAPH_COLORS[graphPlayers.length % GRAPH_COLORS.length];
+    graphPlayers.push({ id, name, color });
+    updateGraphPlayerTags();
+    renderGraph();
+  }
+}
+function hideGraphSuggest() {
+  const el = document.getElementById('graph-player-suggest');
+  if (el) el.style.display = 'none';
+}
+
+// GBF日アンカー（dayKey の 07:00）から captured_at までの経過分（0〜1439）
+function minutesFromAnchor(capturedAt, dayKey) {
+  const [yy, mm, dd] = dayKey.split('-').map(Number);
+  const anchor = new Date(yy, mm - 1, dd, 7, 0, 0).getTime();
+  const cy = Number(capturedAt.substring(0, 4));
+  const cm = Number(capturedAt.substring(5, 7));
+  const cd = Number(capturedAt.substring(8, 10));
+  const ch = Number(capturedAt.substring(11, 13));
+  const cmin = Number(capturedAt.substring(14, 16));
+  const cap = new Date(cy, cm - 1, cd, ch, cmin, 0).getTime();
+  return Math.round((cap - anchor) / 60000);
+}
+
+// フェーズ別の単日表示時間窓（アンカー07:00からのオフセット分 [start, end]）
+// null = クリップなし（全件）
+function graphPhaseWindow(dayKey) {
+  const period = getGBFPeriodName(dayKey + ' 12:00:00', currentEventStartDate());
+  if (period === '予選1日目')   return [720, 1439]; // 19:00〜翌6:59
+  if (period === '予選2日目')   return [0, 1039];   // 7:00〜24:19
+  if (period.startsWith('本戦')) return [0, 1039];   // 7:00〜24:19
+  if (period === 'インターバル') return [0, 1439];   // 全体
+  return null; // 開始前/その他はクリップなし
+}
+
+// ---- データ取得 ----
+async function loadGraphData() {
+  const fromDay = document.getElementById('graph-from-select')?.value;
+  const toDay   = document.getElementById('graph-to-select')?.value;
+  if (!fromDay || !toDay || !currentEventId) return null;
+
+  const days = Object.keys(snapGroups || {}).sort().filter(d => d >= fromDay && d <= toDay);
+  const dayCount = days.length;
+
+  if (window.__STATIC_MODE__) {
+    await Promise.all(days.map(d => ensureSnapDayLoaded(d)));
+  }
+
+  let snaps = [];
+  for (const day of days) snaps.push(...(snapGroups[day] || []));
+  snaps.sort((a, b) => a.captured_at.localeCompare(b.captured_at));
+
+  // 単日選択時はフェーズ別の表示時間窓でクリップ
+  // （複数日選択時はクリップせず残業帯も連続表示）
+  if (dayCount === 1) {
+    const dayKey = days[0];
+    const win = graphPhaseWindow(dayKey);
+    if (win) {
+      snaps = snaps.filter(s => {
+        const m = minutesFromAnchor(s.captured_at, dayKey);
+        return m >= win[0] && m <= win[1];
+      });
+    }
+  }
+
+  const labels = [];
+  const playerSeries = {}; // id -> { speed:[], honor:[], rank:[], timestamps:[] }
+  for (const gp of graphPlayers) {
+    playerSeries[String(gp.id ?? gp.name)] = { speed: [], honor: [], rank: [], timestamps: [] };
+  }
+
+  // 全スナップを並列取得（逐次awaitを廃止）
+  const snapDataList = await Promise.all(
+    snaps.map(snap => apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`))
+  );
+
+  for (let si = 0; si < snaps.length; si++) {
+    const snap = snaps[si];
+    const data = snapDataList[si];
+    if (!data || !data.players) continue;
+    const label = snap.captured_at.substring(5, 16); // MM-DD HH:mm
+    labels.push(label);
+    for (const gp of graphPlayers) {
+      const key = String(gp.id ?? gp.name);
+      const p = gp.id != null
+        ? data.players.find(px => px.player_id === Number(gp.id))
+        : data.players.find(px => px.username === gp.name);
+      playerSeries[key].speed.push(p ? (p.honorDiff ?? null) : null);
+      playerSeries[key].honor.push(p ? (p.honor     ?? null) : null);
+      playerSeries[key].rank.push( p ? (p.rank      ?? null) : null);
+      playerSeries[key].timestamps.push(label);
+    }
+  }
+
+  // 日付境界を検出（24:00 = midnight crossing / 7:00 = GBF日切り替え）
+  const boundaries = [];
+  for (let i = 1; i < labels.length; i++) {
+    const prevTime = labels[i - 1].split(' ')[1]; // HH:mm
+    const currTime = labels[i].split(' ')[1];
+    const prevDate = labels[i - 1].split(' ')[0]; // MM-DD
+    const currDate = labels[i].split(' ')[0];
+    const prevHH = parseInt(prevTime.split(':')[0]);
+    const currHH = parseInt(currTime.split(':')[0]);
+    if (prevDate !== currDate) {
+      // カレンダー日付変わり = 深夜0:00ライン（橙）
+      boundaries.push({ idx: i, type: 'midnight', label: currDate });
+    } else if (prevHH < 7 && currHH >= 7) {
+      // 7:00ラインへの移行 = GBF日付変わり（青）
+      boundaries.push({ idx: i, type: 'morning', label: currDate });
+    }
+  }
+
+  return { labels, playerSeries, dayCount, boundaries };
+}
+
+// ---- 線形予測 ----
+function computeLinearPrediction(values, steps) {
+  const pts = values.filter(v => v != null);
+  if (pts.length < 2) return null;
+  const recent = pts.slice(-8);
+  const n = recent.length;
+  const xs = recent.map((_, i) => i);
+  const ys = recent;
+  const sx = xs.reduce((a,b)=>a+b,0), sy = ys.reduce((a,b)=>a+b,0);
+  const sxy = xs.reduce((a,x,i)=>a+x*ys[i],0), sxx = xs.reduce((a,x)=>a+x*x,0);
+  const denom = n*sxx - sx*sx;
+  if (!denom) return null;
+  const slope = (n*sxy - sx*sy) / denom;
+  const intercept = (sy - slope*sx) / n;
+  const preds = [];
+  for (let i = 1; i <= steps; i++) preds.push(Math.round(intercept + slope*(n-1+i)));
+  return { slope, intercept, preds };
+}
+
+// ---- グラフ描画 ----
+async function renderGraph() {
+  if (document.getElementById('graph-modal').style.display === 'none') return;
+  await ensureChartJs();
+  const emptyEl = document.getElementById('graph-empty');
+  const loadEl  = document.getElementById('graph-loading');
+  const predEl  = document.getElementById('graph-predict-info');
+
+  if (!graphPlayers.length) {
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    emptyEl.style.display = '';
+    predEl.textContent = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  loadEl.style.display  = '';
+
+  const result = await loadGraphData();
+  loadEl.style.display = 'none';
+  if (!result) return;
+
+  const { labels, playerSeries, dayCount, boundaries } = result;
+  const yKey = graphChartType; // 'speed' | 'honor' | 'rank'
+  const showPredict = document.getElementById('graph-predict-chk')?.checked && yKey === 'honor';
+  const isRank = yKey === 'rank';
+  // 期間増加モード: 各プレイヤーの最初の非nullを0基準にオフセット
+  const useRelative = yKey === 'honor' && honorOrigin === 'rel';
+  if (useRelative) {
+    for (const key of Object.keys(playerSeries)) {
+      const vals = playerSeries[key].honor;
+      const firstVal = vals.find(v => v != null) ?? null;
+      if (firstVal != null) {
+        playerSeries[key].honor = vals.map(v => v != null ? v - firstVal : null);
+      }
+    }
+  }
+  // 予測ステップ数: 最終データ時刻から当日24:00までの20分刻み数
+  const PRED_STEPS = (() => {
+    if (!showPredict || !labels.length) return 0;
+    const lastLabel = labels[labels.length - 1]; // "MM-DD HH:mm"
+    const timePart = lastLabel.split(' ')[1];
+    if (!timePart) return 0;
+    const [hh, mm] = timePart.split(':').map(Number);
+    const minutesUntilMidnight = 24 * 60 - (hh * 60 + mm);
+    return Math.max(0, Math.floor(minutesUntilMidnight / 20));
+  })();
+
+  // 予測ラベル生成（実際の時刻形式 MM-DD HH:mm）
+  const predLabels = (() => {
+    if (!showPredict || PRED_STEPS === 0 || !labels.length) return [];
+    const lastLabel = labels[labels.length - 1];
+    const [datePart, timePart] = lastLabel.split(' ');
+    const [hh, mm] = timePart.split(':').map(Number);
+    const baseMins = hh * 60 + mm;
+    return Array.from({ length: PRED_STEPS }, (_, i) => {
+      const totalMins = baseMins + (i + 1) * 20;
+      const newHH = Math.floor(totalMins / 60) % 24;
+      const newMM = totalMins % 60;
+      return `${datePart} ${String(newHH).padStart(2,'0')}:${String(newMM).padStart(2,'0')}`;
+    });
+  })();
+  const allLabels  = [...labels, ...predLabels];
+
+  const datasets = [];
+  const predictSummary = [];
+
+  // 点サイズ: 20分速かつ1日かつPCのみ2pt、それ以外0pt（線のみ）
+  graphDayCount = dayCount;
+  const isMobileGraph = window.innerWidth < 640;
+  const ptRadius = (yKey === 'speed' && dayCount === 1 && !isMobileGraph) ? 2 : 0;
+  const ptHoverR  = dayCount <= 2 ? 5 : 3;
+
+  for (const gp of graphPlayers) {
+    const key = String(gp.id ?? gp.name);
+    const vals = (playerSeries[key] || {})[yKey] || labels.map(() => null);
+
+    // 実データセット
+    datasets.push({
+      label: gp.name,
+      _playerName: gp.name,
+      _origColor: gp.color,
+      data: showPredict ? [...vals, ...Array(PRED_STEPS).fill(null)] : vals,
+      borderColor: gp.color,
+      backgroundColor: gp.color + '15',
+      pointRadius: ptRadius,
+      pointHoverRadius: ptHoverR,
+      tension: 0,
+      spanGaps: yKey === 'honor',
+      borderWidth: 2,
+    });
+
+    // 予測データセット（累計貢献度のみ）
+    if (showPredict) {
+      const pred = computeLinearPrediction(vals, PRED_STEPS);
+      if (pred) {
+        // 最後の実データ地点からつなぐ
+        const lastRealIdx = vals.reduce((last, v, i) => v != null ? i : last, -1);
+        const predData = Array(labels.length).fill(null);
+        if (lastRealIdx >= 0) predData[lastRealIdx] = vals[lastRealIdx];
+        const predVals = [...predData, ...pred.preds];
+
+        datasets.push({
+          label: gp.name + ' (予測)',
+          _playerName: gp.name,
+          _origColor: gp.color,
+          _isPred: true,
+          data: predVals,
+          borderColor: gp.color,
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: 0,
+          spanGaps: true,
+          fill: false,
+        });
+
+        const finalHonor = pred.preds[pred.preds.length - 1];
+        const perInterval = Math.round(pred.slope);
+        predictSummary.push(`${gp.name}: 予測最終貢献度 ${numFmt(finalHonor)}（+${numFmt(perInterval)}/20分ペース）`);
+      }
+    }
+  }
+
+  // ボーダーライン重ね表示
+  const borderTier = document.getElementById('graph-border-select')?.value;
+  if (borderTier && currentEventId && (yKey === 'honor' || yKey === 'speed')) {
+    // ボーダーデータを取得（キャッシュ活用）
+    let bData = null;
+    if (graphBorderCache && graphBorderCache.eventId === currentEventId) {
+      bData = graphBorderCache.data;
+    } else {
+      bData = await apiFetch(`/api/ranking/borders?event_id=${currentEventId}`);
+      graphBorderCache = { eventId: currentEventId, data: bData || [] };
+    }
+    if (bData && bData.length) {
+      const tierNum = Number(borderTier);
+      const tierRows = bData.filter(r => r.rank_tier === tierNum).sort((a, b) => a.captured_at.localeCompare(b.captured_at));
+      if (tierRows.length) {
+        const TIER_LABELS_B = {1:'1位',10:'10位',50:'50位',100:'100位',500:'500位',1000:'1,000位',2000:'2,000位',100000:'10万位',150000:'15万位',200000:'20万位',270000:'27万位',370000:'37万位'};
+        // ラベルにマッチする形式にする（MM-DD HH:mm）
+        const borderTimeMap = {};
+        for (let i = 0; i < tierRows.length; i++) {
+          const t = tierRows[i].captured_at;
+          const lbl = t.substring(5, 16); // MM-DD HH:mm
+          if (yKey === 'speed' && i > 0) {
+            borderTimeMap[lbl] = tierRows[i].honor - tierRows[i - 1].honor;
+          } else if (yKey === 'honor') {
+            borderTimeMap[lbl] = tierRows[i].honor;
+          }
+        }
+        // 期間増加モード: ボーダーも最初の値を0基準にオフセット
+        if (useRelative && yKey === 'honor') {
+          const firstKey = labels.find(l => borderTimeMap[l] != null);
+          if (firstKey != null) {
+            const base = borderTimeMap[firstKey];
+            for (const k of Object.keys(borderTimeMap)) {
+              borderTimeMap[k] -= base;
+            }
+          }
+        }
+        const borderValues = allLabels.map(l => borderTimeMap[l] ?? null);
+        const borderColor = '#fbbf24';
+        datasets.push({
+          label: `ボーダー${TIER_LABELS_B[tierNum] || tierNum + '位'}`,
+          _origColor: borderColor,
+          _isBorder: true,
+          data: borderValues,
+          borderColor: borderColor,
+          backgroundColor: 'transparent',
+          pointRadius: 0,
+          borderWidth: 2,
+          borderDash: [8, 4],
+          tension: 0,
+          spanGaps: yKey === 'honor',
+          yAxisID: 'y',
+        });
+      }
+    }
+  }
+
+  // canvas サイズをエリアに合わせて設定
+  const isMobile = window.innerWidth < 640;
+  const areaEl2 = document.getElementById('graph-chart-area');
+  const canvasW = areaEl2 ? areaEl2.clientWidth || 320 : 320;
+  const chartH = 260;
+  const canvas = document.getElementById('ranking-chart');
+  canvas.width = canvasW; canvas.height = chartH;
+
+  // モバイル時に線を細く
+  if (isMobile) {
+    datasets.forEach(ds => {
+      if (!ds.label?.endsWith('(予測)')) { ds.borderWidth = 1; }
+    });
+  }
+
+  // 境界線プラグイン（7:00=青, 0:00=橙の縦線）複数日のみ描画、線のみ（ラベルなし）
+  const boundaryLinesPlugin = {
+    id: 'gbfBoundaryLines',
+    afterDraw(chart) {
+      if (!boundaries || !boundaries.length || dayCount <= 1) return;
+      const ctx2 = chart.ctx;
+      const { top, bottom } = chart.chartArea;
+      const xAxis = chart.scales.x;
+      boundaries.forEach(b => {
+        if (b.idx >= allLabels.length) return;
+        const x = xAxis.getPixelForValue(b.idx);
+        ctx2.save();
+        ctx2.beginPath();
+        ctx2.setLineDash([4, 5]);
+        ctx2.strokeStyle = b.type === 'midnight' ? 'rgba(251,146,60,0.35)' : 'rgba(96,165,250,0.35)';
+        ctx2.lineWidth = 1;
+        ctx2.moveTo(x, top);
+        ctx2.lineTo(x, bottom);
+        ctx2.stroke();
+        ctx2.restore();
+      });
+    }
+  };
+
+  const ctx = canvas.getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels: allLabels, datasets },
+    plugins: [boundaryLinesPlugin],
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--theme-on-surface-variant').trim() || '#94a3b8', font: { size: 11 }, boxWidth: 14, padding: 10 },
+          position: 'top',
+        },
+        tooltip: {
+          backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-surface-container-high').trim() || '#111127',
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-outline').trim() || '#2d2d5e',
+          borderWidth: 1,
+          titleColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-on-surface-variant').trim() || '#94a3b8',
+          bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--theme-on-surface').trim() || '#e2e8f0',
+          callbacks: {
+            label: ctx => {
+              if (ctx.raw == null) return ` ${ctx.dataset.label}: -`;
+              return isRank
+                ? ` ${ctx.dataset.label}: ${numFmt(ctx.raw)}位`
+                : ` ${ctx.dataset.label}: ${numFmt(ctx.raw)}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--theme-on-surface-variant').trim() || '#64748b', font: { size: 10 }, maxTicksLimit: 14, maxRotation: 45 },
+          grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim() || 'rgba(255,255,255,0.09)' },
+        },
+        y: {
+          reverse: isRank,
+          min: isRank ? 1 : undefined,
+          ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--theme-on-surface-variant').trim() || '#64748b', font: { size: 10 }, maxTicksLimit: 6, padding: 4, callback: v => {
+            if (isRank) return v % 1 === 0 ? numFmt(v) + '位' : '';
+            const a = Math.abs(v);
+            if (a >= 1e8) return (v/1e8).toFixed(1) + '億';
+            if (a >= 1e4) return Math.round(v/1e4) + '万';
+            return numFmt(v);
+          }},
+          grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim() || 'rgba(255,255,255,0.09)' },
+        },
+      },
+    },
+  });
+
+  predEl.innerHTML = predictSummary.join('<br>');
+
+  // タッチ: キャンバス外タップでツールチップを消す（一度だけ登録）
+  if (!window._dashTooltipDismiss) {
+    window._dashTooltipDismiss = (e) => {
+      if (!canvas.contains(e.target) && chartInstance) {
+        chartInstance.tooltip.setActiveElements([], { x: 0, y: 0 });
+        chartInstance.update('none');
+      }
+    };
+    document.addEventListener('touchstart', window._dashTooltipDismiss, { passive: true });
+    document.addEventListener('click', window._dashTooltipDismiss);
+  }
+
+  // ランキングテーブルの最新プレイヤーデータを検索用に保存
+  // (onGraphPlayerSearchで使用)
+}
+
+// ---- 共有画像生成 ----
+function shareGraph() {
+  if (!chartInstance) return;
+  const srcCanvas = document.getElementById('ranking-chart');
+  const typeLabel = { speed: '20分速', honor: '累計貢献度', rank: '順位変遷' }[graphChartType] || '';
+  const players = graphPlayers.map(p => p.name).join(' / ');
+
+  // イベント名
+  const event = loadedEvents.find(e => String(e.id) === String(currentEventId));
+  const eventName = event?.name || 'GBF古戦場';
+
+  // 期間（YYYY-MM-DD → M/D 形式）
+  const fromVal = document.getElementById('graph-from-select')?.value || '';
+  const toVal   = document.getElementById('graph-to-select')?.value   || '';
+  function fmtDay(d) { return d ? `${parseInt(d.slice(5,7))}/${parseInt(d.slice(8,10))}` : ''; }
+  const dateRange = fromVal && toVal
+    ? (fromVal === toVal ? fmtDay(fromVal) : `${fmtDay(fromVal)} 〜 ${fmtDay(toVal)}`)
+    : '';
+
+  const title = [
+    'ランキング',
+    dateRange ? `${eventName}　(${dateRange})` : eventName,
+    typeLabel,
+    players,
+  ].filter(Boolean).join('　｜　');
+
+  const pad = 12;
+  const titleH = 28;
+  const footerH = 20;
+  const W = srcCanvas.width + pad * 2;
+  const H = srcCanvas.height + titleH + footerH + pad * 2;
+
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const ctx = off.getContext('2d');
+
+  const cs = getComputedStyle(document.documentElement);
+
+  // 背景
+  ctx.fillStyle = cs.getPropertyValue('--theme-bg').trim() || '#0a0a0a';
+  ctx.fillRect(0, 0, W, H);
+
+  // タイトル
+  ctx.fillStyle = cs.getPropertyValue('--elem-color').trim() || '#3b82f6';
+  ctx.font = 'bold 13px sans-serif';
+  ctx.fillText(title, pad, pad + 16);
+
+  // グラフ本体
+  ctx.drawImage(srcCanvas, pad, pad + titleH);
+
+  // フッター
+  ctx.fillStyle = '#4b5563';
+  ctx.font = '10px sans-serif';
+  ctx.fillText('gbfranking.com', pad, H - 6);
+
+  const link = document.createElement('a');
+  link.download = `gbfranking-${graphChartType}-${new Date().toLocaleDateString('sv-SE')}.png`;
+  link.href = off.toDataURL('image/png');
+  link.click();
+}
+
+// ランキングデータ描画時に検索用リストを更新
+function saveRankingPlayersForGraph(players) {
+  window._lastRankingPlayers = players || [];
+}
+
+function updateTableHeight() {
+  const wrap = document.getElementById('rank-table-wrap');
+  if (!wrap) return;
+  const top = wrap.getBoundingClientRect().top;
+  const available = (window.innerHeight || document.documentElement.clientHeight) - top - 8;
+  const h = Math.max(180, available);
+  wrap.style.height = h + 'px';
+  if (_vsRanking) _vsRanking.refresh();
+}
+const fitTableHeight = updateTableHeight;
+window.addEventListener('resize', updateTableHeight);
+
+init().catch(err => {
+  console.error('[init] FATAL:', err);
+  try { showNoData('初期化エラー: ' + (err.message || err)); } catch {}
+}).then(() => updateTableHeight());
+</script>
+<script>
+
+// サイドバー折りたたみ
+function toggleSidePanel() {
+  const panel = document.getElementById('side-panel');
+  const btn = document.getElementById('side-collapse-btn');
+  const label = document.getElementById('side-collapse-label');
+  const arrow = document.getElementById('side-collapse-arrow');
+  const collapsed = panel.classList.toggle('collapsed');
+  if (arrow) arrow.textContent = collapsed ? '▶' : '◀';
+  if (label) label.style.display = collapsed ? 'none' : '';
+  btn.title = collapsed ? 'サイドバーを開く' : 'サイドバーを折りたたむ';
+  try { localStorage.setItem('gbf_side_collapsed', collapsed ? '1' : '0'); } catch {}
+}
+// 折りたたみ状態を復元
+(function(){
+  try {
+    if (localStorage.getItem('gbf_side_collapsed') === '1') {
+      const panel = document.getElementById('side-panel');
+      const btn = document.getElementById('side-collapse-btn');
+      const label = document.getElementById('side-collapse-label');
+      const arrow = document.getElementById('side-collapse-arrow');
+      if (panel) panel.classList.add('collapsed');
+      if (arrow) arrow.textContent = '▶';
+      if (label) label.style.display = 'none';
+      if (btn) btn.title = 'サイドバーを開く';
+    }
+  } catch {}
+})();
+</script>
+</body>
+</html>
