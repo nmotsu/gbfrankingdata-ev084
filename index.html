@@ -1883,8 +1883,21 @@ function applyCurrSort() {
 }
 
 function execSavePNG() {
-  const players = currentRenderData && currentRenderData.players;
+  let players = currentRenderData && currentRenderData.players;
   if (!players || !players.length) return;
+
+  // 画面と同じフィルタを適用（検索・バトル）
+  if (battleFilterActive && battlePlayers.length > 0) {
+    players = players.filter(p => getBattleInfo(p.player_id, p.username) !== null);
+  }
+  if (playerSearchTerm) {
+    const t = playerSearchTerm;
+    players = players.filter(p =>
+      String(p.username  || '').toLowerCase().includes(t) ||
+      String(p.player_id || '').includes(t)
+    );
+  }
+  if (!players.length) return;
 
   const fromRank = Math.max(1, parseInt(document.getElementById('save-range-from').value) || 1);
   const toRank   = Math.max(fromRank, parseInt(document.getElementById('save-range-to').value) || 100);
@@ -1945,26 +1958,26 @@ function execSavePNG() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // ---- 画像出力専用カラーパレット（視認性・コントラスト優先）----
+  // ---- 画像出力専用カラーパレット（現在のテーマに追従）----
   const cs        = getComputedStyle(document.documentElement);
   const elemColor = cs.getPropertyValue('--elem-color').trim() || '#3b82f6';
+  const isLight   = document.documentElement.getAttribute('data-theme') === 'light';
 
-  const bgMain      = '#111827';   // 全体背景（slate-900）
-  const bgDim       = '#1e2a3d';   // タイトルバー（やや青みがかった濃紺）
-  const bgContHigh  = '#1a2438';   // ヘッダー行
-  const outlineVar  = '#2e3f58';   // 区切り線（より明確に）
-  const textMain    = '#e8edf4';   // メインテキスト（明るい白系）
-  const textMuted   = '#8fa8c8';   // サブテキスト（青みがかったグレー）
+  const bgMain      = isLight ? '#f4f5f7' : '#111827';
+  const bgDim       = isLight ? '#e7e9ec' : '#1e2a3d';
+  const bgContHigh  = isLight ? '#dfe2e7' : '#1a2438';
+  const outlineVar  = isLight ? '#cfd3da' : '#2e3f58';
+  const textMain    = isLight ? '#1a1d21' : '#e8edf4';
+  const textMuted   = isLight ? '#586173' : '#8fa8c8';
   const colorSuccess= '#4ade80';
   const colorWarn   = '#fbbf24';
   const colorErr    = '#f87171';
-  const colorGN     = textMain;
+  const colorGN     = isLight ? '#1a73e8' : textMain;
   const colorUp     = '#60a5fa';
   const colorDown   = colorErr;
-  // top3 行背景：くっきり視認できる彩度
-  const bg1         = '#3d2c00';   // 金：深みのある琥珀
-  const bg2         = '#1c2540';   // 銀：ミッドナイトブルー
-  const bg3         = '#3a1e00';   // 銅：深みのある橙褐色
+  const bg1         = isLight ? '#fdf6cf' : '#3d2c00';
+  const bg2         = isLight ? '#edf1f6' : '#1c2540';
+  const bg3         = isLight ? '#fce4e4' : '#3a1e00';
 
   // 全体背景
   ctx.fillStyle = bgMain;
@@ -4058,7 +4071,7 @@ function shareGraph() {
   ctx.drawImage(srcCanvas, pad, pad + titleH);
 
   // フッター
-  ctx.fillStyle = '#4b5563';
+  ctx.fillStyle = _cs.getPropertyValue('--theme-on-surface-variant').trim() || '#4b5563';
   ctx.font = '10px sans-serif';
   ctx.fillText('gbfranking.com', pad, H - 6);
 
