@@ -540,7 +540,7 @@ function ensureChartJs() {
   .search-hit { color: var(--md-success); font-size: 0.6875rem; }
   .search-miss { color: var(--md-error); font-size: 0.6875rem; }
   /* バトルバー */
-  .battle-bar { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--md-surface-dim); border:1px solid var(--md-outline); border-radius:var(--md-shape-md); flex-wrap:wrap; }
+  .battle-bar { display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--md-surface-dim); border-bottom:1px solid var(--md-outline); flex-wrap:wrap; }
   .battle-tag { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:var(--md-shape-full); font-size:0.75rem; font-weight:700; color:var(--md-surface-dim); }
   .battle-tag .bt-close { cursor:pointer; opacity:0.6; margin-left:4px; font-size:0.625rem; line-height:1; transition: opacity var(--md-duration-short) var(--md-ease); }
   .battle-tag .bt-close:hover { opacity:1; }
@@ -978,15 +978,6 @@ class VirtualScroll {
 
   </div><!-- /tab-ctrl-wrap -->
 
-  <!-- バトルバー -->
-  <div id="battle-bar" class="battle-bar mt-2" style="display:none">
-    <span class="text-xs text-gray-400">バトル:</span>
-    <div id="battle-tags" class="flex gap-2 flex-wrap"></div>
-    <button id="battle-filter-btn" class="battle-filter-btn" onclick="toggleBattleFilter()">この人たちだけ表示</button>
-    <button class="text-xs text-gray-500 hover:text-red-400 ml-1" onclick="clearAllBattle()">✕ 全解除</button>
-    <span id="battle-count" class="text-xs text-gray-500 ml-1"></span>
-  </div>
-
   <!-- GN / ID 検索バー -->
   <div class="search-bar mt-1">
     <input id="player-search" type="text" placeholder="GN / ID で絞り込み..."
@@ -1011,6 +1002,15 @@ class VirtualScroll {
 
   </div><!-- /ctrl-inner -->
   </div><!-- /ctrl-collapsible -->
+
+  <!-- バトルバー（団ランキングと同仕様: 収納領域の外・テーブル直上に常時表示） -->
+  <div id="battle-bar" class="battle-bar" style="display:none">
+    <span class="text-xs text-gray-400">バトル:</span>
+    <div id="battle-tags" class="flex gap-2 flex-wrap"></div>
+    <button id="battle-filter-btn" class="battle-filter-btn" onclick="toggleBattleFilter()">この人たちだけ表示</button>
+    <button class="text-xs text-gray-500 hover:text-red-400 ml-1" onclick="clearAllBattle()">✕ 全解除</button>
+    <span id="battle-count" class="text-xs text-gray-500 ml-1"></span>
+  </div>
 
   <!-- ランキングテーブル -->
   <div class="card table-card overflow-hidden">
@@ -1481,10 +1481,10 @@ class VirtualScroll {
       <div class="save-section">
         <div class="save-label">行範囲（表示順位）</div>
         <div class="range-row">
-          <input type="number" id="save-range-from" value="1" min="1" max="9999"> 位
+          <input type="number" id="save-range-from" value="1" min="1" max="10000"> 位
           <span>〜</span>
-          <input type="number" id="save-range-to" value="100" min="1" max="9999"> 位
-          <button onclick="document.getElementById('save-range-from').value=1;document.getElementById('save-range-to').value=2000" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">全件</button>
+          <input type="number" id="save-range-to" value="100" min="1" max="10000"> 位
+          <button onclick="document.getElementById('save-range-from').value=1;document.getElementById('save-range-to').value=10000" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">全件</button>
         </div>
       </div>
       <!-- ソート -->
@@ -1566,13 +1566,13 @@ class VirtualScroll {
 <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako_inflate.min.js"></script>
 <script>
 window.__STATIC_MODE__=true;
-window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/"};
+window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/","13":"https://ev999.gbfranking.com/"};
 window.__STATIC_INDEX_URL__='https://gbfranking.com/';
 window.__STATIC_BORDER_URL__='https://border.gbfranking.com/';
 window.__STATIC_LIVE_URL__='';
 window.__STATIC_HAS_GUILD__=false;
-window.__STATIC_GUILD_LATEST_URL__='https://ev083.gbfranking.com/guild';
-window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild","7":"https://ev000.gbfranking.com/guild","10":"https://ev083.gbfranking.com/guild"};
+window.__STATIC_GUILD_LATEST_URL__='https://ev999.gbfranking.com/guild';
+window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild","7":"https://ev000.gbfranking.com/guild","10":"https://ev083.gbfranking.com/guild","13":"https://ev999.gbfranking.com/guild"};
 window.__STATIC_CACHE__=null;
 window.__STATIC_CACHE_PROMISE__=fetch('./data.json.gz')
   .then(function(r){return r.ok?r.arrayBuffer():Promise.reject('HTTP '+r.status);})
@@ -2213,6 +2213,7 @@ function renderBattleBar() {
   if (!bar) return;
   if (battlePlayers.length === 0) {
     bar.style.display = 'none';
+    updateTableHeight();
     return;
   }
   bar.style.display = '';
@@ -2221,6 +2222,7 @@ function renderBattleBar() {
   ).join('');
   document.getElementById('battle-count').textContent = `${battlePlayers.length}人`;
   document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
+  updateTableHeight();
 }
 
 function buildEventDateList() {
@@ -3113,22 +3115,22 @@ function renderRanking(data) {
   const morningSubEl = document.getElementById('tab-morning-sub');
   if (morningSubEl && data.type === '朝活') morningSubEl.textContent = data.isLive ? '7:00→最新' : '7:00→8:00';
 
-  // 更新中バッジ: afterPlayerCount が 2000未満なら表示
+  // 更新中バッジ: afterPlayerCount が 1万未満なら表示
   const updBadge = document.getElementById('updating-badge');
   if (updBadge) {
     const cnt = data.afterPlayerCount ?? data.players.length;
     const afterMs = data.after ? new Date(data.after).getTime() : 0;
     const isRecent = afterMs > 0 && (Date.now() - afterMs) < 30 * 60 * 1000;
-    if (isRecent && cnt > 0 && cnt < 1900) {
-      const phase = cnt < 200 ? '1/3' : cnt < 1100 ? '2/3' : '3/3';
-      updBadge.textContent = `更新中 ${cnt}→2000件 (Phase ${phase})`;
+    if (isRecent && cnt > 0 && cnt < 9500) {
+      const phase = cnt < 200 ? '1/4' : cnt < 1100 ? '2/4' : cnt < 2100 ? '3/4' : '4/4';
+      updBadge.textContent = `更新中 ${cnt}→10000件 (Phase ${phase})`;
       updBadge.style.display = '';
     } else {
       updBadge.style.display = 'none';
     }
   }
 
-  const sorted = sortPlayers(filteredPlayers).slice(0, 2000);
+  const sorted = sortPlayers(filteredPlayers).slice(0, 10000);
   saveRankingPlayersForGraph(data.players); // グラフ検索用
   updateSortIndicators();
 
