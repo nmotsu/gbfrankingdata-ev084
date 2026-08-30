@@ -576,12 +576,15 @@ function ensureChartJs() {
   .search-bar { margin-bottom: 4px; }
   /* タブ+コントロール縦積みラッパー */
   #tab-ctrl-wrap { display:flex; flex-direction:column; gap:2px; }
-  /* コントロール列 + 広告列 横並び（広告が3行分の高さを占有） */
+  /* コントロール列 + 広告列（PCは横並び／スマホは下に縦積みでフル幅） */
   #ctrl-ad-wrap { display:flex; gap:8px; align-items:stretch; }
   #ctrl-left { flex:0 0 auto; display:flex; flex-direction:column; gap:2px; min-width:0; }
-  /* タブエリア広告スロット（728x90・PCのみ・コントロール右・全高span） */
+  /* タブエリア広告スロット（728x90・iframeで隔離してスマホでも安全に表示／未読込時は隙間なく折りたたむ） */
   #tab-ad-slot { display:none; flex:1; min-width:0; align-items:center; justify-content:center; overflow:hidden; }
-  @media (min-width:768px) { #tab-ad-slot { display:flex; } }
+  #tab-ad-slot.ad-loaded { display:flex; height:60px; }
+  #tab-ad-slot iframe { width:100%; height:100%; border:0; display:block; }
+  @media (max-width:767px) { #ctrl-ad-wrap { flex-direction:column; gap:0; } #ctrl-ad-wrap:has(#tab-ad-slot.ad-loaded) { gap:8px; } #tab-ad-slot { flex:0 0 auto; } }
+  @media (min-width:768px) { #tab-ad-slot.ad-loaded { height:90px; } }
   /* コントロール折りたたみ */
   #ctrl-toggle-bar { display:flex; justify-content:flex-end; align-items:center; padding:3px 6px 3px 8px; background:var(--md-surface-dim); border-bottom:1px solid var(--md-outline-variant); gap:6px; }
   #ctrl-toggle-btn { background:none; border:none; cursor:pointer; color:var(--md-on-surface-variant); font-size:11px; padding:3px 8px; border-radius:var(--md-shape-sm); display:flex; align-items:center; gap:4px; transition:all var(--md-duration-short) var(--md-ease); }
@@ -968,11 +971,36 @@ class VirtualScroll {
       </div><!-- /ctrl-left -->
 
       <!-- 右列: 728×90 広告（PCのみ・左列全高にspan） -->
-      <div id="tab-ad-slot">
-        <!-- admax -->
-        <script src="https://adm.shinobi.jp/s/1ef61e7be0d4a5ab7939b953e7b95fbb"></script>
-        <!-- admax -->
-      </div>
+      <div id="tab-ad-slot"></div>
+      <script>
+        (function () {
+          // 広告スクリプトをiframe(srcdoc)内に隔離して読み込む。
+          // position:fixed等のCSSはiframe自身の表示領域にしかスコープされないため、
+          // 広告側がどんな挙動をしてもタブ/検索/下部ボタンなど枠外のUIを覆えなくなる。
+          var el = document.getElementById('tab-ad-slot');
+          var iframe = document.createElement('iframe');
+          iframe.scrolling = 'no';
+          iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+          iframe.srcdoc = '<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;overflow:hidden}</style></head>'
+            + '<body><script src="https://adm.shinobi.jp/s/1ef61e7be0d4a5ab7939b953e7b95fbb"><' + '/script></body></html>';
+          el.appendChild(iframe);
+          // 広告が実際に描画されたら枠を広げる。読み込めなければ隙間を残さず折りたたんだまま。
+          var revealed = false, checks = 0;
+          var timer = setInterval(function () {
+            checks++;
+            if (!revealed) {
+              try {
+                var body = iframe.contentDocument && iframe.contentDocument.body;
+                if (body && body.scrollHeight > 5) {
+                  el.classList.add('ad-loaded');
+                  revealed = true;
+                }
+              } catch (e) {}
+            }
+            if (revealed || checks > 15) clearInterval(timer);
+          }, 400);
+        })();
+      </script>
 
     </div><!-- /ctrl-ad-wrap -->
 
@@ -1566,13 +1594,13 @@ class VirtualScroll {
 <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako_inflate.min.js"></script>
 <script>
 window.__STATIC_MODE__=true;
-window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/","13":"https://ev999.gbfranking.com/"};
+window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/"};
 window.__STATIC_INDEX_URL__='https://gbfranking.com/';
 window.__STATIC_BORDER_URL__='https://border.gbfranking.com/';
 window.__STATIC_LIVE_URL__='';
 window.__STATIC_HAS_GUILD__=false;
-window.__STATIC_GUILD_LATEST_URL__='https://ev999.gbfranking.com/guild';
-window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild","7":"https://ev000.gbfranking.com/guild","10":"https://ev083.gbfranking.com/guild","13":"https://ev999.gbfranking.com/guild"};
+window.__STATIC_GUILD_LATEST_URL__='https://ev083.gbfranking.com/guild';
+window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild","7":"https://ev000.gbfranking.com/guild","10":"https://ev083.gbfranking.com/guild"};
 window.__STATIC_CACHE__=null;
 window.__STATIC_CACHE_PROMISE__=fetch('./data.json.gz')
   .then(function(r){return r.ok?r.arrayBuffer():Promise.reject('HTTP '+r.status);})
