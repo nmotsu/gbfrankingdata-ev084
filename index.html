@@ -1036,7 +1036,8 @@ class VirtualScroll {
     <span class="text-xs text-gray-400">バトル:</span>
     <div id="battle-tags" class="flex gap-2 flex-wrap"></div>
     <button id="battle-filter-btn" class="battle-filter-btn" onclick="toggleBattleFilter()">この人たちだけ表示</button>
-    <button class="text-xs text-gray-500 hover:text-red-400 ml-1" onclick="clearAllBattle()">✕ 全解除</button>
+    <button onclick="openGraphModal()" style="padding:5px 12px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;font-size:12px;flex-shrink:0;transition:all var(--md-duration-short) var(--md-ease)" title="グラフ分析">グラフ</button>
+    <button class="day-nav-btn" onclick="clearAllBattle()" title="バトル登録を全解除">✕ 全解除</button>
     <span id="battle-count" class="text-xs text-gray-500 ml-1"></span>
   </div>
 
@@ -3318,6 +3319,9 @@ async function openPlayerModal(playerId, username, eventId) {
     // 静的モード: キャッシュ済み20分速データからプレイヤー履歴を再構築
     const snaps = (await apiFetch(`/api/ranking/snapshots?event_id=${eventId}`) || [])
       .slice().reverse(); // captured_at ASC
+    // 各スナップの日別ファイルが未ロードだと欠損するため、対象日を全て事前ロードする
+    const neededDays = [...new Set(snaps.map(s => getSnapGBFDay(s.captured_at)))];
+    await Promise.all(neededDays.map(d => ensureSnapDayLoaded(d)));
     for (const snap of snaps) {
       const data = await apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`);
       if (!data || !data.players) continue;
