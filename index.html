@@ -1102,7 +1102,7 @@ class VirtualScroll {
     </div>
     <div class="modal-body" style="overflow-y:auto;padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:10px">
 
-      <!-- コントロール行 -->
+      <!-- コントロール行1: グラフ種別・期間・累計表示モード -->
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <!-- グラフ種別 -->
         <div style="display:flex;gap:3px">
@@ -1122,6 +1122,10 @@ class VirtualScroll {
           <button id="honor-abs-btn" class="gchart-type-btn active" onclick="setHonorOrigin('abs')">実数</button>
           <button id="honor-rel-btn" class="gchart-type-btn" onclick="setHonorOrigin('rel')">期間増加</button>
         </div>
+      </div>
+
+      <!-- コントロール行2: 予測線・ポイント表示・ボーダーライン -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <!-- 予測線 -->
         <label id="graph-predict-wrap" style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
           <input type="checkbox" id="graph-predict-chk" onchange="renderGraph()"> 予測線
@@ -1828,7 +1832,7 @@ function onSoloSettingChange() {
   document.getElementById('solo-options').style.display = soloEnabled ? 'flex' : 'none';
   updateSoloPctLabel();
   try { localStorage.setItem('gbf_solo', JSON.stringify({ enabled: soloEnabled, maxKills: soloMaxKills })); } catch {}
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 // ===== コントロール折りたたみ =====
 function toggleControls() {
@@ -1875,7 +1879,7 @@ function onSearchInput() {
   clearTimeout(_searchTimer);
   _searchTimer = setTimeout(() => {
     playerSearchTerm = (document.getElementById('player-search').value || '').trim().toLowerCase();
-    if (currentRenderData) renderRanking(currentRenderData);
+    if (currentRenderData) renderRanking(currentRenderData, true);
   }, 150);
 }
 
@@ -2199,7 +2203,7 @@ function execSavePNG() {
 function clearSearch() {
   document.getElementById('player-search').value = '';
   playerSearchTerm = '';
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function getBattleInfo(player_id, username) {
@@ -2219,28 +2223,28 @@ function toggleBattlePlayer(player_id, username) {
     battlePlayers.push({ player_id: player_id ?? null, username, color });
   }
   renderBattleBar();
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function removeBattlePlayer(idx) {
   battlePlayers.splice(idx, 1);
   if (battlePlayers.length === 0) battleFilterActive = false;
   renderBattleBar();
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function clearAllBattle() {
   battlePlayers = [];
   battleFilterActive = false;
   renderBattleBar();
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function toggleBattleFilter() {
   if (battlePlayers.length === 0) return;
   battleFilterActive = !battleFilterActive;
   document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function renderBattleBar() {
@@ -2418,7 +2422,7 @@ function onColDrop(e) {
     saveColPrefs();
     renderColgroup();
     renderThead();
-    if (currentRenderData) renderRanking(currentRenderData);
+    if (currentRenderData) renderRanking(currentRenderData, true);
   }
   dragSrcIdx = null;
 }
@@ -2437,7 +2441,7 @@ let currentRenderData = null;
 function sortBy(key) {
   if (sortKey === key) { sortDir = -sortDir; }
   else { sortKey = key; sortDir = (key === 'username' || key === 'rank') ? 1 : -1; }
-  if (currentRenderData) renderRanking(currentRenderData);
+  if (currentRenderData) renderRanking(currentRenderData, true);
 }
 
 function sortPlayers(players) {
@@ -3093,7 +3097,7 @@ const TYPE_META = {
   '残業(進行中)': { label: '残業',   cls: 'type-overnight', desc: '0:00 → 最新' },
 };
 
-function renderRanking(data) {
+function renderRanking(data, keepScroll = false) {
   const tbody   = document.getElementById('ranking-body');
   const statBar = document.getElementById('stat-bar');
   currentRenderData = data;
@@ -3231,7 +3235,7 @@ function renderRanking(data) {
     _vsRanking._rowFactory = buildRow;
     _vsRanking.setColCount(colOrder.length);
   }
-  _vsRanking.setData(sorted);
+  _vsRanking.setData(sorted, keepScroll);
   updateSidePanel(data);
   if (flashOnRender) {
     flashOnRender = false;
@@ -3984,7 +3988,7 @@ async function renderGraph() {
     });
   }
 
-  // 境界線プラグイン（7:00=青, 0:00=橙の縦線）複数日のみ描画、線のみ（ラベルなし）
+  // 境界線プラグイン（0:00=青, 7:00=橙の縦線）複数日のみ描画、線のみ（ラベルなし）
   const boundaryLinesPlugin = {
     id: 'gbfBoundaryLines',
     afterDraw(chart) {
@@ -3998,7 +4002,7 @@ async function renderGraph() {
         ctx2.save();
         ctx2.beginPath();
         ctx2.setLineDash([4, 5]);
-        ctx2.strokeStyle = b.type === 'midnight' ? 'rgba(251,146,60,0.35)' : 'rgba(96,165,250,0.35)';
+        ctx2.strokeStyle = b.type === 'midnight' ? 'rgba(96,165,250,0.35)' : 'rgba(251,146,60,0.35)';
         ctx2.lineWidth = 1;
         ctx2.moveTo(x, top);
         ctx2.lineTo(x, bottom);
