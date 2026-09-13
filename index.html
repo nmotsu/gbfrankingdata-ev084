@@ -3595,7 +3595,7 @@ function highlightGraphLine(name) {
 function unhighlightGraphLine() {
   if (!chartInstance) return;
   const n = chartInstance.data.labels?.length || 0;
-  const basePt = (graphChartType === 'speed' && graphDayCount === 1) ? 2 : 0;
+  const basePt = graphShowPoints ? graphPointSize : 0;
   chartInstance.data.datasets.forEach(ds => {
     const isPred = ds.label?.endsWith('(予測)');
     ds.borderWidth = isPred ? 1.5 : 2;
