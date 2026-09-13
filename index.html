@@ -1126,6 +1126,12 @@ class VirtualScroll {
         <label id="graph-predict-wrap" style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
           <input type="checkbox" id="graph-predict-chk" onchange="renderGraph()"> 予測線
         </label>
+        <!-- ポイント表示 -->
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
+          <input type="checkbox" id="graph-point-chk" onchange="onGraphPointSettingChange()"> ポイント表示
+        </label>
+        <input type="number" id="graph-point-size" value="3" min="1" max="10" step="1" onchange="onGraphPointSettingChange()"
+               title="ポイントサイズ" style="width:42px;font-size:12px;padding:3px 4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);border-radius:var(--md-shape-sm);color:var(--md-on-surface)">
         <!-- ボーダーライン -->
         <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant)">
           <span style="color:var(--md-on-surface-variant)">ボーダー:</span>
@@ -3456,9 +3462,28 @@ let chartInstance  = null;
 let graphLoading   = false;
 let graphDayCount  = 1; // 現在グラフに表示中の日数（点サイズ計算用）
 let graphBorderCache = null; // ボーダーデータキャッシュ { eventId, data }
+// ポイント表示設定（ユーザー任意切替・localStorageで記憶）
+let graphShowPoints = localStorage.getItem('graph_show_points') === '1';
+let graphPointSize  = Number(localStorage.getItem('graph_point_size')) || 3;
+
+function onGraphPointSettingChange() {
+  graphShowPoints = document.getElementById('graph-point-chk').checked;
+  const sizeInput = document.getElementById('graph-point-size');
+  graphPointSize = Math.max(1, Math.min(10, Number(sizeInput.value) || 3));
+  try {
+    localStorage.setItem('graph_show_points', graphShowPoints ? '1' : '0');
+    localStorage.setItem('graph_point_size', String(graphPointSize));
+  } catch {}
+  renderGraph();
+}
 
 function openGraphModal() {
   document.getElementById('graph-modal').style.display = 'flex';
+  // ポイント表示設定をUIに反映
+  const pointChk = document.getElementById('graph-point-chk');
+  const pointSizeInput = document.getElementById('graph-point-size');
+  if (pointChk) pointChk.checked = graphShowPoints;
+  if (pointSizeInput) pointSizeInput.value = graphPointSize;
   updateGraphDaySelects();
   // グラフが空ならバトルプレイヤーを自動追加
   if (graphPlayers.length === 0 && battlePlayers.length > 0) {
@@ -3830,10 +3855,9 @@ async function renderGraph() {
   const datasets = [];
   const predictSummary = [];
 
-  // 点サイズ: 20分速かつ1日かつPCのみ2pt、それ以外0pt（線のみ）
+  // 点サイズ: ユーザーが「ポイント表示」で明示的にON/OFF・サイズを指定可能
   graphDayCount = dayCount;
-  const isMobileGraph = window.innerWidth < 640;
-  const ptRadius = (yKey === 'speed' && dayCount === 1 && !isMobileGraph) ? 2 : 0;
+  const ptRadius = graphShowPoints ? graphPointSize : 0;
   const ptHoverR  = dayCount <= 2 ? 5 : 3;
 
   for (const gp of graphPlayers) {
