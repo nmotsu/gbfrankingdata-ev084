@@ -3779,16 +3779,17 @@ function computeRestWindows(startDateStr, mergeInterval) {
   if (!startDateStr) return [];
   const [y, m, d] = startDateStr.split('-').map(Number);
   const dayDate = (offset) => new Date(y, m - 1, d + offset);
-  const at = (date, hh) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), hh, 0, 0);
+  const at = (date, hh, mm = 0) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), hh, mm, 0);
+  // 終端(7:00)は実際のスナップ着地が数分〜十数分後ろにずれるため、バッファを持たせて7:20までを窓とする
   const windows = [];
   if (mergeInterval) {
-    windows.push([at(dayDate(2), 0), at(dayDate(3), 7)]);   // 2日目24:00 〜 本戦1日目7:00
+    windows.push([at(dayDate(2), 0), at(dayDate(3), 7, 20)]);   // 2日目24:00 〜 本戦1日目7:00
   } else {
-    windows.push([at(dayDate(2), 0), at(dayDate(2), 7)]);   // 2日目24:00 〜 3日目7:00
+    windows.push([at(dayDate(2), 0), at(dayDate(2), 7, 20)]);   // 2日目24:00 〜 3日目7:00
   }
-  windows.push([at(dayDate(4), 0), at(dayDate(4), 7)]);      // 本戦1日目24:00 〜 本戦2日目7:00
-  windows.push([at(dayDate(5), 0), at(dayDate(5), 7)]);      // 本戦2日目24:00 〜 本戦3日目7:00
-  windows.push([at(dayDate(6), 0), at(dayDate(6), 7)]);      // 本戦3日目24:00 〜 本戦4日目7:00
+  windows.push([at(dayDate(4), 0), at(dayDate(4), 7, 20)]);      // 本戦1日目24:00 〜 本戦2日目7:00
+  windows.push([at(dayDate(5), 0), at(dayDate(5), 7, 20)]);      // 本戦2日目24:00 〜 本戦3日目7:00
+  windows.push([at(dayDate(6), 0), at(dayDate(6), 7, 20)]);      // 本戦3日目24:00 〜 本戦4日目7:00
   return windows;
 }
 
