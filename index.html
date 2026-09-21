@@ -3285,7 +3285,10 @@ function roundTimeLabel(label) {
   if (!m) return label;
   const [, prefix, hhStr, mmStr] = m;
   let hh = parseInt(hhStr), mm = parseInt(mmStr);
-  const roundedMin = Math.round(mm / 20) * 20;
+  // 切り上げず常に直前の20分刻みに丸める（実行が遅れて次サイクルの時刻に近づいても、
+  // そのスナップは本来のサイクル分として扱われるべきため。round()だと繰り上がり、
+  // 次の実データと同じラベルに衝突することがある）
+  const roundedMin = Math.floor(mm / 20) * 20;
   hh = (hh + Math.floor(roundedMin / 60)) % 24;
   mm = roundedMin % 60;
   return `${prefix} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
