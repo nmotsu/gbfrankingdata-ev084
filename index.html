@@ -3799,12 +3799,10 @@ function computeRestBands(labels, startDateStr, mergeInterval) {
   const bands = [];
   for (const [startD, endD] of computeRestWindows(startDateStr, mergeInterval)) {
     const startStr = fmt(startD), endStr = fmt(endD);
-    // 夜間は間引き取得等でラベルが疎な場合があるため、窓の直前の最後のラベル〜
-    // 窓の直後の最初のラベルまでを帯として描画し、データの空白区間を視覚的に覆う
-    let startIdx = -1;
-    for (let i = 0; i < labels.length; i++) { if (labels[i] < startStr) startIdx = i; else break; }
-    const endIdx = labels.findIndex(l => l > endStr);
-    if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) continue;
+    const startIdx = labels.findIndex(l => l >= startStr);
+    let endIdx = -1;
+    for (let i = labels.length - 1; i >= 0; i--) { if (labels[i] <= endStr) { endIdx = i; break; } }
+    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) continue;
     bands.push({ startIdx, endIdx });
   }
   return bands;
