@@ -919,7 +919,7 @@ class VirtualScroll {
       <button class="tab-btn active" id="tab-20min" onclick="switchTab('20min')">20分速<span class="tab-sub">直前→最新</span></button>
       <button class="tab-btn" id="tab-morning" onclick="switchTab('morning')">朝活<span class="tab-sub" id="tab-morning-sub">7:00→8:00</span></button>
       <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">日速<span class="tab-sub" id="tab-daily-sub">7:00→最新</span></button>
-      <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub">0:00→7:00</span></button>
+      <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub" id="tab-overnight-sub">0:00→7:00</span></button>
     </div>
 
     <!-- ② コントロール列（左）+ 広告列（右・全高span） -->
@@ -3154,6 +3154,8 @@ function renderRanking(data, keepScroll = false) {
   if (dailySubEl && data.type === '日速') dailySubEl.textContent = data.isLive ? '7:00→最新' : '7:00→0:00';
   const morningSubEl = document.getElementById('tab-morning-sub');
   if (morningSubEl && data.type === '朝活') morningSubEl.textContent = data.isLive ? '7:00→最新' : '7:00→8:00';
+  const overnightSubEl = document.getElementById('tab-overnight-sub');
+  if (overnightSubEl && data.type === '残業') overnightSubEl.textContent = data.isLive ? '0:00→最新' : '0:00→7:00';
 
   // 更新中バッジ: afterPlayerCount が 1万未満なら表示
   const updBadge = document.getElementById('updating-badge');
