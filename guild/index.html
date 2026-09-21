@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>if(location.protocol==='http:'&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'){location.replace('https://'+location.hostname+location.pathname+location.search+location.hash);}</script>
+<title>GBF古戦場 団ランキング</title>
+<meta name="description" content="グランブルーファンタジー古戦場の団ランキングデータを記録・公開する非公式ファンサイト。">
+<link rel="icon" href="../favicon-rich.png" type="image/png"><link rel="apple-touch-icon" href="../favicon-rich.png">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6139585433722718" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako_inflate.min.js"></script>
+<script>
+window.__STATIC_MODE__=true;
+window.__STATIC_EVENT_URLS__={"1":"https://ev078.gbfranking.com/","3":"https://ev080.gbfranking.com/","4":"https://ev079.gbfranking.com/","5":"https://ev081.gbfranking.com/","6":"https://ev082.gbfranking.com/","7":"https://ev000.gbfranking.com/","10":"https://ev083.gbfranking.com/","11":"https://ev084.gbfranking.com/"};
+window.__STATIC_INDEX_URL__='https://gbfranking.com/';
+window.__STATIC_BORDER_URL__='https://border.gbfranking.com/';
+window.__STATIC_LIVE_URL__='https://live.gbfranking.com';
+window.__STATIC_GUILD_LATEST_URL__='https://ev084.gbfranking.com/guild/';
+window.__STATIC_EVENT_GUILD_URLS__={"6":"https://ev082.gbfranking.com/guild/","7":"https://ev000.gbfranking.com/guild/","10":"https://ev083.gbfranking.com/guild/","11":"https://ev084.gbfranking.com/guild/"};
+window.__STATIC_RANKING_LATEST_URL__='https://ev084.gbfranking.com/';
+window.__STATIC_CACHE__=null;
+window.__STATIC_CACHE_PROMISE__=fetch('./../guild-data.json.gz')
+  .then(function(r){return r.ok?r.arrayBuffer():Promise.reject('HTTP '+r.status);})
+  .then(function(buf){
+    window.__STATIC_CACHE__=JSON.parse(pako.inflate(new Uint8Array(buf),{to:'string'}));
+  })
+  .catch(function(e){window.__STATIC_CACHE__={};console.warn('GBF: データ読み込み失敗',e);});
+</script>
+<style>
+/* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
+
+/* --- Display --- */
+.flex        { display: flex; }
+.flex-col    { flex-direction: column; }
+.flex-1      { flex: 1 1 0%; }
+.flex-wrap   { flex-wrap: wrap; }
+.flex-shrink-0 { flex-shrink: 0; }
+.items-center   { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center  { justify-content: center; }
+
+/* --- Gap / Spacing --- */
+.gap-1  { gap: 4px; }
+.gap-2  { gap: 8px; }
+.gap-4  { gap: 16px; }
+.ml-1   { margin-left: 4px; }
+.ml-auto { margin-left: auto; }
+.mt-1   { margin-top: 4px; }
+.mt-2   { margin-top: 8px; }
+.mb-1   { margin-bottom: 4px; }
+
+/* --- Sizing --- */
+.w-full  { width: 100%; }
+.min-w-0 { min-width: 0; }
+
+/* --- Overflow --- */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto   { overflow: auto; }
+
+/* --- Position --- */
+.relative { position: relative; }
+.sticky   { position: sticky; }
+
+/* --- Text size --- */
+.text-xs  { font-size: 0.75rem; line-height: 1rem; }
+.text-sm  { font-size: 0.875rem; line-height: 1.25rem; }
+
+/* --- Text color (dark theme向け: Tailwind互換近似値) --- */
+.text-white    { color: #ffffff; }
+.text-gray-400 { color: #9ca3af; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-blue-300 { color: #93c5fd; }
+.text-blue-400 { color: #60a5fa; }
+.text-red-400  { color: #f87171; }
+
+/* --- ライトモードで読みづらい白系/淡灰をダーク寄りに上書き --- */
+html[data-theme="light"] .text-white    { color: #1a1d21; }
+html[data-theme="light"] .text-gray-400 { color: #5b6470; }
+html[data-theme="light"] .text-gray-500 { color: #6b7280; }
+html[data-theme="light"] .text-gray-600 { color: #4b5563; }
+html[data-theme="light"] .text-blue-300 { color: #2563eb; }
+html[data-theme="light"] .text-blue-400 { color: #1d4ed8; }
+html[data-theme="light"] .hover\:text-white:hover { color: #1a1d21; }
+
+/* --- Hover text color --- */
+.hover\:text-white:hover    { color: #ffffff; }
+.hover\:text-blue-400:hover { color: #60a5fa; }
+.hover\:text-red-400:hover  { color: #f87171; }
+
+/* --- Font --- */
+.font-mono { font-family: 'Consolas', 'Menlo', 'Monaco', monospace; }
+.font-bold { font-weight: 700; }
+
+/* --- Truncate --- */
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+</style>
+<style>
+/* sidebar.css — サイドバー折りたたみ/展開デザイン */
+
+/* === 変数 === */
+:root {
+  --sidebar-expanded: 218px;
+  --sidebar-collapsed: 48px;
+  --sidebar-ease: cubic-bezier(0.2, 0, 0, 1);
+  --sidebar-dur: 180ms;
+}
+
+/* === PC サイドバー全体 (既存CSSを上書き) === */
+@media (min-width: 1024px) {
+  #side-panel {
+    width: var(--sidebar-expanded);
+    flex-shrink: 0;
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0 4px 8px;
+    transition: width var(--sidebar-dur) var(--sidebar-ease);
+    position: sticky;
+    top: 4px;
+    max-height: calc(100vh - 8px);
+    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  #side-panel::-webkit-scrollbar { display: none; }
+
+  /* === 折りたたみ状態 (48px) === */
+  #side-panel.collapsed {
+    width: var(--sidebar-collapsed);
+    padding: 4px 0;
+    overflow: hidden;
+  }
+
+  /* カードを丸ごと非表示 → 折りたたみアイコン表示 */
+  #side-panel.collapsed .side-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 4px;
+    border-radius: var(--md-shape-sm);
+    overflow: hidden;
+    cursor: default;
+  }
+
+  /* カード内コンテンツはすべて非表示 */
+  #side-panel.collapsed .side-card-title,
+  #side-panel.collapsed .side-card-value,
+  #side-panel.collapsed .side-card-sub,
+  #side-panel.collapsed #side-watch-list,
+  #side-panel.collapsed #side-elem-wrap { display: none; }
+
+  /* 折りたたみ時アイコン表示 */
+  #side-panel.collapsed .side-card::before {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--md-on-surface-variant);
+    opacity: 0.7;
+  }
+  #side-panel.collapsed #side-event-card::before { content: '📅'; }
+  #side-panel.collapsed #side-top-card::before   { content: '🏆'; }
+  #side-panel.collapsed #side-watch-card::before  { content: '★'; color: var(--md-warning); opacity: 1; font-style: normal; }
+
+  /* ホバーで一時展開 */
+  #side-panel.collapsed:hover {
+    width: var(--sidebar-expanded);
+    padding: 4px 0 4px 8px;
+    z-index: 50;
+    box-shadow: -4px 0 16px rgba(0,0,0,0.4);
+  }
+  #side-panel.collapsed:hover .side-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+    min-height: unset;
+  }
+  #side-panel.collapsed:hover .side-card::before { display: none; }
+  #side-panel.collapsed:hover .side-card-title,
+  #side-panel.collapsed:hover .side-card-value,
+  #side-panel.collapsed:hover .side-card-sub,
+  #side-panel.collapsed:hover #side-watch-list,
+  #side-panel.collapsed:hover #side-elem-wrap { display: revert; }
+
+  /* 折りたたみトグルボタン */
+  #side-collapse-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    width: 100%;
+    height: 28px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--md-outline-variant);
+    border-radius: 0;
+    cursor: pointer;
+    padding: 0 10px;
+    color: var(--md-on-surface-variant);
+    font-size: 11px;
+    line-height: 1;
+    transition: color var(--sidebar-dur) var(--sidebar-ease),
+                background var(--sidebar-dur) var(--sidebar-ease);
+    flex-shrink: 0;
+  }
+  #side-collapse-btn:hover {
+    color: var(--md-on-surface);
+    background: rgba(255,255,255,0.05);
+  }
+  #side-panel.collapsed #side-collapse-btn {
+    justify-content: center;
+    padding: 0;
+  }
+  #side-panel.collapsed:hover #side-collapse-btn {
+    justify-content: flex-end;
+    padding: 0 10px;
+  }
+}
+
+</style>
+<style>
+/* tiers.css — ランキング順位帯カラーバンド & テーブル密度 */
+
+/* === 順位帯カラー変数 === */
+:root {
+  --tier-top10-bg:    color-mix(in srgb, #FFD700 10%, var(--md-surface));
+  --tier-top10-acc:   #FFD700;
+  --tier-top100-bg:   color-mix(in srgb, #C0C0C0 9%, var(--md-surface));
+  --tier-top100-acc:  #C0C0C0;
+  --tier-top500-bg:   color-mix(in srgb, #CD7F32 9%, var(--md-surface));
+  --tier-top500-acc:  #CD7F32;
+  --tier-top1000-bg:  color-mix(in srgb, #4FC3F7 7%, var(--md-surface));
+  --tier-top1000-acc: #4FC3F7;
+  --tier-top2500-bg:  color-mix(in srgb, #81C784 6%, var(--md-surface));
+  --tier-top2500-acc: #81C784;
+}
+
+/* 順位帯背景・アクセントは無効（以前の仕様: 1-3位メダル色 + 交互ストライプ） */
+
+/* === 仮想スクロール用コンテナ (JS で height を動的設定) === */
+#rank-table-wrap {
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* min-height はJSで上書き。フォールバック値 */
+  min-height: 200px;
+}
+/* thead sticky はコンテナ内スクロールに対応 */
+#rank-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  will-change: transform;
+}
+
+/* === テーブル行 コンパクト密度 === */
+#rank-table td {
+  padding: 5px 10px;
+  font-size: 0.8125rem;
+}
+#rank-table th {
+  padding: 6px 10px;
+}
+#rank-table tr.rank-row {
+  height: 34px;
+}
+
+/* Honor Diff インラインバー */
+.diff-bar-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.diff-bar {
+  display: inline-block;
+  height: 3px;
+  width: var(--bar-w, 0%);
+  max-width: 50px;
+  border-radius: 2px;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+.diff-bar.up   { background: #60a5fa; }
+.diff-bar.down { background: #f87171; }
+.diff-bar.flat { background: var(--md-outline); }
+
+</style>
+<script>
+let _chartJsLoaded = false;
+function ensureChartJs() {
+  if (_chartJsLoaded) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    if (typeof Chart !== 'undefined') { _chartJsLoaded = true; resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+    s.onload = () => { _chartJsLoaded = true; resolve(); };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+</script>
+<style>
+  :root {
+    --theme-bg:#0a0a0a; --theme-surface:#111111; --theme-surface-container:#191919;
+    --theme-surface-container-high:#242424; --theme-outline:#363636; --theme-outline-variant:#202020;
+    --theme-on-surface:#e2e8f0; --theme-on-surface-variant:#8a9ab0;
+    --chart-grid-color:rgba(255,255,255,0.09);
+    --elem-color:#3b82f6; --elem-color-light:#60a5fa99;
+    --md-surface-dim:var(--theme-bg); --md-surface:var(--theme-surface);
+    --md-surface-container:var(--theme-surface-container);
+    --md-surface-container-high:var(--theme-surface-container-high);
+    --md-surface-bright:var(--theme-surface-container-high);
+    --md-on-surface:var(--theme-on-surface); --md-on-surface-variant:var(--theme-on-surface-variant);
+    --md-outline:var(--theme-outline); --md-outline-variant:var(--theme-outline-variant);
+    --md-primary:var(--elem-color); --md-primary-dim:var(--elem-color);
+    --md-primary-container:var(--theme-surface-container-high);
+    --md-on-primary-container:var(--theme-on-surface);
+    --md-secondary:var(--elem-color-light); --md-secondary-container:var(--theme-surface-container-high);
+    --md-success:#4ade80; --md-warning:#fbbf24; --md-error:#f87171;
+    --md-shape-xs:4px; --md-shape-sm:8px; --md-shape-md:12px; --md-shape-lg:16px; --md-shape-full:9999px;
+    --md-ease:cubic-bezier(0.2,0,0,1); --md-duration-short:150ms; --md-duration-medium:300ms;
+    --md-elevation-1:0 1px 3px rgba(0,0,0,0.3); --md-elevation-2:0 2px 6px rgba(0,0,0,0.3);
+    --md-elevation-3:0 4px 12px rgba(0,0,0,0.3);
+    --row-top1-bg:#2a2200; --row-top2-bg:#1e1e2e; --row-top3-bg:#261400;
+    --row-odd-bg:rgba(255,255,255,0.04); --row-hairline:rgba(255,255,255,0.05); --row-hover:rgba(255,255,255,0.05);
+  }
+  html[data-theme="light"]{
+    --theme-bg:#f4f5f7; --theme-surface:#ffffff; --theme-surface-container:#f1f2f4;
+    --theme-surface-container-high:#e7e9ec; --theme-outline:#cfd3da; --theme-outline-variant:#e2e5ea;
+    --theme-on-surface:#1a1d21; --theme-on-surface-variant:#586173;
+    --chart-grid-color:rgba(0,0,0,0.08);
+    --md-elevation-1:0 1px 3px rgba(0,0,0,0.10); --md-elevation-2:0 2px 6px rgba(0,0,0,0.10);
+    --md-elevation-3:0 4px 12px rgba(0,0,0,0.12);
+    --row-top1-bg:#fdf6cf; --row-top2-bg:#edf1f6; --row-top3-bg:#fce4e4;
+    --row-odd-bg:#eaf2fb; --row-hairline:#e3e6ea; --row-hover:rgba(26,115,232,0.10);
+  }
+  html[data-theme="light"] .type-daily{background:#dcf5e3;color:#15803d;}
+  html[data-theme="light"] .type-morning{background:#fff3d6;color:#92600a;}
+  html[data-theme="light"] .gn-clickable:not(.gn-pinned){color:#1a73e8 !important;text-decoration:underline;}
+  html[data-theme="light"] .score-bar-bg{opacity:0.30;}
+  html[data-theme="light"] .score-diff{color:var(--md-on-surface-variant) !important;font-weight:600;}
+  html,body{min-height:100%;margin:0;padding:0;}
+  body{background:var(--theme-bg);color:var(--theme-on-surface);font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;}
+  .main-wrap{flex:1;display:flex;flex-direction:column;}
+  /* Header */
+  .header{background:var(--theme-surface);border-bottom:2px solid var(--elem-color);padding:12px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.5);}
+  .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;}
+  .hdr-h1{font-size:1.05rem;color:var(--md-primary);font-weight:500;display:flex;align-items:center;flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;letter-spacing:0.01em;}
+  .hdr-right{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+  .hdr-btn{color:var(--md-on-surface-variant);text-decoration:none;font-size:0.8125rem;padding:6px 12px;background:var(--md-surface-container);border:1px solid var(--md-outline);border-radius:var(--md-shape-sm);transition:all var(--md-duration-short) var(--md-ease);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;}
+  .hdr-btn:hover{color:var(--md-on-surface);background:var(--md-surface-container-high);}
+  .hdr-btn-blue{color:var(--md-primary);border-color:var(--md-primary-dim);font-weight:600;}
+  .hdr-btn-blue:hover{color:var(--md-on-primary-container);}
+  @media(max-width:599px){.header{padding:8px 12px;}.hdr-h1{font-size:0.875rem;}.hdr-btn{font-size:0.6875rem;padding:4px 8px;}}
+  /* Cards */
+  .card{background:var(--md-surface-container);border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-md);}
+  /* Tabs */
+  .tab-btn{padding:5px 4px 4px;border-radius:var(--md-shape-sm);cursor:pointer;transition:all var(--md-duration-short) var(--md-ease);font-size:0.8125rem;font-weight:600;width:100%;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.2;border:2px solid transparent;}
+  .tab-btn.active{background:var(--md-surface-container-high);color:var(--md-primary);border-color:var(--md-primary);box-shadow:0 0 8px color-mix(in srgb,var(--elem-color) 40%,transparent);}
+  .tab-btn:not(.active){background:var(--md-surface-container-high);color:var(--md-on-surface-variant);}
+  .tab-btn:not(.active):hover{background:var(--md-surface-bright);color:var(--md-on-surface);}
+  .tab-sub{font-size:0.5625rem;font-weight:400;opacity:0.65;}
+  /* Table */
+  table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  th{background:var(--md-surface);color:var(--md-on-surface-variant);font-size:0.6875rem;padding:8px 12px;letter-spacing:0.04em;text-transform:uppercase;font-weight:500;position:sticky;top:0;z-index:2;white-space:nowrap;overflow:hidden;}
+  td{padding:8px 12px;border-bottom:1px solid var(--row-hairline);font-size:0.8125rem;vertical-align:middle;overflow:hidden;font-variant-numeric:tabular-nums;transition:background var(--md-duration-short) var(--md-ease);}
+  .rank-row:hover{background:var(--row-hover) !important;}
+  .rank-row.top-1{border-left:4px solid var(--md-warning);box-shadow:inset 60px 0 20px -20px rgba(251,191,36,0.12);}
+  .rank-row.top-2{border-left:4px solid #c0c0c0;box-shadow:inset 60px 0 20px -20px rgba(192,192,192,0.10);}
+  .rank-row.top-3{border-left:4px solid #cd7c32;box-shadow:inset 60px 0 20px -20px rgba(205,124,50,0.10);}
+  @keyframes row-flash{0%{background-color:var(--md-primary-container)}100%{background-color:transparent}}
+  .up{color:#60a5fa;} .down{color:#f87171;} .flat{color:var(--md-on-surface-variant);} .new{color:var(--md-success);}
+  /* Score bar */
+  .score-cell{position:relative;}
+  .score-bar-bg{position:absolute;left:0;top:0;bottom:0;border-radius:var(--md-shape-xs);opacity:0.15;pointer-events:none;}
+  .score-diff{position:relative;font-weight:700;font-size:0.875rem;display:block;line-height:1.3;}
+  /* Badges */
+  .type-badge{display:inline-block;padding:4px 12px;border-radius:var(--md-shape-full);font-size:0.75rem;font-weight:700;}
+  .type-20min{background:var(--md-secondary-container);color:var(--md-on-primary-container);}
+  .type-daily{background:#1a3020;color:var(--md-success);}
+  .type-morning{background:#3b2f00;color:var(--md-warning);}
+  .type-live{background:rgba(74,222,128,0.12);color:#4ade80;}
+  /* Watch star */
+  .watch-star{background:none;border:none;cursor:pointer;color:var(--md-outline);font-size:0.6875rem;padding:0 2px;transition:color var(--md-duration-short) var(--md-ease);line-height:1;vertical-align:middle;}
+  .watch-star:hover{color:#d97706;}
+  .watch-star.on{color:var(--md-warning);}
+  .side-watch-row{display:flex;align-items:flex-start;gap:6px;padding:6px 0;border-bottom:1px solid var(--md-outline-variant);font-variant-numeric:tabular-nums;}
+  .side-watch-row:last-child{border-bottom:none;}
+  @media(max-width:1023px){.watch-star{display:none !important;}}
+  /* GN links */
+  .gn-clickable{cursor:pointer;color:var(--md-on-primary-container);}
+  .gn-clickable:hover{text-decoration:underline;}
+  .gn-pinned{font-weight:800;text-decoration:underline dotted;}
+  .gn-profile-link{color:var(--md-on-surface-variant);font-size:0.625rem;text-decoration:none;margin-left:4px;transition:color var(--md-duration-short) var(--md-ease);vertical-align:middle;}
+  .gn-profile-link:hover{color:var(--md-primary);}
+  /* ソート & カラムリサイズ */
+  th.sortable{cursor:pointer;position:relative;}
+  th.sortable:hover{color:var(--md-on-surface);}
+  .sort-ind{font-size:0.5625rem;margin-left:2px;color:var(--md-on-surface-variant);}
+  .sort-ind.asc{color:#60a5fa;}
+  .sort-ind.desc{color:#f87171;}
+  /* 使い方ガイド */
+  .help-tab{padding:6px 14px;border-radius:var(--md-shape-sm) var(--md-shape-sm) 0 0;font-size:0.75rem;cursor:pointer;background:var(--md-surface-container);color:var(--md-on-surface-variant);border:1px solid var(--md-outline);border-bottom:1px solid var(--md-outline);margin-bottom:-1px;transition:all var(--md-duration-short) var(--md-ease);}
+  .help-tab.active{background:var(--md-surface-container);color:var(--md-on-surface);border-bottom-color:var(--md-surface-container);}
+  .help-panel-desc{color:var(--md-on-surface-variant);font-size:0.8125rem;margin-bottom:12px;line-height:1.7;}
+  .help-tip{background:var(--md-surface-dim);border-radius:var(--md-shape-sm);padding:12px;font-size:0.75rem;color:var(--md-on-surface-variant);margin-top:12px;line-height:1.7;}
+  .help-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.75rem;margin-top:12px;}
+  .help-grid-item{background:var(--md-surface-dim);border-radius:var(--md-shape-sm);padding:10px 12px;border:1px solid var(--md-outline-variant);transition:border-color var(--md-duration-short) var(--md-ease);}
+  .help-grid-item:hover{border-color:var(--md-outline);}
+  @media(max-width:599px){.help-grid{grid-template-columns:1fr;}}
+  .col-resize-handle{position:absolute;right:-1px;top:0;width:9px;height:100%;cursor:col-resize;z-index:2;}
+  .col-resize-handle::after{content:'';position:absolute;right:1px;top:18%;bottom:18%;width:2px;background:var(--md-outline);border-radius:1px;transition:background var(--md-duration-short) var(--md-ease),top var(--md-duration-short) var(--md-ease),bottom var(--md-duration-short) var(--md-ease);pointer-events:none;}
+  .col-resize-handle:hover::after{background:var(--md-surface-bright);top:5%;bottom:5%;}
+  body.col-resizing{cursor:col-resize !important;}
+  body.col-resizing *{cursor:col-resize !important;user-select:none !important;}
+  body.col-resizing .col-resize-handle::after{background:var(--md-primary) !important;top:0 !important;bottom:0 !important;}
+  #rank-table{width:100%;table-layout:fixed;}
+  /* ドラッグ&ドロップ */
+  th.col-th[draggable="true"]{cursor:grab;}
+  th.col-th.dragging{opacity:0.4;cursor:grabbing;}
+  th.col-th.drop-target{background:#1e40af !important;color:#fff;}
+  /* selects */
+  select,input{background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface);border-radius:var(--md-shape-sm);padding:6px 12px;font-size:0.8125rem;transition:border-color var(--md-duration-short) var(--md-ease);}
+  select:focus,input:focus{border-color:var(--md-primary);outline:2px solid rgba(96,165,250,0.3);}
+  #event-select{max-width:260px;}
+  .day-nav-btn{background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);border-radius:var(--md-shape-sm);padding:3px 8px;cursor:pointer;font-size:0.8125rem;transition:all var(--md-duration-short) var(--md-ease);flex-shrink:0;}
+  .day-nav-btn:hover{background:var(--md-surface-bright);color:var(--md-on-surface);}
+  .loading{color:var(--md-on-surface-variant);text-align:center;padding:48px;}
+  .no-data{color:var(--md-on-surface-variant);text-align:center;padding:48px;}
+  /* Modals */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;}
+  .modal-box{background:var(--md-surface-container);border:1px solid var(--md-outline);border-radius:var(--md-shape-lg);width:min(98vw,820px);max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--md-elevation-3);animation:md-dialog-in var(--md-duration-medium) var(--md-ease) both;}
+  @keyframes md-dialog-in{from{opacity:0;transform:scale(0.92) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  .modal-header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--md-outline-variant);background:var(--md-surface-dim);flex-shrink:0;}
+  .modal-body{overflow-y:auto;padding:12px 14px;flex:1;display:flex;flex-direction:column;gap:10px;}
+  /* Guild modal table */
+  .modal-table{border-collapse:collapse;font-size:0.75rem;table-layout:auto;width:100%;}
+  .modal-table th{background:var(--md-surface);color:var(--md-on-surface-variant);padding:8px 12px;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:1;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;}
+  .modal-table th:first-child{text-align:left;}
+  .modal-table td{padding:6px 12px;border-bottom:1px solid var(--row-hairline);text-align:right;vertical-align:middle;white-space:nowrap;transition:background var(--md-duration-short) var(--md-ease);}
+  .modal-table td:first-child{text-align:left;font-size:0.6875rem;color:var(--md-on-surface-variant);font-family:monospace;}
+  .modal-table tr:hover td{background:var(--row-hover);}
+  /* Graph chart buttons */
+  .gchart-type-btn{padding:6px 12px;font-size:0.75rem;border-radius:var(--md-shape-sm);border:1px solid var(--md-outline);background:var(--md-surface-container-high);color:var(--md-on-surface-variant);cursor:pointer;transition:all var(--md-duration-short) var(--md-ease);}
+  .gchart-type-btn.active{background:#1e40af;color:#fff;border-color:#1e40af;box-shadow:var(--md-elevation-1);}
+  .gchart-type-btn:hover:not(.active){background:var(--md-surface-bright);}
+  /* Battle bar */
+  .battle-bar{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--md-surface-dim);border-bottom:1px solid var(--md-outline);flex-wrap:wrap;}
+  .battle-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--md-shape-full);font-size:0.75rem;font-weight:700;color:#fff;}
+  .battle-tag .bt-close{cursor:pointer;opacity:0.6;margin-left:3px;font-size:0.625rem;line-height:1;transition:opacity var(--md-duration-short) var(--md-ease);}
+  .battle-tag .bt-close:hover{opacity:1;}
+  .battle-filter-btn{padding:4px 10px;border-radius:var(--md-shape-sm);font-size:0.75rem;cursor:pointer;background:var(--md-secondary-container);color:var(--md-on-primary-container);border:1px solid rgba(96,165,250,0.3);transition:all var(--md-duration-short) var(--md-ease);}
+  .battle-filter-btn.active{background:#1e40af;color:#fff;border-color:#1e40af;}
+  .battle-row-mark{display:inline-block;width:3px;height:13px;border-radius:2px;margin-right:4px;vertical-align:middle;}
+  /* Ctrl toggle */
+  #ctrl-toggle-bar{display:flex;justify-content:flex-end;align-items:center;padding:3px 6px 3px 8px;background:var(--md-surface-dim);border-bottom:1px solid var(--md-outline-variant);gap:6px;}
+  #ctrl-toggle-btn{background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:11px;padding:3px 8px;border-radius:var(--md-shape-sm);display:flex;align-items:center;gap:4px;transition:all var(--md-duration-short) var(--md-ease);}
+  #ctrl-toggle-btn:hover{background:var(--row-hover);color:var(--md-on-surface);}
+  #ctrl-toggle-arrow{display:inline-block;transition:transform 0.3s var(--md-ease);}
+  #main-content.ctrl-collapsed #ctrl-toggle-arrow{transform:rotate(180deg);}
+  #ctrl-collapsible{display:grid;grid-template-rows:1fr;transition:grid-template-rows 0.3s var(--md-ease);}
+  #ctrl-collapsible>.ctrl-inner{min-height:0;overflow:hidden;opacity:1;transition:opacity 0.25s var(--md-ease);}
+  #main-content.ctrl-collapsed #ctrl-collapsible{grid-template-rows:0fr;}
+  #main-content.ctrl-collapsed #ctrl-collapsible>.ctrl-inner{opacity:0;}
+  /* コントロール列（dashboard と同仕様。親が flex でないため max-width で代替） */
+  #ctrl-left{display:flex;flex-direction:column;gap:2px;min-width:0;max-width:260px;}
+  #event-row{display:flex;align-items:center;gap:8px;}
+  #snap-selector{display:grid;grid-template-columns:auto 1fr auto auto;row-gap:2px;column-gap:4px;}
+  #snap-selector>div{display:grid;grid-template-columns:subgrid;grid-column:1/-1;align-items:center;}
+  #period-day-selector>div{display:flex;align-items:center;gap:4px;}
+  /* 検索バー（dashboard と同仕様） */
+  .search-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .search-bar input{width:200px;font-size:0.75rem;}
+  @media(min-width:600px){.search-bar{margin-bottom:4px;}}
+  /* Layout */
+  #main-content{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .table-card{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #rank-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #site-footer{flex-shrink:0;}
+  /* Side panel */
+  #side-panel{display:none;}
+  #side-collapse-btn{display:none;width:100%;height:28px;background:transparent;border:none;border-bottom:1px solid var(--md-outline-variant);border-radius:0;cursor:pointer;padding:0 10px;color:var(--md-on-surface-variant);font-size:11px;line-height:1;transition:all var(--md-duration-short) var(--md-ease);flex-shrink:0;align-items:center;justify-content:flex-end;gap:4px;}
+  #side-collapse-btn:hover{color:var(--md-on-surface);background:var(--row-hover);}
+  #side-panel.collapsed #side-collapse-btn{justify-content:center;padding:0;}
+  @media(min-width:1024px){
+    .main-wrap{flex-direction:row !important;align-items:flex-start;}
+    #side-panel{width:210px;flex-shrink:0;display:flex !important;flex-direction:column;gap:8px;padding:4px 0 4px 8px;position:sticky;top:52px;max-height:calc(100vh - 52px);overflow-y:auto;}
+    #side-panel.collapsed{width:28px;padding:4px 0;}
+    #side-panel.collapsed .side-card{display:none;}
+    #side-collapse-btn{display:flex !important;}
+  }
+  @media(max-width:1023px){#side-panel{display:none !important;}#side-collapse-btn{display:none !important;}}
+  .side-card{background:var(--md-surface-container);border:1px solid var(--md-outline-variant);border-radius:var(--md-shape-md);padding:12px;transition:border-color var(--md-duration-short) var(--md-ease);}
+  .side-card:hover{border-color:var(--md-outline);}
+  .side-card-title{font-size:0.625rem;color:var(--md-on-surface-variant);font-weight:500;letter-spacing:0.06em;margin-bottom:6px;text-transform:uppercase;}
+  .side-card-value{font-size:0.8125rem;font-weight:700;color:var(--md-on-surface);font-variant-numeric:tabular-nums;}
+  .side-card-sub{font-size:0.6875rem;color:var(--md-on-surface-variant);margin-top:4px;}
+  .side-elem-badge{display:inline-block;padding:2px 8px;border-radius:var(--md-shape-full);font-size:0.6875rem;font-weight:700;margin-top:4px;}
+  /* Graph suggest */
+  .graph-suggest-item{padding:6px 12px;cursor:pointer;font-size:0.8125rem;color:var(--md-on-surface);border-bottom:1px solid var(--md-outline-variant);}
+  .graph-suggest-item:hover{background:var(--row-hover);}
+  @media(max-width:599px){.tab-sub{display:none;}.tab-btn{padding:5px 2px;font-size:0.75rem;}}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important;}}
+</style>
+<script>
+/**
+ * Element Color System for GBF Ranking App
+ * theme-manager.js - Manages element accent colors only (single dark theme)
+ */
+
+// === Element Accent Colors ===
+const ELEMENT_COLORS = {
+  '火': '#ef4444',
+  '水': '#3b82f6',
+  '土': '#d97706',
+  '風': '#22c55e',
+  '光': '#eab308',
+  '闇': '#7c3aed'
+};
+
+/**
+ * Extract element character from event name
+ */
+function getEventElement(eventName) {
+  if (!eventName) return null;
+  for (const elem of Object.keys(ELEMENT_COLORS)) {
+    if (eventName.includes(elem)) return elem;
+  }
+  return null;
+}
+
+/**
+ * Apply element accent color based on event name
+ */
+function applyElementTheme(eventName) {
+  const element = getEventElement(eventName);
+  const color = (element && ELEMENT_COLORS[element]) ? ELEMENT_COLORS[element] : '#3b82f6';
+  document.documentElement.style.setProperty('--elem-color', color);
+  document.documentElement.style.setProperty('--elem-color-light', color + '99');
+}
+
+/**
+ * Open help/howto modal — works for both dashboard (#help-modal) and border (#howto-modal)
+ */
+function openHowto() {
+  const modal = document.getElementById('howto-modal') || document.getElementById('help-modal');
+  if (!modal) return;
+  if (modal.classList.contains('modal-backdrop')) {
+    modal.classList.add('open');
+  } else {
+    modal.style.display = 'flex';
+  }
+}
+
+/* ─── Color Mode (light / dark) ──────────────── */
+
+const COLOR_MODE_KEY = 'gbf_color_mode';
+
+function getColorMode() {
+  try {
+    const saved = localStorage.getItem(COLOR_MODE_KEY);
+    if (saved === 'light' || saved === 'dark') return saved;
+  } catch {}
+  return 'dark'; // 既定はダーク（既存挙動）
+}
+
+// 添付アイコン: ライト時は太陽（グレー）、ダーク時は月（ブルー）。背景に対して常に視認可能
+const SUN_SVG  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5"/><g stroke="#f59e0b" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/></g></svg>';
+const MOON_SVG = '<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#6366f1"/><path d="M20.5 13.2A8 8 0 1 1 10.8 3.5 6.3 6.3 0 0 0 20.5 13.2Z" fill="#fff"/></svg>';
+
+function applyColorMode(mode) {
+  const m = mode === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', m);
+  try { localStorage.setItem(COLOR_MODE_KEY, m); } catch {}
+  // トグルボタンのアイコンを更新（存在すれば）。現在のモードを表示
+  document.querySelectorAll('.color-mode-toggle').forEach(btn => {
+    btn.innerHTML = m === 'light' ? SUN_SVG : MOON_SVG;
+    btn.title = m === 'light' ? 'ダークモードに切替' : 'ライトモードに切替';
+  });
+}
+
+function toggleColorMode() {
+  const cur = document.documentElement.getAttribute('data-theme') || getColorMode();
+  applyColorMode(cur === 'light' ? 'dark' : 'light');
+}
+
+// FOUC回避のため即時適用（DOMContentLoaded を待たない）
+applyColorMode(getColorMode());
+
+/* ─── Init ───────────────────────────────────── */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Clear any stored background theme (legacy)
+  localStorage.removeItem('gbf_bg_theme');
+  // 保存済みカラーモードを再適用（ボタンアイコン同期のため）
+  applyColorMode(getColorMode());
+});
+
+</script>
+</head>
+<body>
+<!-- ヘッダー -->
+<header class="header">
+  <div class="header-inner">
+    <h1 class="hdr-h1">
+      <a id="hdr-logo-link" href="/guild" style="color:inherit;text-decoration:none;display:inline-flex;align-items:center;min-width:0;overflow:hidden">
+        <img src="/favicon-custom.png" width="22" height="22" style="object-fit:cover;border-radius:3px;flex-shrink:0;margin-right:6px" onerror="this.style.display='none'">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">GBF古戦場 団ランキング</span>
+      </a>
+    </h1>
+    <div class="hdr-right">
+      <button class="hdr-btn color-mode-toggle" onclick="toggleColorMode()" aria-label="カラーモード切替" style="padding:4px 8px;line-height:0"></button>
+      <a id="hdr-ranking-link" href="/" class="hdr-btn hdr-btn-blue">ランキング</a>
+      <a id="hdr-border-link" href="/border" class="hdr-btn hdr-btn-blue">ボーダー</a>
+      <button class="hdr-btn" onclick="openGuildHelpModal()">使い方</button>
+    </div>
+  </div>
+</header>
+
+<div class="main-wrap" style="padding:4px 10px 4px;max-width:1536px;margin:0 auto;width:100%;box-sizing:border-box">
+
+<!-- メインコンテンツ -->
+<div id="main-content">
+  <!-- コントロール折りたたみバー -->
+  <div id="ctrl-toggle-bar">
+    <span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.6">タブ・設定</span>
+    <button id="ctrl-toggle-btn" onclick="toggleCtrl()" title="タブ・設定を収納/展開">
+      <span id="ctrl-toggle-text">収納</span><span id="ctrl-toggle-arrow">▲</span>
+    </button>
+  </div>
+
+  <div id="ctrl-collapsible">
+  <div class="ctrl-inner">
+    <!-- タブ: 2列 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:4px">
+      <button id="tab-20min" class="tab-btn active" onclick="switchTab('20min')">20分速<span class="tab-sub">直近の速度</span></button>
+      <button id="tab-morning" class="tab-btn" onclick="switchTab('morning')">朝活<span class="tab-sub" id="tab-morning-sub">7:00→8:00</span></button>
+      <button id="tab-daily" class="tab-btn" onclick="switchTab('daily')">日速<span class="tab-sub" id="tab-daily-sub">7:00→24:00</span></button>
+    </div>
+
+    <!-- コントロール -->
+    <div style="padding:4px">
+    <div id="ctrl-left">
+      <!-- 行1: 古戦場選択 -->
+      <div id="event-row">
+        <select id="event-select" onchange="onEventChange()" style="flex:1;min-width:0;font-size:12px">
+          <option value="">イベント選択</option>
+        </select>
+      </div>
+
+      <!-- 行2-3: 20分速 スナップ選択（日付行 + 時間行） -->
+      <div id="snap-selector">
+        <div>
+          <button class="day-nav-btn" onclick="shiftSnapDay(-1)" title="前日">◀</button>
+          <select id="snap-day-select" onchange="onSnapDayChange()" style="width:100%;min-width:0;font-size:12px">
+            <option value="">-- 全日（最新自動） --</option>
+          </select>
+          <button class="day-nav-btn" onclick="shiftSnapDay(1)" title="翌日">▶</button>
+        </div>
+        <div>
+          <button class="day-nav-btn" onclick="shiftSnap(-1)" title="前のスナップ">◀</button>
+          <select id="snap-time-select" onchange="onSnapTimeChange()" style="width:100%;min-width:0;font-size:12px" disabled>
+            <option value="">-- 最新（自動） --</option>
+          </select>
+          <button class="day-nav-btn" onclick="shiftSnap(1)" title="次のスナップ">▶</button>
+          <button class="day-nav-btn" onclick="clearSnapSelect()" id="snap-clear-btn" title="最新自動に戻す">✕</button>
+        </div>
+      </div>
+
+      <!-- 行2-3: 日速 期間日付 + スナップ時刻プルダウン -->
+      <div id="period-day-selector" style="display:none">
+        <div>
+          <button class="day-nav-btn" onclick="shiftDate(-1)" title="前日">◀</button>
+          <select id="event-day-select" onchange="onEventDayChange()" style="flex:1;min-width:0;font-size:12px">
+            <option value="">-- 日付を選択 --</option>
+          </select>
+          <button class="day-nav-btn" onclick="shiftDate(1)" title="翌日">▶</button>
+          <button class="day-nav-btn" onclick="jumpToToday()" title="今日" style="flex-shrink:0">今日</button>
+        </div>
+      </div>
+    </div><!-- /#ctrl-left -->
+    </div>
+
+    <!-- 検索バー -->
+    <div class="search-bar" style="padding:0 4px">
+      <input type="text" id="search-input" placeholder="団名で検索..." oninput="applySearch()" autocomplete="off" spellcheck="false">
+      <button onclick="openGraphModal()" style="padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;font-size:12px;flex-shrink:0;transition:all var(--md-duration-short) var(--md-ease);align-self:stretch" title="グラフ分析">グラフ</button>
+      <button style="font-size:0.75rem;color:var(--md-on-surface-variant);background:none;border:none;cursor:pointer;padding:2px 4px;" onclick="clearSearch()" title="検索クリア">✕</button>
+      <span id="search-hit" style="font-size:0.6875rem;color:var(--md-on-surface-variant);white-space:nowrap;"></span>
+    </div>
+  </div><!-- /ctrl-inner -->
+  </div><!-- /ctrl-collapsible -->
+
+  <!-- バトルバー -->
+  <div id="battle-bar" class="battle-bar" style="display:none">
+    <span style="font-size:0.6875rem;color:var(--md-on-surface-variant);">バトル:</span>
+    <div id="battle-tags" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+    <button id="battle-filter-btn" class="battle-filter-btn" onclick="toggleBattleFilter()">この団だけ表示</button>
+    <button onclick="openGraphModal()" style="padding:5px 12px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;font-size:12px;flex-shrink:0;transition:all var(--md-duration-short) var(--md-ease)" title="グラフ分析">グラフ</button>
+    <button class="day-nav-btn" onclick="clearAllBattle()" title="バトル登録を全解除">✕ 全解除</button>
+    <span id="battle-count" style="font-size:0.6875rem;color:var(--md-on-surface-variant);"></span>
+  </div>
+
+  <!-- テーブルカード -->
+  <div class="card table-card overflow-hidden" style="flex:1">
+    <!-- ステータスバー（カード内ヘッダー） -->
+    <div id="stat-bar" style="display:none;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--md-outline-variant);font-size:0.75rem;">
+      <span id="stat-type" class="type-badge type-20min" style="font-size:0.6875rem;">20分速</span>
+      <span id="stat-period" style="color:var(--md-on-surface-variant);font-size:0.6875rem;">--</span>
+      <span id="stat-count" style="color:var(--md-on-surface-variant);margin-left:auto;font-size:0.6875rem;">--</span>
+    </div>
+    <!-- テーブル -->
+    <div id="rank-table-wrap" style="overflow:auto;-webkit-overflow-scrolling:touch">
+      <div id="loading-msg" class="loading">読み込み中...</div>
+      <div id="no-data-msg" class="no-data" style="display:none;">データがありません</div>
+      <table id="rank-table" style="display:none;min-width:500px">
+        <colgroup id="col-group"></colgroup>
+        <thead>
+          <tr id="col-headers"></tr>
+        </thead>
+        <tbody id="rank-tbody"></tbody>
+      </table>
+    </div>
+  </div><!-- /card -->
+
+</div><!-- /#main-content -->
+
+<!-- PC サイドバー -->
+<div id="side-panel">
+  <button id="side-collapse-btn" onclick="toggleSidePanel()" title="サイドバーを折りたたむ">
+    <span id="side-collapse-label" style="font-size:10px;letter-spacing:0.04em">サイド</span>
+    <span id="side-collapse-arrow">◀</span>
+  </button>
+  <div class="side-card" id="side-event-card">
+    <div class="side-card-title">開催中イベント</div>
+    <div class="side-card-value" id="side-event-name" style="font-size:12px;line-height:1.4">-</div>
+    <div id="side-elem-wrap"></div>
+  </div>
+  <div class="side-card" id="side-top-card">
+    <div class="side-card-title">トップスコア</div>
+    <div class="side-card-value" id="side-top-score">-</div>
+    <div class="side-card-sub" id="side-top-name">-</div>
+    <div class="side-card-sub" id="side-top-diff" style="color:var(--md-success)"></div>
+  </div>
+  <div class="side-card" id="side-watch-card" style="display:none">
+    <div class="side-card-title" style="display:flex;align-items:center;justify-content:space-between">
+      注目団
+      <span style="font-size:9px;color:var(--md-on-surface-variant);font-weight:400">★ で追加/解除</span>
+    </div>
+    <div id="side-watch-list"></div>
+  </div>
+</div>
+
+</div><!-- /.main-wrap -->
+
+<!-- フッター -->
+<footer id="site-footer" style="padding:8px 16px;text-align:center;font-size:0.6875rem;color:var(--md-on-surface-variant);border-top:1px solid var(--md-outline-variant);"></footer>
+
+<!-- ===== 団詳細モーダル ===== -->
+<div id="guild-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeGuildModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span id="gmodal-name" style="font-weight:700;font-size:0.9375rem;color:var(--md-on-surface);"></span>
+      <a id="gmodal-game-link" href="#" target="_blank" rel="noopener"
+         style="font-size:11px;color:var(--md-on-surface-variant);text-decoration:none;display:none;">↗ GBF団ページ</a>
+      <div id="gmodal-summary" style="font-size:0.6875rem;color:var(--md-on-surface-variant);margin-left:4px;"></div>
+      <button onclick="closeGuildModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:1.2rem;line-height:1;padding:2px 6px;" title="閉じる">✕</button>
+    </div>
+    <div class="modal-body" style="overflow-x:auto;overflow-y:auto;padding:12px 8px;">
+      <div id="gmodal-loading" style="text-align:center;color:var(--md-on-surface-variant);padding:32px;">読み込み中...</div>
+      <div id="gmodal-table-wrap" style="display:none;">
+        <table class="modal-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">取得時間</th>
+              <th>順位</th>
+              <th>20分速</th>
+              <th>スコア増加</th>
+              <th>累計スコア</th>
+            </tr>
+          </thead>
+          <tbody id="gmodal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 使い方ガイドモーダル ===== -->
+<div id="guild-help-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeGuildHelpModal()">
+  <div class="modal-box" style="width:min(96vw,640px);max-height:90vh">
+    <div class="modal-header">
+      <span style="font-weight:600;font-size:0.9375rem;color:var(--md-secondary)">使い方ガイド</span>
+      <button onclick="closeGuildHelpModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:18px;line-height:1;padding:2px 6px" title="閉じる">✕</button>
+    </div>
+    <div style="display:flex;gap:4px;padding:10px 14px 0;border-bottom:1px solid var(--md-outline-variant);flex-wrap:wrap;background:var(--md-surface-dim)">
+      <button class="help-tab active" id="ghtab-ranking" onclick="switchGuildHelpTab('ranking')">ランキング種別</button>
+      <button class="help-tab" id="ghtab-snap" onclick="switchGuildHelpTab('snap')">スナップ選択</button>
+      <button class="help-tab" id="ghtab-watch" onclick="switchGuildHelpTab('watch')">注目団・バトル</button>
+      <button class="help-tab" id="ghtab-sort" onclick="switchGuildHelpTab('sort')">ソート・検索</button>
+      <button class="help-tab" id="ghtab-graph" onclick="switchGuildHelpTab('graph')">グラフ</button>
+      <button class="help-tab" id="ghtab-legend" onclick="switchGuildHelpTab('legend')">表示の見方</button>
+    </div>
+    <div class="modal-body" style="padding:16px 18px;overflow-y:auto;min-height:380px">
+
+      <!-- ===== ランキング種別 ===== -->
+      <div id="ghpanel-ranking" class="help-panel">
+        <p class="help-panel-desc">団ランキングは <strong style="color:#93c5fd">20分速</strong> と <strong style="color:#4ade80">日速</strong> の 2 種類です。<br><strong style="color:#4ade80">日速</strong>は集計期間中に新しいスナップが届くたび <strong style="color:var(--md-on-surface)">最新までの累計</strong>でライブ更新され、ステータスバーに <span style="color:#4ade80;font-weight:700">(進行中)</span> バッジが表示されます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item" style="border-left:3px solid #93c5fd">
+            <div style="color:#93c5fd;font-weight:700">20分速</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">直前スナップから最新スナップまでの団スコア差分。スナップは約 20 分間隔で取得されます。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #4ade80">
+            <div style="color:#4ade80;font-weight:700">日速</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">7:00 → 翌 0:00 の累計増加量。期間中はライブ更新、翌 0:00 到達で確定。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== スナップ選択 ===== -->
+      <div id="ghpanel-snap" class="help-panel" style="display:none">
+        <p class="help-panel-desc"><strong style="color:#93c5fd">20分速タブ専用</strong>の機能です。<br>日付プルダウンで GBF 日（予選 1 日目・本戦 2 日目など）を、時刻プルダウンで同日内の収集時刻を選びます。日速タブは時刻選択不要・自動でライブ更新されます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item">
+            <div style="color:#93c5fd;font-weight:700;margin-bottom:4px">日付選択</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">◀ ▶ ボタンまたはプルダウンで GBF 日付を切替。「今日」ボタンで最新の日へジャンプ。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">時刻選択</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">同日内の収集時刻を選択。選んだスナップと直前スナップとの差分がランキングに反映されます。「✕」で最新自動に戻ります。</div>
+          </div>
+        </div>
+        <div class="help-tip"><strong style="color:var(--md-on-surface)">日速タブでは:</strong> 開始（朝 7:00）から最新スナップまでの累計が常に自動表示されます。</div>
+      </div>
+
+      <!-- ===== 注目団・バトル ===== -->
+      <div id="ghpanel-watch" class="help-panel" style="display:none">
+        <p class="help-panel-desc">特定の団を継続追跡したいときに使う機能です。<strong style="color:#fbbf24">★ 注目団</strong>は端末ローカルに保存、<strong style="color:#60a5fa">バトル団</strong>は色分けで複数団を同時にハイライトできます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">★ 注目団</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">団名横の ★ をクリックで登録/解除。サイドバー「注目団」カードに常時表示され、ブラウザ間で永続化されます（PC のみ表示）。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">バトル団</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">団名をクリックでバトルバーに追加。色付きの左罫線で行が強調されます。複数団を同時に登録可能。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">絞り込み表示</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">バトルバーの「この団だけ表示」で登録団のみのランキングに切替。再度クリックで全団表示に戻ります。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#f87171;font-weight:700;margin-bottom:4px">解除</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">バトルタグの ✕ で個別解除、「✕ 全解除」で一括クリア。</div>
+          </div>
+        </div>
+        <div class="help-tip"><strong style="color:var(--md-on-surface)">団詳細モーダル:</strong> 団名をダブルクリックまたは GN リンクから、その団のスナップごとのスコア推移・順位履歴を確認できます。「↗ GBF 団ページ」で公式サイトに飛べます。</div>
+      </div>
+
+      <!-- ===== ソート・検索 ===== -->
+      <div id="ghpanel-sort" class="help-panel" style="display:none">
+        <p class="help-panel-desc">テーブル列ヘッダのクリックでソート、検索欄で団名フィルタができます。列の順序や幅もドラッグ操作で調整可能です。</p>
+        <div class="help-grid">
+          <div class="help-grid-item">
+            <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">ソート</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">列ヘッダをクリックすると <span style="color:#60a5fa">▲ 昇順</span> ⇄ <span style="color:#f87171">▼ 降順</span> をトグル。順位・変動・全体順位・GN・増加量・累計貢献度すべて並べ替え可能。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">検索</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">団名で部分一致フィルタ。表示順位は維持されます。「✕」でクリア。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">列の並べ替え</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">ヘッダをドラッグ＆ドロップで列順を変更可能。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#a78bfa;font-weight:700;margin-bottom:4px">列幅調整</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">ヘッダ右端のハンドルをドラッグで列幅を調整できます。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== グラフ ===== -->
+      <div id="ghpanel-graph" class="help-panel" style="display:none">
+        <p class="help-panel-desc">複数団のスコア推移を折れ線グラフで比較できます。検索欄横の「グラフ」ボタンから開きます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item">
+            <div style="color:#93c5fd;font-weight:700;margin-bottom:4px">グラフ種別</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px"><strong style="color:var(--md-on-surface)">20分速</strong> ― スナップごとの増加量<br><strong style="color:var(--md-on-surface)">累計スコア</strong> ― 総スコアの推移<br><strong style="color:var(--md-on-surface)">順位変遷</strong> ― 全体順位の推移</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">団追加</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">バトル団・注目団から一括追加、またはモーダル内検索欄から個別追加。タグの ✕ で削除。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">期間絞り込み</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">日付の From〜To で表示するスナップ範囲を限定できます。</div>
+          </div>
+          <div class="help-grid-item">
+            <div style="color:#fb923c;font-weight:700;margin-bottom:4px">画像保存</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">「保存」ボタンでグラフを PNG 画像としてダウンロードできます。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 表示の見方（色凡例） ===== -->
+      <div id="ghpanel-legend" class="help-panel" style="display:none">
+        <p class="help-panel-desc">テーブルの記号や色の意味です。順位変動の <strong style="color:#60a5fa">▲</strong>/<strong style="color:#f87171">▼</strong> はイベント属性色（火・水など）に関わらず常に同じ色で表示されます。</p>
+        <div class="help-grid">
+          <div class="help-grid-item" style="border-left:3px solid #60a5fa">
+            <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">▲ 青 / NEW</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位上昇または新規ランクイン。テーブルヘッダのソート ▲（昇順）も同じ青色。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #f87171">
+            <div style="color:#f87171;font-weight:700;margin-bottom:4px">▼ 赤</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位下降。ソート ▼（降順）も同じ赤色。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #94a3b8">
+            <div style="color:#94a3b8;font-weight:700;margin-bottom:4px">→ グレー</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">順位変動なし。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid var(--elem-color)">
+            <div style="color:var(--elem-color);font-weight:700;margin-bottom:4px">イベント属性色</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">ヘッダ・タブ等の装飾色は古戦場の属性で変わりますが、データ読み取りには影響しません。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #fbbf24">
+            <div style="color:#fbbf24;font-weight:700;margin-bottom:4px">トップ3</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">表示順位 1〜3 位はメダル色（金・銀・銅）でハイライト。</div>
+          </div>
+          <div class="help-grid-item" style="border-left:3px solid #4ade80">
+            <div style="color:#4ade80;font-weight:700;margin-bottom:4px">(進行中) バッジ</div>
+            <div style="color:var(--md-on-surface-variant);font-size:12px">日速の集計期間中に表示。翌 0:00 到達で自動で消えます。</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--md-outline-variant);margin-top:16px;padding-top:12px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <a href="/privacy.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none">プライバシーポリシー</a>
+        <a href="/contact.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none">お問い合わせ</a>
+        <a href="/about.html" style="font-size:0.75rem;color:var(--md-on-surface-variant);text-decoration:none">サイトについて</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== グラフモーダル ===== -->
+<div id="graph-modal" style="display:none;" class="modal-overlay" onclick="if(event.target===this)closeGraphModal()">
+  <div class="modal-box" style="width:min(98vw,860px);max-height:92vh">
+    <div class="modal-header">
+      <span style="font-weight:700;font-size:0.9375rem;color:var(--md-on-surface);">団スコア推移</span>
+      <button onclick="closeGraphModal()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--md-on-surface-variant);font-size:1.2rem;line-height:1;">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- コントロール行1: 種別 + 期間 + 保存 -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <div style="display:flex;gap:3px;">
+          <button id="gchart-speed-btn" class="gchart-type-btn active" onclick="setGChartType('speed')">20分速</button>
+          <button id="gchart-score-btn" class="gchart-type-btn" onclick="setGChartType('score')">累計スコア</button>
+          <button id="gchart-rank-btn"  class="gchart-type-btn" onclick="setGChartType('rank')">順位変遷</button>
+        </div>
+        <!-- 期間増加切替（累計スコア選択時のみ表示） -->
+        <div id="score-origin-ctrl" style="display:none;gap:3px;">
+          <button id="score-abs-btn" class="gchart-type-btn active" onclick="setScoreOrigin('abs')">実数</button>
+          <button id="score-rel-btn" class="gchart-type-btn" onclick="setScoreOrigin('rel')">期間増加</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);">
+          <span>期間:</span>
+          <select id="graph-from-select" onchange="renderGuildGraph()" style="font-size:12px;padding:2px 6px;"></select>
+          <span>〜</span>
+          <select id="graph-to-select" onchange="renderGuildGraph()" style="font-size:12px;padding:2px 6px;"></select>
+        </div>
+        <!-- ポイント表示 -->
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
+          <input type="checkbox" id="graph-point-chk" onchange="onGraphPointSettingChange()"> ポイント表示
+        </label>
+        <input type="number" id="graph-point-size" value="3" min="1" max="10" step="1" onchange="onGraphPointSettingChange()"
+               title="ポイントサイズ" style="width:42px;font-size:12px;padding:3px 4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);border-radius:var(--md-shape-sm);color:var(--md-on-surface)">
+        <button onclick="shareGuildGraph()" style="margin-left:auto;padding:4px 10px;border-radius:5px;background:var(--md-primary-dim);border:1px solid var(--md-primary-dim);color:#fff;cursor:pointer;font-size:12px;">保存</button>
+      </div>
+      <!-- 団追加 -->
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+        <button onclick="addBattleGuildsToGraph()" style="padding:4px 10px;font-size:0.75rem;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;">バトルから追加</button>
+        <button onclick="addWatchedGuildsToGraph()" style="padding:4px 10px;font-size:0.75rem;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;">注目から追加</button>
+        <div style="position:relative;">
+          <input id="graph-guild-search" type="text" placeholder="団名検索..." style="font-size:12px;width:140px;" oninput="onGraphGuildSearch()" onblur="setTimeout(()=>hideGraphGuildSuggest(),200)" autocomplete="off">
+          <div id="graph-guild-suggest" style="display:none;position:absolute;top:100%;left:0;z-index:300;background:var(--md-surface-container);border:1px solid var(--md-outline);border-radius:var(--md-shape-sm);max-height:160px;overflow-y:auto;min-width:180px;box-shadow:var(--md-elevation-3);"></div>
+        </div>
+        <button onclick="clearGraphGuilds()" style="padding:4px 10px;font-size:0.75rem;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-error);cursor:pointer;">クリア</button>
+      </div>
+      <!-- 追加済み団タグ -->
+      <div id="graph-guild-tags" style="display:flex;flex-wrap:wrap;gap:4px;min-height:28px;"></div>
+      <!-- グラフエリア -->
+      <div id="graph-loading" style="display:none;color:var(--md-on-surface-variant);font-size:0.8125rem;padding:8px 0;text-align:center;">読み込み中...</div>
+      <div id="graph-empty" style="color:var(--md-on-surface-variant);font-size:0.8125rem;padding:8px 0;text-align:center;">団を追加してください</div>
+      <div id="graph-chart-area" style="position:relative;width:100%;height:260px;flex-shrink:0">
+        <canvas id="guild-chart" style="display:block;max-width:100%;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 定数・状態
+// ============================================================
+const GRAPH_COLORS = ['#3b82f6','#ef4444','#22c55e','#a855f7','#f97316','#06b6d4','#eab308','#ec4899','#14b8a6','#f59e0b'];
+const BATTLE_COLORS = ['#60a5fa','#fb923c','#4ade80','#c084fc','#f472b6','#facc15'];
+const ELEMENT_THEMES = {
+  '火':{ color:'#ef4444', light:'#ef444499' },
+  '水':{ color:'#3b82f6', light:'#3b82f699' },
+  '土':{ color:'#d97706', light:'#d9770699' },
+  '風':{ color:'#22c55e', light:'#22c55e99' },
+  '光':{ color:'#eab308', light:'#eab30899' },
+  '闇':{ color:'#7c3aed', light:'#7c3aed99' },
+};
+
+let currentEventId = null;
+let loadedEvents = [];
+let allGuildSnaps = [];
+let snapGroups = {};
+let snapDayList = [];
+let currentTab = '20min';
+let currentDate = '';
+let currentSnapId = null;
+let watchGuilds = JSON.parse(localStorage.getItem('guild_watch') || '[]');
+let lastData = null;
+
+// カラム定義 & 永続化
+const COL_DEFS = {
+  displayRank: { label: '順位',       width: 44,  align: 'center', sortKey: 'displayRank' },
+  rankDelta:   { label: '変動',       width: 44,  align: 'center', sortKey: 'rankDelta'   },
+  rank:        { label: '全体順位',   width: 62,  align: 'center', sortKey: 'rank'        },
+  name:        { label: 'GN',         width: 200, align: 'left',   sortKey: 'name'        },
+  scoreDiff:   { label: '増加量',     width: 130, align: 'right',  sortKey: 'scoreDiff'   },
+  score:       { label: '累計貢献度', width: 130, align: 'right',  sortKey: 'score'       },
+};
+let colOrder = (() => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('guild_col_order') || 'null');
+    if (Array.isArray(saved) && saved.every(k => k in COL_DEFS) && saved.length === Object.keys(COL_DEFS).length) return saved;
+  } catch {}
+  return Object.keys(COL_DEFS);
+})();
+let colWidths = (() => {
+  try { return JSON.parse(localStorage.getItem('guild_col_widths') || '{}') || {}; } catch { return {}; }
+})();
+function saveColPrefs() {
+  localStorage.setItem('guild_col_order', JSON.stringify(colOrder));
+  localStorage.setItem('guild_col_widths', JSON.stringify(colWidths));
+}
+
+let chartInstance = null;
+let gChartType = 'speed';
+let scoreOrigin = 'abs';  // 'abs' | 'rel'
+let graphGuilds = [];
+let _colorIdx = 0;
+// ポイント表示設定（ユーザー任意切替・localStorageで記憶。個人ランキングと共有キー）
+let graphShowPoints = localStorage.getItem('graph_show_points') === '1';
+let graphPointSize  = Number(localStorage.getItem('graph_point_size')) || 3;
+function onGraphPointSettingChange() {
+  graphShowPoints = document.getElementById('graph-point-chk').checked;
+  const sizeInput = document.getElementById('graph-point-size');
+  graphPointSize = Math.max(1, Math.min(10, Number(sizeInput.value) || 3));
+  try {
+    localStorage.setItem('graph_show_points', graphShowPoints ? '1' : '0');
+    localStorage.setItem('graph_point_size', String(graphPointSize));
+  } catch {}
+  renderGuildGraph();
+}
+// バトル
+let battleGuilds = [];
+let battleFilterActive = false;
+// ソート
+let sortKey = 'displayRank';
+let sortDir = 1;  // 1=昇順, -1=降順
+
+// ============================================================
+// API キャッシュ
+// ============================================================
+const _apiCache = new Map();
+async function apiFetch(url, ttl = 60000) {
+  // 静的モード: キャッシュからのみ読む（LIVE fetch しない）
+  if (window.__STATIC_MODE__) {
+    if (window.__STATIC_CACHE_PROMISE__) { try { await window.__STATIC_CACHE_PROMISE__; } catch {} }
+    if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
+    return null;
+  }
+  // LIVE: サーバ埋め込みの静的キャッシュがあれば優先、なければ fetch
+  if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
+  const cached = _apiCache.get(url);
+  if (cached && Date.now() - cached.ts < ttl) return cached.data;
+  const r = await fetch(url);
+  if (!r.ok) return null;
+  const data = await r.json();
+  _apiCache.set(url, { data, ts: Date.now() });
+  return data;
+}
+
+// 静的モード: 団の日別20分速/日速/朝活ファイルを遅延ロード（guild-snap-YYYY-MM-DD.json.gz）
+const _guildSnapDayLoading = new Map();
+async function ensureGuildSnapDayLoaded(gbfDay) {
+  if (!window.__STATIC_MODE__ || !gbfDay) return;
+  const daySnaps = snapGroups[gbfDay] || [];
+  if (daySnaps.length === 0) return;
+  const firstKey = `/api/guild/ranking/20min?snapshot_id=${daySnaps[0].id}`;
+  if (window.__STATIC_CACHE__ && firstKey in window.__STATIC_CACHE__) return;
+  if (_guildSnapDayLoading.has(gbfDay)) { await _guildSnapDayLoading.get(gbfDay); return; }
+  const p = fetch(`../guild-snap-${gbfDay}.json.gz`)
+    .then(r => r.ok ? r.arrayBuffer() : null)
+    .then(buf => {
+      if (!buf) return;
+      const dayCache = JSON.parse(pako.inflate(new Uint8Array(buf), { to: 'string' }));
+      window.__STATIC_CACHE__ = window.__STATIC_CACHE__ || {};
+      Object.assign(window.__STATIC_CACHE__, dayCache);
+    })
+    .catch(() => {})
+    .finally(() => _guildSnapDayLoading.delete(gbfDay));
+  _guildSnapDayLoading.set(gbfDay, p);
+  await p;
+}
+
+function numFmt(v) {
+  if (v == null) return '-';
+  return Number(v).toLocaleString('ja-JP');
+}
+
+// グラフ表示専用: ラベル末尾の "HH:mm" を直近20分刻み(:00/:20/:40)に丸める
+// （実際の取得時刻は内部処理でそのまま使用し、表示のみ統一する）
+function roundTimeLabel(label) {
+  const m = String(label).match(/^(.*) (\d{1,2}):(\d{2})$/);
+  if (!m) return label;
+  const [, prefix, hhStr, mmStr] = m;
+  let hh = parseInt(hhStr), mm = parseInt(mmStr);
+  const roundedMin = Math.round(mm / 20) * 20;
+  hh = (hh + Math.floor(roundedMin / 60)) % 24;
+  mm = roundedMin % 60;
+  return `${prefix} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+}
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function getGBFDay(capturedAt) {
+  const dt = capturedAt.substring(0, 10);
+  const hh = parseInt(capturedAt.substring(11, 13));
+  if (hh < 7) {
+    const [y, m, d] = dt.split('-').map(Number);
+    const prev = new Date(y, m-1, d-1);
+    return prev.toLocaleDateString('sv-SE');
+  }
+  return dt;
+}
+function getEventElement(name) {
+  for (const [k, v] of Object.entries(ELEMENT_THEMES)) {
+    if (name && name.includes(k)) return v;
+  }
+  return null;
+}
+function applyElementTheme(eventName) {
+  const t = getEventElement(eventName);
+  if (t) {
+    document.documentElement.style.setProperty('--elem-color', t.color);
+    document.documentElement.style.setProperty('--elem-color-light', t.light);
+  } else {
+    document.documentElement.style.setProperty('--elem-color', '#3b82f6');
+    document.documentElement.style.setProperty('--elem-color-light', '#60a5fa99');
+  }
+}
+
+// ============================================================
+// 初期化
+// ============================================================
+async function init() {
+  // テーブル列を動的生成
+  renderColgroup();
+  renderThead();
+  initControlsState();
+
+  // 静的モード: キャッシュ読み込み待機 + ヘッダーナビを相対リンクへ付け替え
+  if (window.__STATIC_MODE__) {
+    if (window.__STATIC_CACHE_PROMISE__) { try { await window.__STATIC_CACHE_PROMISE__; } catch {} }
+    const logoEl    = document.getElementById('hdr-logo-link');
+    const rankEl    = document.getElementById('hdr-ranking-link');
+    const borderEl  = document.getElementById('hdr-border-link');
+    if (logoEl)    logoEl.setAttribute('href', './');
+    if (rankEl)    rankEl.setAttribute('href', window.__STATIC_RANKING_LATEST_URL__ || './index.html');
+    if (borderEl && window.__STATIC_BORDER_URL__) borderEl.setAttribute('href', window.__STATIC_BORDER_URL__);
+    // meta.json から動的上書き（古いエクスポートのリンク修正）
+    if (window.__STATIC_INDEX_URL__) {
+      fetch(window.__STATIC_INDEX_URL__ + 'meta.json', { cache: 'no-cache' })
+        .then(r => r.ok ? r.json() : null)
+        .then(meta => {
+          if (!meta) return;
+          if (borderEl && meta.border_url)          borderEl.setAttribute('href', meta.border_url);
+          if (rankEl   && meta.ranking_latest_url)  rankEl.setAttribute('href', meta.ranking_latest_url);
+        }).catch(() => {});
+    }
+  }
+
+  const events = await apiFetch('/api/guild/events', 300000);
+  loadedEvents = events || [];
+
+  const sel = document.getElementById('event-select');
+  sel.innerHTML = '<option value="">-- イベント選択 --</option>';
+  for (const e of loadedEvents) {
+    const opt = document.createElement('option');
+    opt.value = e.id; opt.textContent = e.name;
+    sel.appendChild(opt);
+  }
+
+  // 静的モード: URL の ev{uid} からイベントを逆引きして自動選択（localStorage より優先）
+  let staticEventId = null;
+  if (window.__STATIC_MODE__) {
+    let urlId = null;
+    const hostM = window.location.hostname.match(/^ev(\d+)\./);
+    if (hostM) urlId = hostM[1];
+    else {
+      const pathM = window.location.pathname.match(/-ev(\d+)\//);
+      if (pathM) urlId = pathM[1];
+    }
+    if (urlId && window.__STATIC_EVENT_URLS__) {
+      for (const [dbId, url] of Object.entries(window.__STATIC_EVENT_URLS__)) {
+        if (url.includes(`/ev${urlId}.`) || url.includes(`-ev${urlId}/`)) {
+          if (loadedEvents.some(e => e.id === Number(dbId))) { staticEventId = Number(dbId); break; }
+        }
+      }
+    }
+  }
+
+  const savedEvent = localStorage.getItem('guild_event_id');
+  if (staticEventId) {
+    sel.value = staticEventId;
+  } else if (savedEvent && loadedEvents.some(e => String(e.id) === savedEvent)) {
+    sel.value = savedEvent;
+  } else if (loadedEvents.length) {
+    const active = loadedEvents.find(e => e.active) || loadedEvents[0];
+    const todayStr = new Date().toLocaleDateString('sv-SE');
+    const isFutureActive = active?.start_date && active.start_date > todayStr;
+    const fallback = isFutureActive
+      ? (loadedEvents.find(e => !e.start_date || e.start_date <= todayStr) || active)
+      : active;
+    sel.value = fallback.id;
+  }
+
+  renderWatchPanel();
+  if (sel.value) await onEventChange();
+  else { document.getElementById('loading-msg').textContent = 'イベントを選択してください'; }
+}
+
+// ============================================================
+// イベント変更
+// ============================================================
+async function onEventChange() {
+  const sel = document.getElementById('event-select');
+  currentEventId = sel.value ? Number(sel.value) : null;
+  if (!currentEventId) return;
+  localStorage.setItem('guild_event_id', currentEventId);
+
+  // 静的モード: 選択イベントが他イベント専用のサブドメインにしか団データが無い場合は
+  // そちらの ev{uid}.example.com/guild へ遷移する（個人ランキング側と同仕様）
+  if (window.__STATIC_MODE__ && window.__STATIC_EVENT_GUILD_URLS__) {
+    const hostM = window.location.hostname.match(/^ev(\d+)\./);
+    const pathM = !hostM && window.location.pathname.match(/-ev(\d+)\//);
+    const currentUrlId = hostM ? hostM[1] : (pathM ? pathM[1] : null);
+    const targetUrl = window.__STATIC_EVENT_GUILD_URLS__[currentEventId];
+    if (targetUrl && !(currentUrlId && (targetUrl.includes(`/ev${currentUrlId}.`) || targetUrl.includes(`-ev${currentUrlId}/`)))) {
+      window.location.href = targetUrl;
+      return;
+    }
+  }
+
+  const event = loadedEvents.find(e => e.id === currentEventId);
+  if (event) { applyElementTheme(event.name); updateSideEventCard(event.name); }
+
+  const snaps = await apiFetch(`/api/guild/snapshots?event_id=${currentEventId}`, 30000);
+  allGuildSnaps = snaps || [];
+
+  snapGroups = {};
+  allGuildSnaps.forEach(s => {
+    const day = getGBFDay(s.captured_at);
+    if (!snapGroups[day]) snapGroups[day] = [];
+    snapGroups[day].push(s);
+  });
+  snapDayList = Object.keys(snapGroups).sort();
+
+  populateSnapDaySelect();
+  updateGraphDaySelects();
+  populateEventDaySelect();
+  await reload();
+}
+
+// ============================================================
+// スナップ選択
+// ============================================================
+function populateSnapDaySelect() {
+  const sel = document.getElementById('snap-day-select');
+  sel.innerHTML = '<option value="">-- 全日（最新自動） --</option>';
+  const isMobile = window.innerWidth < 640;
+  for (const day of [...snapDayList].reverse()) {
+    const cnt = (snapGroups[day] || []).length;
+    const shortDay = day.substring(5).replace('-', '/');
+    const label = isMobile ? `${shortDay}(${cnt})` : `${day} (${cnt}件)`;
+    const opt = document.createElement('option');
+    opt.value = day; opt.textContent = label;
+    sel.appendChild(opt);
+  }
+  // 初期状態: 日付未選択 → 時間セレクトを無効化
+  const timeSel = document.getElementById('snap-time-select');
+  if (!sel.value) {
+    timeSel.disabled = true;
+    timeSel.style.opacity = '0.45';
+  }
+}
+function shiftSnapDay(delta) {
+  const sel = document.getElementById('snap-day-select');
+  const days = ['', ...snapDayList.slice().reverse()];
+  const idx = days.indexOf(sel.value);
+  const next = days[idx + delta];
+  if (next !== undefined) { sel.value = next; onSnapDayChange(); }
+}
+async function onSnapDayChange() {
+  const day = document.getElementById('snap-day-select').value;
+  const timeSel = document.getElementById('snap-time-select');
+  if (!day) {
+    timeSel.innerHTML = '<option value="">-- 最新（自動） --</option>';
+    timeSel.disabled = true;
+    timeSel.style.opacity = '0.45';
+  } else {
+    timeSel.disabled = false;
+    timeSel.style.opacity = '';
+    timeSel.innerHTML = '<option value="">-- この日の最新 --</option>';
+    const daySnaps = (snapGroups[day] || []);
+    for (const s of daySnaps) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.captured_at.substring(11, 16) + ` (${s.guild_count}団)`;
+      timeSel.appendChild(opt);
+    }
+  }
+  currentSnapId = null; timeSel.value = '';
+  await reload();
+}
+function shiftSnap(dir) {
+  // dashboard と同じ方向: ArrowLeft(dir=-1)=古い方へ / ArrowRight(dir=+1)=新しい方へ
+  // allGuildSnaps は captured_at DESC（index 0 が最新）
+  if (!allGuildSnaps || !allGuildSnaps.length) return;
+  let curIdx = -1;
+  if (currentSnapId) {
+    curIdx = allGuildSnaps.findIndex(s => s.id === currentSnapId);
+  }
+  // currentSnapId 未設定（最新自動）→ index 0 扱い
+  if (dir === -1) {
+    // 古い方向へ
+    if (curIdx === -1) {
+      selectSnapByGlobalIdx(1); // 最新自動 → ひとつ古いスナップ
+    } else if (curIdx < allGuildSnaps.length - 1) {
+      selectSnapByGlobalIdx(curIdx + 1);
+    }
+  } else {
+    // 新しい方向へ
+    if (curIdx <= 0) {
+      // すでに最新 → 最新自動へ戻す
+      clearSnapSelect();
+    } else {
+      selectSnapByGlobalIdx(curIdx - 1);
+    }
+  }
+}
+function selectSnapByGlobalIdx(globalIdx) {
+  if (globalIdx < 0 || globalIdx >= allGuildSnaps.length) return;
+  const snap = allGuildSnaps[globalIdx];
+  const day = getGBFDay(snap.captured_at);
+  const daySel = document.getElementById('snap-day-select');
+  const timeSel = document.getElementById('snap-time-select');
+  if (daySel.value !== day) {
+    daySel.value = day;
+    timeSel.disabled = false;
+    timeSel.style.opacity = '';
+    timeSel.innerHTML = '<option value="">-- この日の最新 --</option>';
+    for (const s of (snapGroups[day] || [])) {
+      const opt = document.createElement('option');
+      opt.value = s.id;
+      opt.textContent = s.captured_at.substring(11, 16) + ` (${s.guild_count}団)`;
+      timeSel.appendChild(opt);
+    }
+  }
+  timeSel.value = String(snap.id);
+  currentSnapId = snap.id;
+  reload();
+}
+function onSnapTimeChange() {
+  currentSnapId = document.getElementById('snap-time-select').value
+    ? Number(document.getElementById('snap-time-select').value) : null;
+  reload();
+}
+function clearSnapSelect() {
+  document.getElementById('snap-day-select').value = '';
+  const timeSel = document.getElementById('snap-time-select');
+  timeSel.innerHTML = '<option value="">-- 最新（自動） --</option>';
+  timeSel.disabled = true;
+  timeSel.style.opacity = '0.45';
+  currentSnapId = null; reload();
+}
+
+// ============================================================
+// 日速 日付セレクト
+// ============================================================
+function populateEventDaySelect() {
+  const sel = document.getElementById('event-day-select');
+  sel.innerHTML = '<option value="">-- 日付を選択 --</option>';
+  for (const day of [...snapDayList].reverse()) {
+    const opt = document.createElement('option');
+    opt.value = day; opt.textContent = day;
+    sel.appendChild(opt);
+  }
+  const last = snapDayList[snapDayList.length - 1];
+  if (last) { sel.value = currentDate && snapDayList.includes(currentDate) ? currentDate : last; currentDate = sel.value; }
+}
+function onEventDayChange() {
+  currentDate = document.getElementById('event-day-select').value;
+  reload();
+}
+function shiftDate(delta) {
+  const idx = snapDayList.indexOf(currentDate);
+  const next = snapDayList[idx + delta];
+  if (next !== undefined) {
+    currentDate = next;
+    document.getElementById('event-day-select').value = next;
+    reload();
+  }
+}
+function jumpToToday() {
+  const now = new Date();
+  const jst = new Date(now.getTime() + 9 * 3600 * 1000);
+  if (jst.getUTCHours() < 7) jst.setUTCDate(jst.getUTCDate() - 1);
+  const today = jst.toISOString().substring(0, 10);
+  const d = snapDayList.includes(today) ? today : snapDayList[snapDayList.length - 1] || today;
+  document.getElementById('event-day-select').value = d;
+  currentDate = d; reload();
+}
+
+// ============================================================
+// タブ切り替え
+// ============================================================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById('snap-selector').style.display = tab === '20min' ? 'grid' : 'none';
+  document.getElementById('period-day-selector').style.display = tab !== '20min' ? 'block' : 'none';
+  reload();
+}
+
+// ============================================================
+// データ読み込み
+// ============================================================
+async function reload() {
+  document.getElementById('loading-msg').style.display = '';
+  document.getElementById('no-data-msg').style.display = 'none';
+  document.getElementById('rank-table').style.display = 'none';
+  document.getElementById('stat-bar').style.display = 'none';
+
+  if (!currentEventId) { document.getElementById('loading-msg').textContent = 'イベントを選択してください'; return; }
+
+  let data = null;
+  if (currentTab === '20min') {
+    if (currentSnapId) {
+      const snap = allGuildSnaps.find(s => s.id === currentSnapId);
+      if (snap) await ensureGuildSnapDayLoaded(getGBFDay(snap.captured_at));
+      data = await apiFetch(`/api/guild/ranking/20min?snapshot_id=${currentSnapId}`, 60000);
+    } else {
+      data = await apiFetch(`/api/guild/ranking/latest?event_id=${currentEventId}`, 60000);
+    }
+  } else {
+    const date = currentDate || snapDayList[snapDayList.length - 1];
+    const ep = currentTab === 'morning' ? 'morning' : 'daily';
+    if (date) {
+      await ensureGuildSnapDayLoaded(date);
+      data = await apiFetch(`/api/guild/ranking/${ep}?event_id=${currentEventId}&date=${date}`, 60000);
+    }
+  }
+
+  document.getElementById('loading-msg').style.display = 'none';
+  if (!data || !data.guilds) { document.getElementById('no-data-msg').style.display = ''; return; }
+  lastData = data;
+  renderTable(data);
+  updateSideTopCard(data);
+  renderWatchPanel();
+}
+
+// ============================================================
+// テーブル描画
+// ============================================================
+function renderTable(data) {
+  const tbody = document.getElementById('rank-tbody');
+  const guilds = data.guilds || [];
+  const maxDiff = Math.max(1, ...guilds.map(g => g.scoreDiff || 0));
+
+  // stat-bar
+  const typeMap = { '20分速':'type-20min', '朝活': data.isLive ? 'type-live' : 'type-morning', '日速': data.isLive ? 'type-live' : 'type-daily' };
+  const typeEl = document.getElementById('stat-type');
+  typeEl.className = 'type-badge ' + (typeMap[data.type] || 'type-20min');
+  typeEl.textContent = data.type + (data.isLive ? '(進行中)' : '');
+  const fmt = s => s ? s.substring(5, 16) : '--';
+  document.getElementById('stat-period').textContent = `${fmt(data.before)} → ${fmt(data.after)}`;
+  document.getElementById('stat-count').textContent = `${guilds.length}団`;
+  document.getElementById('stat-bar').style.display = 'flex';
+
+  if (currentTab === 'daily') {
+    document.getElementById('tab-daily-sub').textContent = data.isLive ? '7:00→最新' : '7:00→24:00';
+  }
+  if (currentTab === 'morning') {
+    document.getElementById('tab-morning-sub').textContent = data.isLive ? '7:00→最新' : '7:00→8:00';
+  }
+
+  const search = document.getElementById('search-input').value.toLowerCase();
+  let rows = sortGuilds(guilds);
+  if (battleFilterActive && battleGuilds.length > 0) {
+    rows = rows.filter(g => battleGuilds.some(b => b.id === g.guild_id));
+  }
+  if (search) rows = rows.filter(g => g.name?.toLowerCase().includes(search));
+  updateSortIndicators();
+
+  const html = rows.map((g, displayIdx) => {
+    const wOn  = watchGuilds.some(w => w.id === g.guild_id);
+    const bInfo = battleGuilds.find(b => b.id === g.guild_id);
+
+    // 背景色・行スタイル（dashboard と同仕様）
+    const bg = rowBg(g.displayRank, displayIdx);
+    const rowStyle = bInfo ? `background:${bg};border-left:5px solid ${bInfo.color}` : `background:${bg}`;
+    const rankCls = !bInfo && g.displayRank <= 3 ? ` top-${g.displayRank}` : '';
+
+    // 表示順の色
+    const rankColor  = g.displayRank === 1 ? '#fbbf24' : g.displayRank === 2 ? '#c0c0c0' : g.displayRank === 3 ? '#cd7c32' : 'var(--md-on-surface-variant)';
+    const rankWeight = g.displayRank <= 3 ? '700' : '400';
+
+    // 順位変動
+    let rankDeltaHtml = '<span class="flat">—</span>';
+    if (g.prevRank != null && g.rank != null) {
+      const d = g.prevRank - g.rank;
+      if (d > 0) rankDeltaHtml = `<span class="up">▲${d}</span>`;
+      else if (d < 0) rankDeltaHtml = `<span class="down">▼${Math.abs(d)}</span>`;
+      else rankDeltaHtml = '<span class="flat">→</span>';
+    } else if (g.prevRank == null) {
+      rankDeltaHtml = '<span class="new">NEW</span>';
+    }
+
+    // スコアバー（色仕様は個人ランキングと同一: 1位=金 / 2-3位=青 / 4-10位=緑 / 以降=藍）
+    const barPct = maxDiff > 0 ? (g.scoreDiff / maxDiff * 100).toFixed(1) : 0;
+    const barColor = g.displayRank === 1 ? '#fbbf24' : g.displayRank <= 3 ? '#60a5fa' : g.displayRank <= 10 ? '#4ade80' : '#6366f1';
+
+    // GNセル構造（dashboard と同仕様: battleMark + histBtn + gn-clickable→battle + profileLink + ★）
+    const battleMark = bInfo ? `<span class="battle-row-mark" style="background:${bInfo.color}"></span>` : '';
+    const gnCls = bInfo ? ' gn-pinned' : '';
+    const gnCol = bInfo ? ` style="color:${bInfo.color}"` : '';
+    const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openGuildModal(${g.guild_id},'${escHtml(g.name)}')" title="履歴を見る">📋</span>`;
+    const profileLink = `<a class="gn-profile-link" href="https://game.granbluefantasy.jp/#guild/detail/${g.guild_id}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="GBF団ページ">↗</a>`;
+    const starBtn = `<button class="watch-star ${wOn?'on':''}" onclick="toggleWatch(${g.guild_id},'${escHtml(g.name)}')" title="${wOn?'注目解除':'注目'}">★</button>`;
+    const gnCell = `${battleMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattleGuild(${g.guild_id},'${escHtml(g.name)}')">${escHtml(g.name)}</span>${profileLink}${starBtn}`;
+
+    const cells = {
+      displayRank: `<td style="text-align:center;color:${rankColor};font-weight:${rankWeight};">${g.displayRank}</td>`,
+      rankDelta:   `<td style="text-align:center;font-size:0.6875rem;">${rankDeltaHtml}</td>`,
+      rank:        `<td style="text-align:center;font-size:0.75rem;color:var(--md-on-surface-variant);">${g.rank != null ? numFmt(g.rank) : '-'}</td>`,
+      name:        `<td style="white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${gnCell}</td>`,
+      scoreDiff:   `<td class="score-cell" style="text-align:right;"><div class="score-bar-bg" style="width:${barPct}%;background:${barColor};"></div><span class="score-diff">${g.scoreDiff > 0 ? '+'+numFmt(g.scoreDiff) : g.scoreDiff === 0 ? '±0' : numFmt(g.scoreDiff)}</span></td>`,
+      score:       `<td style="text-align:right;color:var(--md-on-surface-variant);font-size:0.75rem;">${numFmt(g.score)}</td>`,
+    };
+    const tierCls = !bInfo ? ` ${getTierClass(g.rank)}` : '';
+    return `<tr class="rank-row${rankCls}${tierCls}" style="${rowStyle}" data-gid="${g.guild_id}">${colOrder.map(k => cells[k]).join('')}</tr>`;
+  }).join('');
+
+  tbody.innerHTML = html;
+  document.getElementById('rank-table').style.display = '';
+  document.getElementById('search-hit').textContent = search ? `${rows.length}件` : '';
+  updateTableHeight();
+}
+
+// #rank-table-wrap に明示的な高さを設定し、テーブル本体だけが内部スクロールするようにする
+// （個人ランキングと同仕様。これが無いとページ全体がスクロールしヘッダーごと流れる）
+function updateTableHeight() {
+  const wrap = document.getElementById('rank-table-wrap');
+  if (!wrap) return;
+  const top = wrap.getBoundingClientRect().top;
+  const available = (window.innerHeight || document.documentElement.clientHeight) - top - 8;
+  wrap.style.height = Math.max(180, available) + 'px';
+}
+window.addEventListener('resize', updateTableHeight);
+
+function applySearch() { if (lastData) renderTable(lastData); }
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  applySearch();
+}
+
+// ============================================================
+// ソート
+// ============================================================
+// カラムリサイズ
+// ============================================================
+let _resizingCol = null, _resizeStartX = 0, _resizeStartW = 0;
+function startColResize(e, key) {
+  e.preventDefault();
+  _resizingCol = key;
+  _resizeStartX = e.clientX;
+  const col = document.getElementById(`col-${key}`);
+  _resizeStartW = col ? col.offsetWidth : 100;
+  document.body.classList.add('col-resizing');
+  document.addEventListener('mousemove', _onColResizeMove);
+  document.addEventListener('mouseup',   _stopColResize);
+}
+function _onColResizeMove(e) {
+  if (!_resizingCol) return;
+  const newW = Math.max(30, _resizeStartW + (e.clientX - _resizeStartX));
+  const col = document.getElementById(`col-${_resizingCol}`);
+  if (col) col.style.width = newW + 'px';
+}
+function _stopColResize() {
+  if (_resizingCol) {
+    const col = document.getElementById(`col-${_resizingCol}`);
+    if (col) colWidths[_resizingCol] = col.offsetWidth;
+    saveColPrefs();
+  }
+  _resizingCol = null;
+  document.body.classList.remove('col-resizing');
+  document.removeEventListener('mousemove', _onColResizeMove);
+  document.removeEventListener('mouseup',   _stopColResize);
+}
+
+// ============================================================
+// ヘッダー動的生成 + ドラッグ並び替え
+// ============================================================
+function renderColgroup() {
+  const cg = document.getElementById('col-group');
+  cg.innerHTML = colOrder.map(key => {
+    const def = COL_DEFS[key];
+    const w = colWidths[key] != null ? colWidths[key] : def.width;
+    return `<col id="col-${key}" style="width:${w}px">`;
+  }).join('');
+}
+function renderThead() {
+  const tr = document.getElementById('col-headers');
+  tr.innerHTML = colOrder.map((key, i) => {
+    const def = COL_DEFS[key];
+    const isActive = def.sortKey === sortKey;
+    const siText = isActive ? (sortDir === -1 ? '▼' : '▲') : '⇅';
+    const siCls  = isActive ? (sortDir === 1 ? 'sort-ind asc' : 'sort-ind desc') : 'sort-ind';
+    const alignSt = def.align === 'right' ? 'text-align:right;' : (def.align === 'center' ? 'text-align:center;' : '');
+    return `<th class="sortable col-th" style="${alignSt}" data-col="${key}" data-colidx="${i}" draggable="true">${def.label}<span id="si-${key}" class="${siCls}">${siText}</span><div class="col-resize-handle"></div></th>`;
+  }).join('');
+
+  tr.querySelectorAll('th.col-th').forEach(th => {
+    const key = th.dataset.col;
+    const def = COL_DEFS[key];
+    th.addEventListener('click', (e) => {
+      if (e.target.closest('.col-resize-handle') || _dragOccurred) return;
+      sortBy(def.sortKey);
+    });
+    th.addEventListener('dragstart', _onColDragStart);
+    th.addEventListener('dragover',  _onColDragOver);
+    th.addEventListener('dragleave', _onColDragLeave);
+    th.addEventListener('drop',      _onColDrop);
+    th.addEventListener('dragend',   _onColDragEnd);
+    const handle = th.querySelector('.col-resize-handle');
+    handle.addEventListener('mousedown', (e) => { e.stopPropagation(); startColResize(e, key); });
+    handle.addEventListener('click',     (e) => e.stopPropagation());
+  });
+}
+let _dragSrcIdx = null;
+let _dragOccurred = false;
+function _onColDragStart(e) {
+  _dragSrcIdx = parseInt(e.currentTarget.dataset.colidx);
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+function _onColDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('#col-headers th').forEach(th => th.classList.remove('drop-target'));
+  e.currentTarget.classList.add('drop-target');
+}
+function _onColDragLeave(e) {
+  e.currentTarget.classList.remove('drop-target');
+}
+function _onColDrop(e) {
+  e.preventDefault();
+  const targetIdx = parseInt(e.currentTarget.dataset.colidx);
+  document.querySelectorAll('#col-headers th').forEach(th => { th.classList.remove('drop-target'); th.classList.remove('dragging'); });
+  if (_dragSrcIdx != null && _dragSrcIdx !== targetIdx) {
+    const newOrder = [...colOrder];
+    const [moved] = newOrder.splice(_dragSrcIdx, 1);
+    newOrder.splice(targetIdx, 0, moved);
+    colOrder = newOrder;
+    saveColPrefs();
+    renderColgroup();
+    renderThead();
+    if (lastData) renderTable(lastData);
+  }
+  _dragSrcIdx = null;
+}
+function _onColDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('#col-headers th').forEach(th => th.classList.remove('drop-target'));
+  _dragOccurred = true;
+  setTimeout(() => { _dragOccurred = false; }, 200);
+  _dragSrcIdx = null;
+}
+
+// ============================================================
+function sortBy(key) {
+  if (sortKey === key) { sortDir = -sortDir; }
+  else { sortKey = key; sortDir = (key === 'displayRank' || key === 'rank' || key === 'name') ? 1 : -1; }
+  if (lastData) renderTable(lastData);
+}
+function sortGuilds(guilds) {
+  return [...guilds].sort((a, b) => {
+    if (sortKey === 'displayRank') return sortDir * (a.displayRank - b.displayRank);
+    if (sortKey === 'rank') return sortDir * ((a.rank ?? 99999) - (b.rank ?? 99999));
+    if (sortKey === 'rankDelta') {
+      const da = a.prevRank != null ? a.prevRank - a.rank : -99999;
+      const db = b.prevRank != null ? b.prevRank - b.rank : -99999;
+      return sortDir === -1 ? db - da : da - db;
+    }
+    if (sortKey === 'name') return sortDir * String(a.name || '').localeCompare(String(b.name || ''), 'ja');
+    if (sortKey === 'scoreDiff') return sortDir === -1 ? (b.scoreDiff ?? 0) - (a.scoreDiff ?? 0) : (a.scoreDiff ?? 0) - (b.scoreDiff ?? 0);
+    if (sortKey === 'score') return sortDir === -1 ? (b.score ?? 0) - (a.score ?? 0) : (a.score ?? 0) - (b.score ?? 0);
+    return 0;
+  });
+}
+function updateSortIndicators() {
+  ['displayRank','rankDelta','rank','name','scoreDiff','score'].forEach(k => {
+    const el = document.getElementById(`si-${k}`);
+    if (!el) return;
+    const isActive = k === sortKey;
+    el.className = isActive ? (sortDir === 1 ? 'sort-ind asc' : 'sort-ind desc') : 'sort-ind';
+    el.textContent = isActive ? (sortDir === -1 ? '▼' : '▲') : '⇅';
+  });
+}
+function rowBg(displayRank, displayIdx) {
+  if (displayRank === 1) return 'var(--row-top1-bg)';
+  if (displayRank === 2) return 'var(--row-top2-bg)';
+  if (displayRank === 3) return 'var(--row-top3-bg)';
+  if (displayIdx % 2 === 0) return 'transparent';
+  return 'var(--row-odd-bg)';
+}
+
+function getTierClass(rank) {
+  if (!rank || rank <= 0) return '';
+  if (rank <= 10)   return 'tier-top10';
+  if (rank <= 100)  return 'tier-top100';
+  if (rank <= 500)  return 'tier-top500';
+  if (rank <= 1000) return 'tier-top1000';
+  if (rank <= 2500) return 'tier-top2500';
+  return '';
+}
+
+// ============================================================
+// バトル機能
+// ============================================================
+function toggleBattleGuild(guildId, name) {
+  const existing = battleGuilds.find(b => b.id === guildId);
+  if (existing) {
+    battleGuilds = battleGuilds.filter(b => b.id !== guildId);
+    if (battleGuilds.length === 0) battleFilterActive = false;
+  } else {
+    const usedColors = new Set(battleGuilds.map(b => b.color));
+    const color = BATTLE_COLORS.find(c => !usedColors.has(c)) || BATTLE_COLORS[battleGuilds.length % BATTLE_COLORS.length];
+    battleGuilds.push({ id: guildId, name, color });
+  }
+  renderBattleBar();
+  if (lastData) renderTable(lastData);
+}
+function removeBattleGuild(idx) {
+  battleGuilds.splice(idx, 1);
+  if (battleGuilds.length === 0) battleFilterActive = false;
+  renderBattleBar();
+  if (lastData) renderTable(lastData);
+}
+function clearAllBattle() {
+  battleGuilds = []; battleFilterActive = false;
+  renderBattleBar();
+  if (lastData) renderTable(lastData);
+}
+function toggleBattleFilter() {
+  if (battleGuilds.length === 0) return;
+  battleFilterActive = !battleFilterActive;
+  document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
+  if (lastData) renderTable(lastData);
+}
+function renderBattleBar() {
+  const bar = document.getElementById('battle-bar');
+  if (battleGuilds.length === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('battle-tags').innerHTML = battleGuilds.map((b, i) =>
+    `<span class="battle-tag" style="background:${b.color}">${escHtml(b.name)}<span class="bt-close" onclick="removeBattleGuild(${i})" title="解除">✕</span></span>`
+  ).join('');
+  document.getElementById('battle-count').textContent = `${battleGuilds.length}団`;
+  document.getElementById('battle-filter-btn').classList.toggle('active', battleFilterActive);
+}
+function addBattleGuildsToGraph() {
+  for (const b of battleGuilds) addGuildToGraph(b.id, b.name);
+  renderGuildGraph();
+}
+
+// ============================================================
+// 注目団
+// ============================================================
+function toggleWatch(guildId, name) {
+  const idx = watchGuilds.findIndex(w => w.id === guildId);
+  if (idx >= 0) watchGuilds.splice(idx, 1);
+  else watchGuilds.push({ id: guildId, name });
+  localStorage.setItem('guild_watch', JSON.stringify(watchGuilds));
+  renderWatchPanel();
+  if (lastData) renderTable(lastData);
+}
+function renderWatchPanel() {
+  const card = document.getElementById('side-watch-card');
+  const listEl = document.getElementById('side-watch-list');
+  if (!watchGuilds.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const guilds = (lastData && lastData.guilds) ? lastData.guilds : [];
+  // 20分速順位で昇順、圏外は末尾
+  const sorted = [...watchGuilds].sort((a, b) => {
+    const ga = guilds.find(x => x.guild_id === a.id);
+    const gb = guilds.find(x => x.guild_id === b.id);
+    return (ga?.displayRank ?? Infinity) - (gb?.displayRank ?? Infinity);
+  });
+
+  const closeBtn = (w) => `<button onclick="toggleWatch(${w.id},'${escHtml(w.name)}')" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button>`;
+
+  listEl.innerHTML = sorted.map(w => {
+    const g = guilds.find(x => x.guild_id === w.id);
+    if (!g) {
+      return `<div class="side-watch-row" style="flex-direction:column;padding:4px 0">
+        <div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0">
+          <span style="flex:1;font-size:12px;color:var(--md-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(w.name)}</span>
+          <span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.5">圏外</span>
+          ${closeBtn(w)}
+        </div></div>`;
+    }
+    const spd = g.displayRank != null ? `${g.displayRank}位` : '';
+    let rankStr = '';
+    if (g.rank != null) {
+      let arrow = '';
+      if (g.prevRank && g.rank) {
+        const d = g.prevRank - g.rank;
+        if (d > 0) arrow = `<span style="color:#60a5fa">▲</span>`;
+        else if (d < 0) arrow = `<span style="color:#f87171">▼</span>`;
+      }
+      rankStr = `全体${numFmt(g.rank)}位${arrow}`;
+    }
+    const statsLine = [spd, rankStr].filter(Boolean).join('　');
+    return `<div class="side-watch-row" style="flex-direction:column;align-items:flex-start;gap:2px;padding:5px 0">
+      <div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0">
+        <span style="flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(w.name)}</span>
+        ${g.scoreDiff > 0 ? `<span style="color:#4ade80;font-size:11px;flex-shrink:0">+${numFmt(g.scoreDiff)}</span>` : ''}
+        ${closeBtn(w)}
+      </div>
+      <div style="font-size:10px;color:var(--md-on-surface-variant);line-height:1.5">${statsLine}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// サイドパネル更新
+// ============================================================
+function updateSideEventCard(name) {
+  document.getElementById('side-event-name').textContent = name || '-';
+  const wrap = document.getElementById('side-elem-wrap');
+  wrap.innerHTML = '';
+  for (const [k, v] of Object.entries(ELEMENT_THEMES)) {
+    if (name && name.includes(k)) {
+      wrap.innerHTML = `<span class="side-elem-badge" style="background:${v.color}22;color:${v.color};border:1px solid ${v.color}66;">${k}属性</span>`;
+      break;
+    }
+  }
+}
+function updateSideTopCard(data) {
+  if (!data?.guilds?.length) return;
+  const top = data.guilds[0];
+  document.getElementById('side-top-score').textContent = numFmt(top.score);
+  document.getElementById('side-top-name').textContent = top.name || '-';
+  document.getElementById('side-top-diff').textContent = top.scoreDiff > 0 ? `+${numFmt(top.scoreDiff)}/速` : '';
+}
+function toggleSidePanel() {
+  const panel = document.getElementById('side-panel');
+  const label = document.getElementById('side-collapse-label');
+  const arrow = document.getElementById('side-collapse-arrow');
+  panel.classList.toggle('collapsed');
+  const collapsed = panel.classList.contains('collapsed');
+  if (arrow) arrow.textContent = collapsed ? '▶' : '◀';
+  if (label) label.style.display = collapsed ? 'none' : '';
+}
+
+// ============================================================
+// コントロール折りたたみ
+// ============================================================
+function toggleCtrl() {
+  const mc = document.getElementById('main-content');
+  const text = document.getElementById('ctrl-toggle-text');
+  const collapsed = mc.classList.toggle('ctrl-collapsed');
+  if (text) text.textContent = collapsed ? '展開' : '収納';
+  try { localStorage.setItem('guild_ctrl_collapsed', collapsed ? '1' : '0'); } catch {}
+  // 収納アニメーション後に高さを再計算 → テーブルが画面全体に広がる
+  setTimeout(updateTableHeight, 320);
+}
+function initControlsState() {
+  try {
+    if (localStorage.getItem('guild_ctrl_collapsed') === '1') {
+      const mc   = document.getElementById('main-content');
+      const text = document.getElementById('ctrl-toggle-text');
+      if (mc) {
+        mc.classList.add('ctrl-collapsed');
+        // 初回はトランジションを一時停止して瞬時に閉じる
+        const c = document.getElementById('ctrl-collapsible');
+        const i = c?.querySelector('.ctrl-inner');
+        if (c) c.style.transition = 'none';
+        if (i) i.style.transition = 'none';
+        requestAnimationFrame(() => {
+          if (c) c.style.transition = '';
+          if (i) i.style.transition = '';
+        });
+      }
+      if (text) text.textContent = '展開';
+    }
+  } catch {}
+}
+
+// ============================================================
+// 団詳細モーダル（履歴）
+// ============================================================
+async function openGuildModal(guildId, name) {
+  const modal = document.getElementById('guild-modal');
+  modal.style.display = 'flex';
+
+  document.getElementById('gmodal-name').textContent = name || '(不明)';
+  document.getElementById('gmodal-summary').textContent = '';
+  document.getElementById('gmodal-loading').style.display = '';
+  document.getElementById('gmodal-table-wrap').style.display = 'none';
+
+  const linkEl = document.getElementById('gmodal-game-link');
+  if (guildId) {
+    linkEl.href = `https://game.granbluefantasy.jp/#guild/detail/${guildId}`;
+    linkEl.style.display = '';
+  } else {
+    linkEl.style.display = 'none';
+  }
+
+  if (!currentEventId) {
+    document.getElementById('gmodal-loading').textContent = 'イベントを選択してください';
+    return;
+  }
+
+  let history = [];
+  if (window.__STATIC_MODE__) {
+    // 静的モード: 日別20分速データ(遅延ロード)からこの団の履歴を再構築
+    await Promise.all(snapDayList.map(d => ensureGuildSnapDayLoaded(d)));
+    for (const snap of allGuildSnaps.slice().reverse()) { // captured_at ASC
+      const data = await apiFetch(`/api/guild/ranking/20min?snapshot_id=${snap.id}`);
+      const g = data?.guilds?.find(x => x.guild_id === guildId);
+      if (!g) continue;
+      history.push({
+        rank: g.rank, score: g.score,
+        captured_at: snap.captured_at, snapshot_id: snap.id,
+        rank_20min: g.displayRank,
+      });
+    }
+  } else {
+    history = (await apiFetch(`/api/guild/history?event_id=${currentEventId}&guild_id=${guildId}`, 60000)) || [];
+  }
+
+  document.getElementById('gmodal-loading').style.display = 'none';
+
+  if (!history.length) {
+    document.getElementById('gmodal-tbody').innerHTML =
+      '<tr><td colspan="5" style="text-align:center;color:var(--md-on-surface-variant);padding:24px">データがありません</td></tr>';
+    document.getElementById('gmodal-table-wrap').style.display = '';
+    return;
+  }
+
+  // スコア差分をクライアント側で計算（history は ASC 順）
+  const histWithDiff = history.map((h, i) => {
+    const prev = history[i - 1];
+    const diff = prev != null ? (h.score - prev.score) : null;
+    return { ...h, score_diff: diff };
+  });
+
+  // サマリ（差分計算後に実施）
+  const totalScore = histWithDiff[histWithDiff.length - 1]?.score ?? 0;
+  const totalDiff  = histWithDiff.reduce((s, h) => s + (h.score_diff || 0), 0);
+  document.getElementById('gmodal-summary').textContent =
+    `累計: ${numFmt(totalScore)}  /  期間増: +${numFmt(totalDiff)}  /  ${history.length}スナップ`;
+
+  // テーブル（新しい順）
+  const rows = [...histWithDiff].reverse().map(h => {
+    const diff      = h.score_diff;
+    const diffStr   = diff != null ? (diff > 0 ? `+${numFmt(diff)}` : numFmt(diff)) : '-';
+    const diffColor = diff > 0 ? '#4ade80' : diff < 0 ? '#f87171' : 'var(--md-on-surface-variant)';
+    const diffWt    = diff > 0 ? 700 : 400;
+    const rankColor = h.rank <= 3 ? (h.rank === 1 ? '#fbbf24' : h.rank === 2 ? '#c0c0c0' : '#cd7c32') : 'var(--md-on-surface-variant)';
+    const timeStr   = escHtml((h.captured_at || '').substring(0, 16));
+    // 20分速順位
+    const rank20    = h.rank_20min;
+    const rank20Str = rank20 != null ? numFmt(rank20) : '-';
+    const rank20Clr = rank20 === 1 ? '#fbbf24' : rank20 === 2 ? '#c0c0c0' : rank20 === 3 ? '#cd7c32' : 'var(--md-on-surface-variant)';
+    const rank20Wt  = rank20 != null && rank20 <= 3 ? 700 : 400;
+    return `<tr>
+      <td>${timeStr}</td>
+      <td style="color:${rankColor};font-weight:${h.rank <= 3 ? 700 : 400}">${h.rank != null ? numFmt(h.rank) : '-'}</td>
+      <td style="color:${rank20Clr};font-weight:${rank20Wt}">${rank20Str}</td>
+      <td style="color:${diffColor};font-weight:${diffWt}">${diffStr}</td>
+      <td style="color:var(--md-on-surface-variant)">${numFmt(h.score)}</td>
+    </tr>`;
+  });
+
+  document.getElementById('gmodal-tbody').innerHTML = rows.join('');
+  document.getElementById('gmodal-table-wrap').style.display = '';
+}
+function closeGuildModal() {
+  document.getElementById('guild-modal').style.display = 'none';
+}
+
+// ============================================================
+// グラフモーダル
+// ============================================================
+function openGraphModal() {
+  document.getElementById('graph-modal').style.display = 'flex';
+  // ポイント表示設定をUIに反映
+  const pointChk = document.getElementById('graph-point-chk');
+  const pointSizeInput = document.getElementById('graph-point-size');
+  if (pointChk) pointChk.checked = graphShowPoints;
+  if (pointSizeInput) pointSizeInput.value = graphPointSize;
+  // バトル中の団を自動でグラフに追加（重複はaddGuildToGraph内でスキップ）
+  if (battleGuilds.length > 0) {
+    for (const b of battleGuilds) addGuildToGraph(b.id, b.name);
+  }
+  renderGuildGraph();
+}
+function closeGraphModal() {
+  document.getElementById('graph-modal').style.display = 'none';
+}
+
+// ===== 使い方ガイド =====
+function openGuildHelpModal() {
+  document.getElementById('guild-help-modal').style.display = 'flex';
+}
+function closeGuildHelpModal() {
+  document.getElementById('guild-help-modal').style.display = 'none';
+}
+function switchGuildHelpTab(tab) {
+  ['ranking','snap','watch','sort','graph','legend'].forEach(t => {
+    document.getElementById(`ghtab-${t}`)?.classList.toggle('active', t === tab);
+    const p = document.getElementById(`ghpanel-${t}`);
+    if (p) p.style.display = t === tab ? '' : 'none';
+  });
+}
+
+function setGChartType(t) {
+  gChartType = t;
+  document.getElementById('gchart-speed-btn')?.classList.toggle('active', t === 'speed');
+  document.getElementById('gchart-score-btn')?.classList.toggle('active', t === 'score');
+  document.getElementById('gchart-rank-btn')?.classList.toggle('active', t === 'rank');
+  // 累計スコア時のみ期間増切替を表示
+  const originCtrl = document.getElementById('score-origin-ctrl');
+  originCtrl.style.display = t === 'score' ? 'flex' : 'none';
+  renderGuildGraph();
+}
+function setScoreOrigin(mode) {
+  scoreOrigin = mode;
+  document.getElementById('score-abs-btn')?.classList.toggle('active', mode === 'abs');
+  document.getElementById('score-rel-btn')?.classList.toggle('active', mode === 'rel');
+  renderGuildGraph();
+}
+
+function updateGraphDaySelects() {
+  ['graph-from-select','graph-to-select'].forEach((id, i) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '';
+    snapDayList.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d; o.textContent = d;
+      sel.appendChild(o);
+    });
+    if (snapDayList.length) sel.value = i === 0 ? snapDayList[0] : snapDayList[snapDayList.length - 1];
+  });
+}
+
+function addGuildToGraph(guildId, name) {
+  if (graphGuilds.some(g => g.id === guildId)) return;
+  const color = GRAPH_COLORS[_colorIdx++ % GRAPH_COLORS.length];
+  graphGuilds.push({ id: guildId, name, color });
+  renderGuildGraphTags();
+}
+function addWatchedGuildsToGraph() {
+  for (const w of watchGuilds) addGuildToGraph(w.id, w.name);
+  renderGuildGraph();
+}
+function clearGraphGuilds() {
+  graphGuilds = []; _colorIdx = 0;
+  renderGuildGraphTags(); renderGuildGraph();
+}
+function renderGuildGraphTags() {
+  const el = document.getElementById('graph-guild-tags');
+  el.innerHTML = graphGuilds.map(g => `
+    <span class="graph-guild-tag" data-gid="${g.id}"
+      onmouseenter="highlightGuildGraphLine(${g.id})"
+      onmouseleave="unhighlightGuildGraphLine()"
+      ontouchstart="highlightGuildGraphLine(${g.id})"
+      ontouchend="unhighlightGuildGraphLine()"
+      style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--md-shape-full);font-size:0.75rem;font-weight:700;background:${g.color}22;border:1px solid ${g.color}66;color:${g.color};cursor:default;transition:opacity var(--md-duration-short) var(--md-ease);">
+      <span style="pointer-events:none">${escHtml(g.name)}</span>
+      <span onclick="event.stopPropagation();removeGraphGuild(${g.id})" style="cursor:pointer;opacity:0.7;font-size:0.625rem;margin-left:2px;">✕</span>
+    </span>`).join('');
+}
+
+// 団グラフのフォーカス機能: タグにホバー(またはタッチ)するとその団の線を強調し、他は暗転させる
+function highlightGuildGraphLine(guildId) {
+  if (!chartInstance) return;
+  const hiPt = graphShowPoints ? graphPointSize : (chartInstance.data.labels?.length <= 2 ? 5 : 3);
+  chartInstance.data.datasets.forEach(ds => {
+    const isTarget = ds._guildId === guildId;
+    ds.borderWidth = isTarget ? 3.5 : 0.7;
+    ds.borderColor = isTarget ? ds._origColor : (ds._origColor || ds.borderColor) + '44';
+    ds.pointRadius = isTarget ? Math.max(hiPt, 2) : 0;
+    ds.pointBorderColor     = isTarget ? ds._origColor : 'transparent';
+    ds.pointBackgroundColor = isTarget ? ds._origColor : 'transparent';
+  });
+  chartInstance.update('none');
+  document.querySelectorAll('.graph-guild-tag').forEach(el => {
+    el.style.opacity = Number(el.dataset.gid) === guildId ? '1' : '0.35';
+  });
+}
+function unhighlightGuildGraphLine() {
+  if (!chartInstance) return;
+  const basePt = graphShowPoints ? graphPointSize : 0;
+  chartInstance.data.datasets.forEach(ds => {
+    ds.borderWidth = 2;
+    ds.borderColor = ds._origColor || ds.borderColor;
+    ds.pointRadius = basePt;
+    ds.pointBorderColor     = ds._origColor || ds.borderColor;
+    ds.pointBackgroundColor = ds._origColor || ds.borderColor;
+  });
+  chartInstance.update('none');
+  document.querySelectorAll('.graph-guild-tag').forEach(el => { el.style.opacity = ''; });
+}
+function removeGraphGuild(id) {
+  graphGuilds = graphGuilds.filter(g => g.id !== id);
+  renderGuildGraphTags(); renderGuildGraph();
+}
+
+async function onGraphGuildSearch() {
+  const q = document.getElementById('graph-guild-search').value.trim();
+  const suggestEl = document.getElementById('graph-guild-suggest');
+  if (!q) { suggestEl.style.display = 'none'; return; }
+  let results;
+  if (window.__STATIC_MODE__) {
+    // 静的モード: latest.guilds をクライアント側部分一致
+    const latest = await apiFetch(`/api/guild/ranking/latest?event_id=${currentEventId}`, 60000);
+    const pool = (latest?.guilds) || [];
+    const ql = q.toLowerCase();
+    results = pool
+      .filter(g => (g.name || '').toLowerCase().includes(ql))
+      .slice(0, 20)
+      .map(g => ({ id: g.guild_id, name: g.name }));
+  } else {
+    results = await apiFetch(`/api/guild/search?q=${encodeURIComponent(q)}`, 10000);
+  }
+  if (!results?.length) { suggestEl.style.display = 'none'; return; }
+  suggestEl.innerHTML = results.map(g =>
+    `<div class="graph-suggest-item" onclick="addGuildToGraph(${g.id},'${escHtml(g.name)}');hideGraphGuildSuggest();renderGuildGraph();">${escHtml(g.name)}</div>`
+  ).join('');
+  suggestEl.style.display = '';
+}
+function hideGraphGuildSuggest() {
+  const el = document.getElementById('graph-guild-suggest');
+  if (el) el.style.display = 'none';
+}
+
+async function loadGuildGraphData() {
+  const fromDay = document.getElementById('graph-from-select')?.value;
+  const toDay   = document.getElementById('graph-to-select')?.value;
+  if (!fromDay || !toDay || !currentEventId || !graphGuilds.length) return null;
+
+  const days = snapDayList.filter(d => d >= fromDay && d <= toDay);
+  const dayCount = days.length;
+
+  if (window.__STATIC_MODE__) {
+    await Promise.all(days.map(d => ensureGuildSnapDayLoaded(d)));
+  }
+
+  let snaps = [];
+  for (const day of days) snaps.push(...(snapGroups[day] || []));
+  snaps.sort((a, b) => a.captured_at.localeCompare(b.captured_at));
+
+  // 単日選択時は7:00〜24:05でクリップ（複数日選択時はクリップせず夜間帯も連続表示。個人ランキングと同仕様）
+  if (dayCount === 1) {
+    const [yy, mm, dd] = days[0].split('-').map(Number);
+    const startMs = new Date(yy, mm - 1, dd, 7, 0, 0).getTime();
+    const endMs   = new Date(yy, mm - 1, dd + 1, 0, 20, 0).getTime(); // 24:00境界スナップの着地ズレを吸収
+    snaps = snaps.filter(s => {
+      const t = new Date(s.captured_at.replace(' ', 'T')).getTime();
+      return t >= startMs && t <= endMs;
+    });
+  }
+
+  const labels = [];
+  const guildSeries = {};
+  for (const g of graphGuilds) guildSeries[g.id] = { speed: [], score: [], rank: [] };
+
+  const snapDataList = await Promise.all(
+    snaps.map(s => apiFetch(`/api/guild/ranking/20min?snapshot_id=${s.id}`, 300000))
+  );
+
+  for (let si = 0; si < snaps.length; si++) {
+    const snap = snaps[si];
+    const data = snapDataList[si];
+    if (!data?.guilds) continue;
+    labels.push(snap.captured_at.substring(5, 16));
+    for (const g of graphGuilds) {
+      const gd = data.guilds.find(x => x.guild_id === g.id);
+      guildSeries[g.id].speed.push(gd ? (gd.scoreDiff ?? null) : null);
+      guildSeries[g.id].score.push(gd ? (gd.score ?? null) : null);
+      guildSeries[g.id].rank.push(gd ? (gd.rank ?? null) : null);
+    }
+  }
+
+  // 休み期間（夜間）の帯を検出: 団ランキングは2日目24:00〜本戦1日目7:00をインターバル日込みで1本の帯にする
+  const eventStartDate = loadedEvents.find(e => e.id === currentEventId)?.start_date || null;
+  const restBands = computeRestBands(labels, eventStartDate, true);
+
+  return { labels, guildSeries, dayCount, restBands };
+}
+
+// 古戦場スケジュールに基づく休み期間（夜間）の時間帯を算出
+// Day1=開催開始日 ... Day2=予選終了日 Day3=インターバル日 Day4-7=本戦1-4日目
+// mergeInterval=true（団ランキング用）: Day2 24:00〜Day4 7:00 をインターバル日全体込みで1本の帯にする
+function computeRestWindows(startDateStr, mergeInterval) {
+  if (!startDateStr) return [];
+  const [y, m, d] = startDateStr.split('-').map(Number);
+  const dayDate = (offset) => new Date(y, m - 1, d + offset);
+  const at = (date, hh, mm = 0) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), hh, mm, 0);
+  // 終端(7:00)は実際のスナップ着地が数分〜十数分後ろにずれるため、バッファを持たせて7:20までを窓とする
+  const windows = [];
+  if (mergeInterval) {
+    windows.push([at(dayDate(2), 0), at(dayDate(3), 7, 20)]);   // 2日目24:00 〜 本戦1日目7:00
+  } else {
+    windows.push([at(dayDate(2), 0), at(dayDate(2), 7, 20)]);   // 2日目24:00 〜 3日目7:00
+  }
+  windows.push([at(dayDate(4), 0), at(dayDate(4), 7, 20)]);      // 本戦1日目24:00 〜 本戦2日目7:00
+  windows.push([at(dayDate(5), 0), at(dayDate(5), 7, 20)]);      // 本戦2日目24:00 〜 本戦3日目7:00
+  windows.push([at(dayDate(6), 0), at(dayDate(6), 7, 20)]);      // 本戦3日目24:00 〜 本戦4日目7:00
+  return windows;
+}
+
+// labels（"MM-DD HH:mm"形式、年なし）に対して休み期間の帯をラベル配列のインデックス範囲に変換
+function computeRestBands(labels, startDateStr, mergeInterval) {
+  if (!startDateStr || !labels.length) return [];
+  const fmt = (date) => `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  const bands = [];
+  for (const [startD, endD] of computeRestWindows(startDateStr, mergeInterval)) {
+    const startStr = fmt(startD), endStr = fmt(endD);
+    const startIdx = labels.findIndex(l => l >= startStr);
+    let endIdx = -1;
+    for (let i = labels.length - 1; i >= 0; i--) { if (labels[i] <= endStr) { endIdx = i; break; } }
+    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) continue;
+    bands.push({ startIdx, endIdx });
+  }
+  return bands;
+}
+
+async function renderGuildGraph() {
+  if (document.getElementById('graph-modal').style.display === 'none') return;
+  await ensureChartJs();
+  const emptyEl = document.getElementById('graph-empty');
+  const loadEl  = document.getElementById('graph-loading');
+
+  if (!graphGuilds.length) {
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    emptyEl.style.display = ''; return;
+  }
+  emptyEl.style.display = 'none';
+  loadEl.style.display = '';
+
+  const result = await loadGuildGraphData();
+  loadEl.style.display = 'none';
+  if (!result) return;
+
+  const { labels, guildSeries, dayCount, restBands } = result;
+  const yKey = gChartType;
+  const isRank = yKey === 'rank';
+  const useRelative = yKey === 'score' && scoreOrigin === 'rel';
+
+  const datasets = graphGuilds.map(g => {
+    let series = (guildSeries[g.id] || {})[yKey] || labels.map(() => null);
+    // 期間増加モード: 最初の非null値を 0 基準に変換
+    if (useRelative) {
+      const baseIdx = series.findIndex(v => v != null);
+      const base = baseIdx >= 0 ? series[baseIdx] : 0;
+      series = series.map(v => v != null ? v - base : null);
+    }
+    return {
+      label: g.name,
+      _guildId: g.id,
+      _origColor: g.color,
+      data: series,
+      borderColor: g.color,
+      backgroundColor: g.color + '15',
+      // 点サイズ: ユーザーが「ポイント表示」で明示的にON/OFF・サイズを指定可能
+      pointRadius: graphShowPoints ? graphPointSize : 0,
+      pointHoverRadius: dayCount <= 2 ? 5 : 3,
+      tension: 0,
+      spanGaps: yKey === 'score',
+      borderWidth: 2,
+    };
+  });
+
+  const areaEl = document.getElementById('graph-chart-area');
+  const canvasW = areaEl ? areaEl.clientWidth || 320 : 320;
+  const canvas = document.getElementById('guild-chart');
+  canvas.width = canvasW; canvas.height = 260;
+
+  const boundaryPlugin = {
+    id: 'guildBoundaryLines',
+    beforeDraw(chart) {
+      if (!restBands?.length || dayCount <= 1) return;
+      const ctx2 = chart.ctx, { top, bottom } = chart.chartArea;
+      const xAxis = chart.scales.x;
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      restBands.forEach(band => {
+        if (band.startIdx >= labels.length) return;
+        const x0 = xAxis.getPixelForValue(band.startIdx);
+        const x1 = xAxis.getPixelForValue(band.endIdx);
+        ctx2.save();
+        ctx2.fillStyle = isLight ? 'rgba(71,85,105,0.16)' : 'rgba(148,163,184,0.10)';
+        ctx2.fillRect(x0, top, x1 - x0, bottom - top);
+        ctx2.restore();
+      });
+    }
+  };
+
+  const cs = getComputedStyle(document.documentElement);
+  const clrMuted = cs.getPropertyValue('--theme-on-surface-variant').trim() || '#8a9ab0';
+  const clrGrid  = cs.getPropertyValue('--chart-grid-color').trim() || 'rgba(255,255,255,0.09)';
+  const clrTooltipBg = cs.getPropertyValue('--theme-surface-container-high').trim() || '#242424';
+
+  const ctx = canvas.getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels.map(roundTimeLabel), datasets },
+    plugins: [boundaryPlugin],
+    options: {
+      responsive: false, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels:{ color:clrMuted, font:{ size:11 }, boxWidth:14, padding:10 }, position:'top' },
+        tooltip: {
+          backgroundColor: clrTooltipBg,
+          borderColor: cs.getPropertyValue('--theme-outline').trim() || '#363636',
+          borderWidth: 1, titleColor: clrMuted,
+          bodyColor: cs.getPropertyValue('--theme-on-surface').trim() || '#e2e8f0',
+          callbacks: {
+            label: ctx => {
+              if (ctx.raw == null) return ` ${ctx.dataset.label}: -`;
+              if (isRank) return ` ${ctx.dataset.label}: ${numFmt(ctx.raw)}位`;
+              return ` ${ctx.dataset.label}: ${numFmt(ctx.raw)}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: { ticks:{ color:clrMuted, font:{ size:10 }, maxTicksLimit:14, maxRotation:45 }, grid:{ color:clrGrid } },
+        y: {
+          reverse: isRank, min: isRank ? 1 : undefined,
+          ticks: {
+            color: clrMuted, font:{ size:10 }, maxTicksLimit:6,
+            callback: v => {
+              if (isRank) return v % 1 === 0 ? numFmt(v) + '位' : '';
+              const a = Math.abs(v);
+              if (a >= 1e12) return (v/1e12).toFixed(1) + '兆';
+              if (a >= 1e8)  return (v/1e8).toFixed(1)  + '億';
+              if (a >= 1e4)  return Math.round(v/1e4)    + '万';
+              return numFmt(v);
+            }
+          },
+          grid: { color:clrGrid },
+        },
+      },
+    },
+  });
+}
+
+function shareGuildGraph() {
+  if (!chartInstance) return;
+  const canvas = document.getElementById('guild-chart');
+  const a = document.createElement('a');
+  a.download = `guild_graph_${new Date().toISOString().substring(0,10)}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+// ============================================================
+// キーボード操作（左右矢印でスナップ/日付移動）
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  const hm = document.getElementById('guild-help-modal');
+  if (hm && hm.style.display !== 'none') {
+    if (e.key === 'Escape') closeGuildHelpModal();
+    return;
+  }
+  const gm = document.getElementById('guild-modal');
+  if (gm && gm.style.display !== 'none') {
+    if (e.key === 'Escape') closeGuildModal();
+    return;
+  }
+  const gr = document.getElementById('graph-modal');
+  if (gr && gr.style.display !== 'none') {
+    if (e.key === 'Escape') closeGraphModal();
+    return;
+  }
+  const tag = document.activeElement?.tagName;
+  if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    const dir = e.key === 'ArrowLeft' ? -1 : 1;
+    if (currentTab === '20min') {
+      shiftSnap(dir);
+    } else if (currentTab === 'daily' || currentTab === 'morning') {
+      shiftDate(dir);
+    }
+  }
+});
+
+// ============================================================
+// 初期化実行
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  updateTableHeight(); // データ読み込み前でも枠を確保
+  init().catch(err => console.error('[init] FATAL:', err));
+});
+</script>
+</body>
+</html>
