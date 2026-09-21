@@ -2290,9 +2290,13 @@ function updateEventDaySelect(selectedDate) {
   // イベント開始日そのもの（例: 09-21）には「開始前の深夜帯」が存在しないため一覧から除外する。
   const isOvernight = currentTab === 'overnight';
   const refTime = isOvernight ? ' 03:00:00' : ' 12:00:00';
+  // 朝活(7:00〜8:00)・日速(7:00〜24:00)は、予選1日目が19:00開始のため7:00時点のデータが存在せず、
+  // イベント終了後も永久に空になる。予選1日目自体を一覧から除外する。
+  const excludeDay1 = currentTab === 'morning' || currentTab === 'daily';
   dates.forEach(d => {
     const period = getGBFPeriodName(d + refTime, startDate);
     if (isOvernight && period === '開始前') return;
+    if (excludeDay1 && d === startDate) return;
     const shortD = d.substring(5).replace('-', '/');
     const label = isMobileDaySel ? shortD : `[${period}] ${d}`;
     sel.innerHTML += `<option value="${d}"${d === selectedDate ? ' selected' : ''}>${label}</option>`;
