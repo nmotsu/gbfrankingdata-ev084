@@ -2340,33 +2340,33 @@ async function renderGuildGraph() {
   loadEl.style.display = 'none';
   if (!result) return;
 
-  const { labels, guildSeries, dayCount, restBands } = result;
+  const { labels, guildSeries, dayCount, restBands, lastCapturedAt } = result;
   const yKey = gChartType;
   const isRank = yKey === 'rank';
   const useRelative = yKey === 'score' && scoreOrigin === 'rel';
   const showPredict = document.getElementById('graph-predict-chk')?.checked && yKey === 'score';
 
-  // 予測ステップ数: 最終データ時刻から当日24:00までの20分刻み数（個人ランキングと同仕様）
+  // 予測ステップ数: 最終データ時刻からゴール地点までの20分刻み数
+  // ゴール地点は予選1日目のみ翌7:00、それ以外は当日24:00
+  const eventStartDateForPred = loadedEvents.find(e => e.id === currentEventId)?.start_date || null;
   const PRED_STEPS = (() => {
-    if (!showPredict || !labels.length) return 0;
-    const lastLabel = labels[labels.length - 1]; // "MM-DD HH:mm"
-    const timePart = lastLabel.split(' ')[1];
-    if (!timePart) return 0;
-    const [hh, mm] = timePart.split(':').map(Number);
-    const minutesUntilMidnight = 24 * 60 - (hh * 60 + mm);
-    return Math.max(0, Math.floor(minutesUntilMidnight / 20));
+    if (!showPredict || !labels.length || !lastCapturedAt) return 0;
+    const goal = predictionGoalDate(lastCapturedAt, eventStartDateForPred);
+    if (!goal) return 0;
+    const lastMs = new Date(lastCapturedAt.replace(' ', 'T')).getTime();
+    const remainingMin = (goal.getTime() - lastMs) / 60000;
+    return Math.max(0, Math.floor(remainingMin / 20));
   })();
   const predLabels = (() => {
-    if (!showPredict || PRED_STEPS === 0 || !labels.length) return [];
-    const lastLabel = labels[labels.length - 1];
-    const [datePart, timePart] = lastLabel.split(' ');
-    const [hh, mm] = timePart.split(':').map(Number);
-    const baseMins = hh * 60 + mm;
+    if (!showPredict || PRED_STEPS === 0 || !lastCapturedAt) return [];
+    const base = new Date(lastCapturedAt.replace(' ', 'T'));
     return Array.from({ length: PRED_STEPS }, (_, i) => {
-      const totalMins = baseMins + (i + 1) * 20;
-      const newHH = Math.floor(totalMins / 60) % 24;
-      const newMM = totalMins % 60;
-      return `${datePart} ${String(newHH).padStart(2,'0')}:${String(newMM).padStart(2,'0')}`;
+      const t = new Date(base.getTime() + (i + 1) * 20 * 60000);
+      const mm = String(t.getMonth() + 1).padStart(2, '0');
+      const dd = String(t.getDate()).padStart(2, '0');
+      const hh = String(t.getHours()).padStart(2, '0');
+      const mi = String(t.getMinutes()).padStart(2, '0');
+      return `${mm}-${dd} ${hh}:${mi}`;
     });
   })();
   const allLabels = [...labels, ...predLabels];
