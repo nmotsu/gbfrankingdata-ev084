@@ -2285,8 +2285,11 @@ function updateEventDaySelect(selectedDate) {
   const dates = buildEventDateList();
   sel.innerHTML = '<option value="">-- 日付を選択 --</option>';
   const isMobileDaySel = window.innerWidth < 640;
+  // 残業タブ（0:00〜7:00の集計）は、その日の深夜帯が前日のGBF日に属するため、
+  // 正午ではなく深夜の代表時刻で期間名を判定する（例: 09-22の残業→予選1日目扱い）
+  const refTime = currentTab === 'overnight' ? ' 03:00:00' : ' 12:00:00';
   dates.forEach(d => {
-    const period = getGBFPeriodName(d + ' 12:00:00', startDate);
+    const period = getGBFPeriodName(d + refTime, startDate);
     const shortD = d.substring(5).replace('-', '/');
     const label = isMobileDaySel ? shortD : `[${period}] ${d}`;
     sel.innerHTML += `<option value="${d}"${d === selectedDate ? ' selected' : ''}>${label}</option>`;
@@ -2631,25 +2634,30 @@ function applyElementTheme(eventName) {
   }
 }
 
-// ===== 注目プレイヤー =====
-const watchedNames = (() => {
-  try { return new Set(JSON.parse(localStorage.getItem('gbf_watched') || '[]')); }
-  catch { return new Set(); }
+// ===== 注目プレイヤー（player_id基準で管理。同じGNの別プレイヤーと取り違えないようIDで識別する） =====
+// Map<player_id, 最後に確認できたusername>（圏外時の表示名フォールバック用にusernameもキャッシュ）
+const watchedPlayers = (() => {
+  try {
+    const raw = JSON.parse(localStorage.getItem('gbf_watched_ids') || '[]');
+    return new Map(raw.map(entry => Array.isArray(entry) ? [Number(entry[0]), entry[1]] : [Number(entry), String(entry)]));
+  } catch { return new Map(); }
 })();
 
 function saveWatched() {
-  try { localStorage.setItem('gbf_watched', JSON.stringify([...watchedNames])); } catch {}
+  try { localStorage.setItem('gbf_watched_ids', JSON.stringify([...watchedPlayers.entries()])); } catch {}
 }
 
-function toggleWatch(e, username) {
+function toggleWatch(e, playerId, username) {
   e.stopPropagation();
-  if (watchedNames.has(username)) watchedNames.delete(username);
-  else watchedNames.add(username);
+  const id = Number(playerId);
+  if (isNaN(id)) return;
+  if (watchedPlayers.has(id)) watchedPlayers.delete(id);
+  else watchedPlayers.set(id, username);
   saveWatched();
   // 全行の★更新
   document.querySelectorAll('.watch-star').forEach(btn => {
-    const un = btn.dataset.un;
-    if (un) { btn.classList.toggle('on', watchedNames.has(un)); }
+    const pid = Number(btn.dataset.pid);
+    if (!isNaN(pid)) { btn.classList.toggle('on', watchedPlayers.has(pid)); }
   });
   updateWatchPanel(currentRenderData);
 }
@@ -2658,20 +2666,22 @@ function updateWatchPanel(data) {
   const card  = document.getElementById('side-watch-card');
   const listEl = document.getElementById('side-watch-list');
   if (!card || !listEl) return;
-  if (watchedNames.size === 0) { card.style.display = 'none'; return; }
+  if (watchedPlayers.size === 0) { card.style.display = 'none'; return; }
   card.style.display = '';
   const players = (data && data.players) ? data.players : [];
 
   // 選択タブの速度順位で昇順ソート（圏外は末尾）
-  const sortedNames = [...watchedNames].sort((a, b) => {
-    const pa = players.find(pl => pl.username === a);
-    const pb = players.find(pl => pl.username === b);
+  const sortedIds = [...watchedPlayers.keys()].sort((a, b) => {
+    const pa = players.find(pl => pl.player_id === a);
+    const pb = players.find(pl => pl.player_id === b);
     return (pa?.honorRank ?? Infinity) - (pb?.honorRank ?? Infinity);
   });
 
-  const html = sortedNames.map(name => {
-    const p = players.find(pl => pl.username === name);
-    if (!p) return `<div class="side-watch-row" style="flex-direction:column;padding:4px 0"><div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0"><span style="flex:1;font-size:12px;color:var(--md-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span><span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.5">圏外</span><button onclick="removeWatchedPlayer(event,'${escHtml(name)}')" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button></div></div>`;
+  const html = sortedIds.map(id => {
+    const p = players.find(pl => pl.player_id === id);
+    const name = p ? p.username : (watchedPlayers.get(id) || `ID:${id}`);
+    if (p && p.username !== watchedPlayers.get(id)) { watchedPlayers.set(id, p.username); saveWatched(); } // 改名を追従
+    if (!p) return `<div class="side-watch-row" style="flex-direction:column;padding:4px 0"><div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0"><span style="flex:1;font-size:12px;color:var(--md-on-surface-variant);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span><span style="font-size:10px;color:var(--md-on-surface-variant);opacity:0.5">圏外</span><button onclick="removeWatchedPlayer(event,${id})" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button></div></div>`;
 
     // 速度順位（ラベルなし）
     const spd = p.honorRank != null ? `${p.honorRank}位` : '';
@@ -2695,7 +2705,7 @@ function updateWatchPanel(data) {
       <div style="display:flex;align-items:center;gap:4px;width:100%;min-width:0">
         <span style="flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span>
         ${p.honorDiff > 0 ? `<span style="color:#4ade80;font-size:11px;flex-shrink:0">+${numFmt(p.honorDiff)}</span>` : ''}
-        <button onclick="removeWatchedPlayer(event,'${escHtml(name)}')" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button>
+        <button onclick="removeWatchedPlayer(event,${id})" style="background:none;border:none;color:var(--md-on-surface-variant);cursor:pointer;font-size:13px;padding:0 0 0 4px;line-height:1;flex-shrink:0;opacity:0.5;transition:opacity var(--md-duration-short) var(--md-ease)" onmouseenter="this.style.opacity='1';this.style.color='var(--md-error)'" onmouseleave="this.style.opacity='0.5';this.style.color='var(--md-on-surface-variant)'" title="削除">✕</button>
       </div>
       <div style="font-size:10px;color:var(--md-on-surface-variant);line-height:1.5">${statsLine}</div>
     </div>`;
@@ -2703,14 +2713,14 @@ function updateWatchPanel(data) {
   listEl.innerHTML = html;
 }
 
-function removeWatchedPlayer(e, username) {
+function removeWatchedPlayer(e, playerId) {
   e.stopPropagation();
-  watchedNames.delete(username);
+  watchedPlayers.delete(Number(playerId));
   saveWatched();
   // テーブル内の★も連動して更新
   document.querySelectorAll('.watch-star').forEach(btn => {
-    const un = btn.dataset.un;
-    if (un) btn.classList.toggle('on', watchedNames.has(un));
+    const pid = Number(btn.dataset.pid);
+    if (!isNaN(pid)) btn.classList.toggle('on', watchedPlayers.has(pid));
   });
   const row = e.target.closest('.side-watch-row');
   if (row) {
@@ -3197,7 +3207,7 @@ function renderRanking(data, keepScroll = false) {
     const gnCls  = bInfo ? ' gn-pinned' : '';
     const gnCol  = bInfo ? ` style="color:${bInfo.color}"` : '';
     const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
-    const starBtn = `<button class="watch-star${watchedNames.has(p.username)?' on':''}" data-un="${escHtml(p.username)}" onclick="toggleWatch(event,${escHtml(JSON.stringify(p.username))})" title="${watchedNames.has(p.username)?'注目解除':'注目に追加'}">★</button>`;
+    const starBtn = p.player_id == null ? '' : `<button class="watch-star${watchedPlayers.has(p.player_id)?' on':''}" data-pid="${p.player_id}" onclick="toggleWatch(event,${p.player_id},${escHtml(JSON.stringify(p.username))})" title="${watchedPlayers.has(p.player_id)?'注目解除':'注目に追加'}">★</button>`;
     const _soloMatch = getSoloMatch(p);
     const soloMark = _soloMatch ? `<span class="solo-mark" title="推定ソロ: ${_soloMatch}">S</span>` : '';
     const gnCell = `${markEl}${soloMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattlePlayer(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))})">${escHtml(p.username)}</span>${profileLink}${starBtn}`;
@@ -3568,12 +3578,11 @@ function addBattlePlayersToGraph() {
 
 function addWatchedPlayersToGraph() {
   const pool = currentRenderData?.players || window._lastRankingPlayers || [];
-  for (const username of watchedNames) {
-    const key = String(username);
-    if (graphPlayers.find(p => String(p.id ?? p.name) === key || p.name === username)) continue;
-    const found = pool.find(p => p.username === username);
+  for (const [id, cachedName] of watchedPlayers) {
+    if (graphPlayers.find(p => String(p.id ?? p.name) === String(id))) continue;
+    const found = pool.find(p => p.player_id === id);
     const color = GRAPH_COLORS[graphPlayers.length % GRAPH_COLORS.length];
-    graphPlayers.push({ id: found?.player_id ?? null, name: username, color });
+    graphPlayers.push({ id, name: found?.username ?? cachedName, color });
   }
   updateGraphPlayerTags();
   renderGraph();
