@@ -968,6 +968,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <button id="score-abs-btn" class="gchart-type-btn active" onclick="setScoreOrigin('abs')">実数</button>
           <button id="score-rel-btn" class="gchart-type-btn" onclick="setScoreOrigin('rel')">期間増加</button>
         </div>
+        <!-- 予測線（累計スコア選択時のみ表示。当日24:00までの予測のみ） -->
+        <label id="graph-predict-ctrl" style="display:none;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);cursor:pointer">
+          <input type="checkbox" id="graph-predict-chk" onchange="renderGuildGraph()"> 予測線
+        </label>
         <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--md-on-surface-variant);">
           <span>期間:</span>
           <select id="graph-from-select" onchange="renderGuildGraph()" style="font-size:12px;padding:2px 6px;"></select>
@@ -2068,9 +2072,11 @@ function setGChartType(t) {
   document.getElementById('gchart-speed-btn')?.classList.toggle('active', t === 'speed');
   document.getElementById('gchart-score-btn')?.classList.toggle('active', t === 'score');
   document.getElementById('gchart-rank-btn')?.classList.toggle('active', t === 'rank');
-  // 累計スコア時のみ期間増切替を表示
+  // 累計スコア時のみ期間増切替・予測線チェックを表示
   const originCtrl = document.getElementById('score-origin-ctrl');
   originCtrl.style.display = t === 'score' ? 'flex' : 'none';
+  const predictCtrl = document.getElementById('graph-predict-ctrl');
+  if (predictCtrl) predictCtrl.style.display = t === 'score' ? 'flex' : 'none';
   renderGuildGraph();
 }
 function setScoreOrigin(mode) {
@@ -2282,6 +2288,25 @@ function computeRestBands(labels, startDateStr, mergeInterval) {
   return bands;
 }
 
+// ---- 線形予測（個人ランキングと同仕様。直近8点から当日24:00までを予測） ----
+function computeLinearPrediction(values, steps) {
+  const pts = values.filter(v => v != null);
+  if (pts.length < 2) return null;
+  const recent = pts.slice(-8);
+  const n = recent.length;
+  const xs = recent.map((_, i) => i);
+  const ys = recent;
+  const sx = xs.reduce((a,b)=>a+b,0), sy = ys.reduce((a,b)=>a+b,0);
+  const sxy = xs.reduce((a,x,i)=>a+x*ys[i],0), sxx = xs.reduce((a,x)=>a+x*x,0);
+  const denom = n*sxx - sx*sx;
+  if (!denom) return null;
+  const slope = (n*sxy - sx*sy) / denom;
+  const intercept = (sy - slope*sx) / n;
+  const preds = [];
+  for (let i = 1; i <= steps; i++) preds.push(Math.round(intercept + slope*(n-1+i)));
+  return { slope, intercept, preds };
+}
+
 async function renderGuildGraph() {
   if (document.getElementById('graph-modal').style.display === 'none') return;
   await ensureChartJs();
@@ -2303,8 +2328,35 @@ async function renderGuildGraph() {
   const yKey = gChartType;
   const isRank = yKey === 'rank';
   const useRelative = yKey === 'score' && scoreOrigin === 'rel';
+  const showPredict = document.getElementById('graph-predict-chk')?.checked && yKey === 'score';
 
-  const datasets = graphGuilds.map(g => {
+  // 予測ステップ数: 最終データ時刻から当日24:00までの20分刻み数（個人ランキングと同仕様）
+  const PRED_STEPS = (() => {
+    if (!showPredict || !labels.length) return 0;
+    const lastLabel = labels[labels.length - 1]; // "MM-DD HH:mm"
+    const timePart = lastLabel.split(' ')[1];
+    if (!timePart) return 0;
+    const [hh, mm] = timePart.split(':').map(Number);
+    const minutesUntilMidnight = 24 * 60 - (hh * 60 + mm);
+    return Math.max(0, Math.floor(minutesUntilMidnight / 20));
+  })();
+  const predLabels = (() => {
+    if (!showPredict || PRED_STEPS === 0 || !labels.length) return [];
+    const lastLabel = labels[labels.length - 1];
+    const [datePart, timePart] = lastLabel.split(' ');
+    const [hh, mm] = timePart.split(':').map(Number);
+    const baseMins = hh * 60 + mm;
+    return Array.from({ length: PRED_STEPS }, (_, i) => {
+      const totalMins = baseMins + (i + 1) * 20;
+      const newHH = Math.floor(totalMins / 60) % 24;
+      const newMM = totalMins % 60;
+      return `${datePart} ${String(newHH).padStart(2,'0')}:${String(newMM).padStart(2,'0')}`;
+    });
+  })();
+  const allLabels = [...labels, ...predLabels];
+
+  const datasets = [];
+  for (const g of graphGuilds) {
     let series = (guildSeries[g.id] || {})[yKey] || labels.map(() => null);
     // 期間増加モード: 最初の非null値を 0 基準に変換
     if (useRelative) {
@@ -2312,11 +2364,11 @@ async function renderGuildGraph() {
       const base = baseIdx >= 0 ? series[baseIdx] : 0;
       series = series.map(v => v != null ? v - base : null);
     }
-    return {
+    datasets.push({
       label: g.name,
       _guildId: g.id,
       _origColor: g.color,
-      data: series,
+      data: showPredict ? [...series, ...Array(PRED_STEPS).fill(null)] : series,
       borderColor: g.color,
       backgroundColor: g.color + '15',
       // 点サイズ: ユーザーが「ポイント表示」で明示的にON/OFF・サイズを指定可能
@@ -2325,8 +2377,32 @@ async function renderGuildGraph() {
       tension: 0,
       spanGaps: yKey === 'score',
       borderWidth: 2,
-    };
-  });
+    });
+
+    if (showPredict) {
+      const pred = computeLinearPrediction(series, PRED_STEPS);
+      if (pred) {
+        const lastRealIdx = series.reduce((last, v, i) => v != null ? i : last, -1);
+        const predData = Array(labels.length).fill(null);
+        if (lastRealIdx >= 0) predData[lastRealIdx] = series[lastRealIdx];
+        datasets.push({
+          label: g.name + ' (予測)',
+          _guildId: g.id,
+          _origColor: g.color,
+          _isPred: true,
+          data: [...predData, ...pred.preds],
+          borderColor: g.color,
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          tension: 0,
+          spanGaps: true,
+          fill: false,
+        });
+      }
+    }
+  }
 
   const areaEl = document.getElementById('graph-chart-area');
   const canvasW = areaEl ? areaEl.clientWidth || 320 : 320;
@@ -2361,7 +2437,7 @@ async function renderGuildGraph() {
   if (chartInstance) chartInstance.destroy();
   chartInstance = new Chart(ctx, {
     type: 'line',
-    data: { labels: labels.map(roundTimeLabel), datasets },
+    data: { labels: allLabels.map(roundTimeLabel), datasets },
     plugins: [boundaryPlugin],
     options: {
       responsive: false, maintainAspectRatio: false,
