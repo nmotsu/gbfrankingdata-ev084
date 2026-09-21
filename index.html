@@ -3703,9 +3703,11 @@ function minutesFromAnchor(capturedAt, dayKey) {
 // null = クリップなし（全件）
 function graphPhaseWindow(dayKey) {
   const period = getGBFPeriodName(dayKey + ' 12:00:00', currentEventStartDate());
+  const isFinalDay = period === GBF_PERIOD_NAMES[GBF_PERIOD_NAMES.length - 1];
   if (period === '予選1日目')   return [720, 1439]; // 19:00〜翌6:59
   if (period === '予選2日目')   return [0, 1039];   // 7:00〜24:19
-  if (period.startsWith('本戦')) return [0, 1039];   // 7:00〜24:19
+  if (period.startsWith('本戦') && !isFinalDay) return [0, 1439]; // 7:00〜翌6:59（最終日以外は夜間も個人・ボーダーは継続）
+  if (period.startsWith('本戦')) return [0, 1039];   // 7:00〜24:19（最終日は夜なし）
   if (period === 'インターバル') return [0, 1439];   // 全体
   return null; // 開始前/その他はクリップなし
 }

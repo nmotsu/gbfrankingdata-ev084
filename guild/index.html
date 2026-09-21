@@ -2202,10 +2202,15 @@ async function loadGuildGraphData() {
   snaps.sort((a, b) => a.captured_at.localeCompare(b.captured_at));
 
   // 単日選択時は7:00〜24:05でクリップ（複数日選択時はクリップせず夜間帯も連続表示。個人ランキングと同仕様）
+  // ただし予選1日目（イベント開始日）は団ランキングも夜通し動くため、翌7:00までクリップしない
   if (dayCount === 1) {
+    const eventStartDate = loadedEvents.find(e => e.id === currentEventId)?.start_date || null;
+    const isDay1 = days[0] === eventStartDate;
     const [yy, mm, dd] = days[0].split('-').map(Number);
-    const startMs = new Date(yy, mm - 1, dd, 7, 0, 0).getTime();
-    const endMs   = new Date(yy, mm - 1, dd + 1, 0, 20, 0).getTime(); // 24:00境界スナップの着地ズレを吸収
+    const startMs = new Date(yy, mm - 1, dd, isDay1 ? 19 : 7, 0, 0).getTime();
+    const endMs   = isDay1
+      ? new Date(yy, mm - 1, dd + 1, 7, 20, 0).getTime()  // 予選1日目: 19:00〜翌7:00（夜通し）
+      : new Date(yy, mm - 1, dd + 1, 0, 20, 0).getTime(); // それ以外: 7:00〜24:05（24:00境界スナップの着地ズレを吸収）
     snaps = snaps.filter(s => {
       const t = new Date(s.captured_at.replace(' ', 'T')).getTime();
       return t >= startMs && t <= endMs;
