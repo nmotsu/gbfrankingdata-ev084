@@ -919,7 +919,7 @@ class VirtualScroll {
       <button class="tab-btn active" id="tab-20min" onclick="switchTab('20min')">20分速<span class="tab-sub">直前→最新</span></button>
       <button class="tab-btn" id="tab-morning" onclick="switchTab('morning')">朝活<span class="tab-sub" id="tab-morning-sub">7:00→8:00</span></button>
       <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">日速<span class="tab-sub" id="tab-daily-sub">7:00→最新</span></button>
-      <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub" id="tab-overnight-sub">0:00→7:00</span></button>
+      <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub" id="tab-overnight-sub">24:00→7:00</span></button>
     </div>
 
     <!-- ② コントロール列（左）+ 広告列（右・全高span） -->
@@ -1244,7 +1244,7 @@ class VirtualScroll {
         <div class="help-grid">
           <div class="help-grid-item" style="border-left:3px solid var(--elem-color)">
             <div style="color:var(--elem-color);font-weight:700">残業</div>
-            <div style="color:var(--md-on-surface-variant);margin-top:4px">0:00 → 7:00（深夜帯）の累計増加量。期間中は最新スナップまでライブ更新、7:00 到達で確定。</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">24:00 → 7:00（深夜帯）の累計増加量。期間中は最新スナップまでライブ更新、7:00 到達で確定。</div>
           </div>
           <div class="help-grid-item" style="border-left:3px solid #fbbf24">
             <div style="color:#fbbf24;font-weight:700">朝活</div>
@@ -1252,7 +1252,7 @@ class VirtualScroll {
           </div>
           <div class="help-grid-item" style="border-left:3px solid #4ade80">
             <div style="color:#4ade80;font-weight:700">日速</div>
-            <div style="color:var(--md-on-surface-variant);margin-top:4px">7:00 → 翌0:00（1日全体）の累計増加量。期間中はライブ更新、翌0:00 到達で確定。</div>
+            <div style="color:var(--md-on-surface-variant);margin-top:4px">7:00 → 24:00（1日全体）の累計増加量。期間中はライブ更新、24:00 到達で確定。</div>
           </div>
           <div class="help-grid-item" style="border-left:3px solid #93c5fd">
             <div style="color:#93c5fd;font-weight:700">20分速</div>
@@ -2285,11 +2285,14 @@ function updateEventDaySelect(selectedDate) {
   const dates = buildEventDateList();
   sel.innerHTML = '<option value="">-- 日付を選択 --</option>';
   const isMobileDaySel = window.innerWidth < 640;
-  // 残業タブ（0:00〜7:00の集計）は、その日の深夜帯が前日のGBF日に属するため、
-  // 正午ではなく深夜の代表時刻で期間名を判定する（例: 09-22の残業→予選1日目扱い）
-  const refTime = currentTab === 'overnight' ? ' 03:00:00' : ' 12:00:00';
+  // 残業タブ（24:00〜7:00の集計）は、その日の深夜帯が前日のGBF日に属するため、
+  // 正午ではなく深夜の代表時刻で期間名を判定する（例: 09-22の残業→予選1日目扱い）。
+  // イベント開始日そのもの（例: 09-21）には「開始前の深夜帯」が存在しないため一覧から除外する。
+  const isOvernight = currentTab === 'overnight';
+  const refTime = isOvernight ? ' 03:00:00' : ' 12:00:00';
   dates.forEach(d => {
     const period = getGBFPeriodName(d + refTime, startDate);
+    if (isOvernight && period === '開始前') return;
     const shortD = d.substring(5).replace('-', '/');
     const label = isMobileDaySel ? shortD : `[${period}] ${d}`;
     sel.innerHTML += `<option value="${d}"${d === selectedDate ? ' selected' : ''}>${label}</option>`;
@@ -3102,10 +3105,10 @@ const TYPE_META = {
   '20分速':       { label: '20分速', cls: 'type-20min',     desc: '直前 → 最新スナップ' },
   '朝活':         { label: '朝活',   cls: 'type-morning',   desc: '7:00 → 8:00' },
   '朝活(進行中)': { label: '朝活',   cls: 'type-morning',   desc: '7:00 → 最新' },
-  '日速':         { label: '日速',   cls: 'type-daily',     desc: '7:00 → 0:00' },
+  '日速':         { label: '日速',   cls: 'type-daily',     desc: '7:00 → 24:00' },
   '日速(進行中)': { label: '日速',   cls: 'type-daily',     desc: '7:00 → 最新' },
-  '残業':         { label: '残業',   cls: 'type-overnight', desc: '0:00 → 7:00' },
-  '残業(進行中)': { label: '残業',   cls: 'type-overnight', desc: '0:00 → 最新' },
+  '残業':         { label: '残業',   cls: 'type-overnight', desc: '24:00 → 7:00' },
+  '残業(進行中)': { label: '残業',   cls: 'type-overnight', desc: '24:00 → 最新' },
 };
 
 function renderRanking(data, keepScroll = false) {
@@ -3161,11 +3164,11 @@ function renderRanking(data, keepScroll = false) {
   badgeEl.className   = `type-badge ${meta.cls}`;
   // タブのサブテキストを更新（日速・朝活）
   const dailySubEl = document.getElementById('tab-daily-sub');
-  if (dailySubEl && data.type === '日速') dailySubEl.textContent = data.isLive ? '7:00→最新' : '7:00→0:00';
+  if (dailySubEl && data.type === '日速') dailySubEl.textContent = data.isLive ? '7:00→最新' : '7:00→24:00';
   const morningSubEl = document.getElementById('tab-morning-sub');
   if (morningSubEl && data.type === '朝活') morningSubEl.textContent = data.isLive ? '7:00→最新' : '7:00→8:00';
   const overnightSubEl = document.getElementById('tab-overnight-sub');
-  if (overnightSubEl && data.type === '残業') overnightSubEl.textContent = data.isLive ? '0:00→最新' : '0:00→7:00';
+  if (overnightSubEl && data.type === '残業') overnightSubEl.textContent = data.isLive ? '24:00→最新' : '24:00→7:00';
 
   // 更新中バッジ: afterPlayerCount が 1万未満なら表示
   const updBadge = document.getElementById('updating-badge');
