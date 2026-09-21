@@ -3774,7 +3774,22 @@ async function loadGraphData() {
   // 休み期間（夜間）の帯を検出: 2日目24:00〜3日目7:00、本戦1〜3日目24:00〜翌7:00
   const restBands = computeRestBands(labels, currentEventStartDate(), false);
 
-  return { labels, playerSeries, dayCount, restBands };
+  const lastCapturedAt = snaps.length ? snaps[snaps.length - 1].captured_at : null;
+  return { labels, playerSeries, dayCount, restBands, lastCapturedAt };
+}
+
+// 予測ゴール地点（実時刻）を算出。予選1日目・インターバルは翌7:00、それ以外は当日24:00。
+function predictionGoalDate(lastCapturedAt, startDateStr) {
+  if (!lastCapturedAt || !startDateStr) return null;
+  const period = getGBFPeriodName(lastCapturedAt, startDateStr);
+  const dt = lastCapturedAt.substring(0, 10);
+  const hh = parseInt(lastCapturedAt.substring(11, 13));
+  let [y, m, d] = dt.split('-').map(Number);
+  if (hh < 7) d -= 1; // GBF日基準のカレンダー日（その日7:00始まりの日付）に戻す
+  const needsNightGoal = period === '予選1日目' || period === 'インターバル';
+  return needsNightGoal
+    ? new Date(y, m - 1, d + 1, 7, 0, 0)   // 翌7:00
+    : new Date(y, m - 1, d + 1, 0, 0, 0);  // 当日24:00（＝翌日0:00）
 }
 
 // 古戦場スケジュールに基づく休み期間（夜間）の時間帯を算出
@@ -3854,7 +3869,7 @@ async function renderGraph() {
   loadEl.style.display = 'none';
   if (!result) return;
 
-  const { labels, playerSeries, dayCount, restBands } = result;
+  const { labels, playerSeries, dayCount, restBands, lastCapturedAt } = result;
   const yKey = graphChartType; // 'speed' | 'honor' | 'rank'
   const showPredict = document.getElementById('graph-predict-chk')?.checked && yKey === 'honor';
   const isRank = yKey === 'rank';
@@ -3869,29 +3884,28 @@ async function renderGraph() {
       }
     }
   }
-  // 予測ステップ数: 最終データ時刻から当日24:00までの20分刻み数
+  // 予測ステップ数: 最終データ時刻からゴール地点までの20分刻み数
+  // ゴール地点は期間ごとに異なる（予選1日目・インターバルは翌7:00、それ以外は当日24:00）
   const PRED_STEPS = (() => {
-    if (!showPredict || !labels.length) return 0;
-    const lastLabel = labels[labels.length - 1]; // "MM-DD HH:mm"
-    const timePart = lastLabel.split(' ')[1];
-    if (!timePart) return 0;
-    const [hh, mm] = timePart.split(':').map(Number);
-    const minutesUntilMidnight = 24 * 60 - (hh * 60 + mm);
-    return Math.max(0, Math.floor(minutesUntilMidnight / 20));
+    if (!showPredict || !labels.length || !lastCapturedAt) return 0;
+    const goal = predictionGoalDate(lastCapturedAt, currentEventStartDate());
+    if (!goal) return 0;
+    const lastMs = new Date(lastCapturedAt.replace(' ', 'T')).getTime();
+    const remainingMin = (goal.getTime() - lastMs) / 60000;
+    return Math.max(0, Math.floor(remainingMin / 20));
   })();
 
   // 予測ラベル生成（実際の時刻形式 MM-DD HH:mm）
   const predLabels = (() => {
-    if (!showPredict || PRED_STEPS === 0 || !labels.length) return [];
-    const lastLabel = labels[labels.length - 1];
-    const [datePart, timePart] = lastLabel.split(' ');
-    const [hh, mm] = timePart.split(':').map(Number);
-    const baseMins = hh * 60 + mm;
+    if (!showPredict || PRED_STEPS === 0 || !lastCapturedAt) return [];
+    const base = new Date(lastCapturedAt.replace(' ', 'T'));
     return Array.from({ length: PRED_STEPS }, (_, i) => {
-      const totalMins = baseMins + (i + 1) * 20;
-      const newHH = Math.floor(totalMins / 60) % 24;
-      const newMM = totalMins % 60;
-      return `${datePart} ${String(newHH).padStart(2,'0')}:${String(newMM).padStart(2,'0')}`;
+      const t = new Date(base.getTime() + (i + 1) * 20 * 60000);
+      const mm = String(t.getMonth() + 1).padStart(2, '0');
+      const dd = String(t.getDate()).padStart(2, '0');
+      const hh = String(t.getHours()).padStart(2, '0');
+      const mi = String(t.getMinutes()).padStart(2, '0');
+      return `${mm}-${dd} ${hh}:${mi}`;
     });
   })();
   const allLabels  = [...labels, ...predLabels];

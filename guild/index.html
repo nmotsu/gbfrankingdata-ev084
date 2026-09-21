@@ -2248,7 +2248,23 @@ async function loadGuildGraphData() {
   const eventStartDate = loadedEvents.find(e => e.id === currentEventId)?.start_date || null;
   const restBands = computeRestBands(labels, eventStartDate, true);
 
-  return { labels, guildSeries, dayCount, restBands };
+  const lastCapturedAt = snaps.length ? snaps[snaps.length - 1].captured_at : null;
+  return { labels, guildSeries, dayCount, restBands, lastCapturedAt };
+}
+
+// 予測ゴール地点（実時刻）を算出。団ランキングは予選1日目（イベント開始日）のみ夜通し運用のため翌7:00、
+// それ以外（本戦1〜4日目など）は当日24:00がゴール（インターバル日・本戦の夜間は団ランキング自体が動かないため対象外）。
+function predictionGoalDate(lastCapturedAt, eventStartDate) {
+  if (!lastCapturedAt || !eventStartDate) return null;
+  const dt = lastCapturedAt.substring(0, 10);
+  const hh = parseInt(lastCapturedAt.substring(11, 13));
+  let [y, m, d] = dt.split('-').map(Number);
+  if (hh < 7) d -= 1; // GBF日基準のカレンダー日（その日7:00始まりの日付）に戻す
+  const gbfDayStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const isDay1 = gbfDayStr === eventStartDate;
+  return isDay1
+    ? new Date(y, m - 1, d + 1, 7, 0, 0)   // 予選1日目: 翌7:00
+    : new Date(y, m - 1, d + 1, 0, 0, 0);  // それ以外: 当日24:00（＝翌日0:00）
 }
 
 // 古戦場スケジュールに基づく休み期間（夜間）の時間帯を算出
