@@ -2898,7 +2898,8 @@ function renderTimeSelect(gbfDay, selectedSnapId) {
   sel.innerHTML = '<option value="">-- この日の最新 --</option>';
   (snapGroups[gbfDay] || []).forEach(s => {
     const time = s.captured_at.substring(11, 19);
-    sel.innerHTML += `<option value="${s.id}"${String(s.id) === String(selectedSnapId) ? ' selected' : ''}>${time} (${s.player_count}件)</option>`;
+    const estTag = s.estimated_count > 0 ? (s.estimated_count >= s.player_count ? ' [推定]' : ` [一部推定:${s.estimated_count}件]`) : '';
+    sel.innerHTML += `<option value="${s.id}"${String(s.id) === String(selectedSnapId) ? ' selected' : ''}>${time} (${s.player_count}件)${estTag}</option>`;
   });
 }
 
@@ -3217,7 +3218,8 @@ function renderRanking(data, keepScroll = false) {
     const starBtn = p.player_id == null ? '' : `<button class="watch-star${watchedPlayers.has(p.player_id)?' on':''}" data-pid="${p.player_id}" onclick="toggleWatch(event,${p.player_id},${escHtml(JSON.stringify(p.username))})" title="${watchedPlayers.has(p.player_id)?'注目解除':'注目に追加'}">★</button>`;
     const _soloMatch = getSoloMatch(p);
     const soloMark = _soloMatch ? `<span class="solo-mark" title="推定ソロ: ${_soloMatch}">S</span>` : '';
-    const gnCell = `${markEl}${soloMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattlePlayer(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))})">${escHtml(p.username)}</span>${profileLink}${starBtn}`;
+    const estMark = p.isEstimated ? `<span title="取得漏れのため前後データから算出した推定値です" style="color:#fbbf24;font-size:9px;border:1px solid #fbbf24;border-radius:3px;padding:0 2px;margin-right:2px">推定</span>` : '';
+    const gnCell = `${markEl}${soloMark}${estMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattlePlayer(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))})">${escHtml(p.username)}</span>${profileLink}${starBtn}`;
 
     const cells = {
       honorRank:  `<td class="cell-r">${honorRank <= 3 ? `<span class="medal-${honorRank}">${honorRank}</span>` : honorRank}</td>`,
