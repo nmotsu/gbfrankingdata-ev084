@@ -16,6 +16,7 @@
 <meta name="twitter:description" content="グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開する非公式ファンサイト。">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GBF古戦場ランキング","url":"https://gbfranking.com/","description":"グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開する非公式ファンサイト","applicationCategory":"Sports","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
 <link rel="icon" href="./favicon-rich.png" type="image/png"><link rel="apple-touch-icon" href="./favicon-rich.png">
+<link rel="stylesheet" href="/css/theme.css">
 <style>
 /* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
 
@@ -84,6 +85,17 @@ html[data-theme="light"] .hover\:text-white:hover { color: #1a1d21; }
 
 /* --- Truncate --- */
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --- タップ領域の拡張（見た目は変えず、透明な当たり判定だけ広げる） ---
+ * 実測: 📋 14x13px / GN 高さ18px / ↗ 約10px。行の高さ(34px)いっぱいまで縦に広げる。
+ * 横は隣の要素（📋→GN→↗）と当たり判定が重ならないよう最小限に留める。 */
+.hist-btn, .gn-clickable, .gn-profile-link { position: relative; }
+.hist-btn::before, .gn-clickable::before, .gn-profile-link::before {
+  content: ''; position: absolute; top: -10px; bottom: -10px;
+}
+.hist-btn::before        { left: -4px; right: -2px; }
+.gn-clickable::before    { left: 0;    right: 0; }
+.gn-profile-link::before { left: -3px; right: -6px; }
 
 </style>
 <style>
@@ -295,52 +307,9 @@ function ensureChartJs() {
 }
 </script>
 <style>
+  /* 共通トークン（--theme-* / --elem-* / --md-*）は /css/theme.css に一元化 */
   :root {
-    /* === Background & Theme Variables (managed by theme-manager.js) === */
-    --theme-bg: #0a0a0a;
-    --theme-surface: #111111;
-    --theme-surface-container: #191919;
-    --theme-surface-container-high: #242424;
-    --theme-outline: #363636;
-    --theme-outline-variant: #202020;
-    --theme-on-surface: #e2e8f0;
-    --theme-on-surface-variant: #8a9ab0;
-    --chart-grid-color: rgba(255,255,255,0.09);
-    /* === Element Color Variables === */
-    --elem-color: #3b82f6;
-    --elem-color-light: #60a5fa99;
-    /* === MD3 Design Tokens === */
-    --md-surface-dim: var(--theme-bg);
-    --md-surface: var(--theme-surface);
-    --md-surface-container: var(--theme-surface-container);
-    --md-surface-container-high: var(--theme-surface-container-high);
-    --md-surface-bright: var(--theme-surface-container-high);
-    --md-on-surface: var(--theme-on-surface);
-    --md-on-surface-variant: var(--theme-on-surface-variant);
-    --md-outline: var(--theme-outline);
-    --md-outline-variant: var(--theme-outline-variant);
-    --md-primary: var(--elem-color);
-    --md-primary-dim: var(--elem-color);
-    --md-primary-container: var(--theme-surface-container-high);
-    --md-on-primary-container: var(--theme-on-surface);
-    --md-secondary: var(--elem-color-light);
-    --md-secondary-container: var(--theme-surface-container-high);
-    --md-success: #4ade80;
-    --md-warning: #fbbf24;
-    --md-error: #f87171;
-    --md-shape-xs: 4px;
-    --md-shape-sm: 8px;
-    --md-shape-md: 12px;
-    --md-shape-lg: 16px;
-    --md-shape-full: 9999px;
-    --md-ease: cubic-bezier(0.2, 0, 0, 1);
-    --md-duration-short: 150ms;
-    --md-duration-medium: 300ms;
-    --md-duration-long: 500ms;
-    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
-    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
-    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
-    /* 行/オーバーレイ（テーマ追従） */
+    /* 行/オーバーレイ（テーマ追従・このページ固有） */
     --row-top1-bg: #2a2200;
     --row-top2-bg: #1e1e2e;
     --row-top3-bg: #261400;
@@ -350,18 +319,6 @@ function ensureChartJs() {
   }
   /* === ライトモード（data-theme="light" で base 変数を上書き、MD3トークンへ波及） === */
   html[data-theme="light"] {
-    --theme-bg: #f4f5f7;
-    --theme-surface: #ffffff;
-    --theme-surface-container: #f1f2f4;
-    --theme-surface-container-high: #e7e9ec;
-    --theme-outline: #cfd3da;
-    --theme-outline-variant: #e2e5ea;
-    --theme-on-surface: #1a1d21;
-    --theme-on-surface-variant: #586173;
-    --chart-grid-color: rgba(0,0,0,0.08);
-    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
-    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
-    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
     --row-top1-bg: #fdf6cf;
     --row-top2-bg: #edf1f6;
     --row-top3-bg: #fce4e4;
@@ -376,7 +333,7 @@ function ensureChartJs() {
   html[data-theme="light"] .gn-clickable:not(.gn-pinned) { color:#1a73e8 !important; text-decoration:underline; }
   html[data-theme="light"] .honor-bar-bg { opacity:0.30; }
   html[data-theme="light"] .honor-diff { color:var(--md-on-surface-variant) !important; font-weight:600; }
-  body { background: var(--theme-bg); color: var(--theme-on-surface); font-family: 'Segoe UI', sans-serif; }
+  body { background: var(--theme-bg); color: var(--theme-on-surface); }
   .header { background: var(--theme-surface); border-bottom: 2px solid var(--elem-color); padding: 12px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.5); }
   .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
   .hdr-h1 { font-size: 1.05rem; color: var(--md-primary); font-weight: 500; display: flex; align-items: center; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; letter-spacing: 0.01em; }
@@ -420,7 +377,9 @@ function ensureChartJs() {
   .tab-btn.active { background: var(--md-surface-container-high); color: var(--md-primary); border-color: var(--md-primary); box-shadow: 0 0 8px color-mix(in srgb, var(--elem-color) 40%, transparent); }
   .tab-btn:not(.active) { background: var(--md-surface-container-high); color: var(--md-on-surface-variant); }
   .tab-btn:not(.active):hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
-  .tab-sub { font-size: 0.5625rem; font-weight:400; opacity:0.65; }
+  /* 時間帯の補足: 9px・不透明度65%（コントラスト3.1:1）だったため、11px・専用の補足色（4.5:1以上）に変更 */
+  .tab-sub { font-size: 0.6875rem; font-weight:400; color: var(--text-caption); }
+  .tab-btn.active .tab-sub { color: var(--md-on-surface); }
   tr.rank-row:nth-child(even) { background: var(--row-odd-bg); }
   .rank-row:hover { background: var(--row-hover) !important; }
   .rank-row.top-1 { border-left: 4px solid var(--md-warning); box-shadow: inset 60px 0 20px -20px rgba(251,191,36,0.12); }
@@ -459,7 +418,8 @@ function ensureChartJs() {
   .day-nav-btn:hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
   .day-nav-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
   /* タイプバッジ */
-  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; }
+  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+  .stat-label    { white-space: nowrap; flex-shrink: 0; }
   .type-20min    { background: var(--md-secondary-container); color: var(--md-on-primary-container); }
   .type-morning  { background: #3b2f00; color: var(--md-warning); }
   .type-daily    { background: #1a3020; color: var(--md-success); }
@@ -1046,7 +1006,7 @@ class VirtualScroll {
     <!-- 統計バー（テーブルカード内ヘッダー） -->
     <div id="stat-bar" style="display:none;align-items:center;gap:10px">
       <span id="type-badge-label" class="type-badge type-20min">20分速</span>
-      <span class="text-gray-400">期間:</span>
+      <span class="text-gray-400 stat-label">期間:</span>
       <span id="stat-range" class="text-blue-300 font-mono text-xs"></span>
       <span id="refresh-status" style="font-size:11px;color:var(--md-on-surface-variant);white-space:nowrap"></span>
       <button onclick="openSaveModal()" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;flex-shrink:0" title="PNG保存">保存</button>
@@ -3258,8 +3218,13 @@ function renderRanking(data, keepScroll = false) {
     honorRankMap.get(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`) || 999;
 
   statBar.style.display = 'flex';
-  const bef = data.before ? data.before.substring(0, 16) : '?';
-  const aft = data.after  ? data.after.substring(0, 16)  : '?';
+  // 年はイベント名で分かるため省略し、同日なら終了側は時刻のみにする（モバイルで折り返さない長さに）
+  const bef = data.before ? data.before.substring(5, 16) : '?';
+  const aft = data.after
+    ? (data.before && data.before.substring(0, 10) === data.after.substring(0, 10)
+        ? data.after.substring(11, 16)
+        : data.after.substring(5, 16))
+    : '?';
   document.getElementById('stat-range').textContent = `${bef} → ${aft}`;
   const active   = data.players.filter(p => p.honorDiff > 0);
   const topHonor = Math.max(0, ...active.map(p => p.honorDiff));
@@ -3316,7 +3281,7 @@ function renderRanking(data, keepScroll = false) {
     const markEl = bInfo ? `<span class="battle-row-mark" style="background:${bInfo.color}"></span>` : '';
     const gnCls  = bInfo ? ' gn-pinned' : '';
     const gnCol  = bInfo ? ` style="color:${bInfo.color}"` : '';
-    const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
+    const histBtn = `<span class="hist-btn" style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
     const starBtn = p.player_id == null ? '' : `<button class="watch-star${watchedPlayers.has(p.player_id)?' on':''}" data-pid="${p.player_id}" onclick="toggleWatch(event,${p.player_id},${escHtml(JSON.stringify(p.username))})" title="${watchedPlayers.has(p.player_id)?'注目解除':'注目に追加'}">★</button>`;
     const _soloMatch = getSoloMatch(p);
     const soloMark = _soloMatch ? `<span class="solo-mark" title="推定ソロ: ${_soloMatch}">S</span>` : '';

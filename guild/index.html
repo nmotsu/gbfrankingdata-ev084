@@ -26,6 +26,7 @@ window.__STATIC_CACHE_PROMISE__=fetch('./../guild-data.json.gz')
   })
   .catch(function(e){window.__STATIC_CACHE__={};console.warn('GBF: データ読み込み失敗',e);});
 </script>
+<link rel="stylesheet" href="/css/theme.css">
 <style>
 /* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
 
@@ -94,6 +95,17 @@ html[data-theme="light"] .hover\:text-white:hover { color: #1a1d21; }
 
 /* --- Truncate --- */
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* --- タップ領域の拡張（見た目は変えず、透明な当たり判定だけ広げる） ---
+ * 実測: 📋 14x13px / GN 高さ18px / ↗ 約10px。行の高さ(34px)いっぱいまで縦に広げる。
+ * 横は隣の要素（📋→GN→↗）と当たり判定が重ならないよう最小限に留める。 */
+.hist-btn, .gn-clickable, .gn-profile-link { position: relative; }
+.hist-btn::before, .gn-clickable::before, .gn-profile-link::before {
+  content: ''; position: absolute; top: -10px; bottom: -10px;
+}
+.hist-btn::before        { left: -4px; right: -2px; }
+.gn-clickable::before    { left: 0;    right: 0; }
+.gn-profile-link::before { left: -3px; right: -6px; }
 
 </style>
 <style>
@@ -304,37 +316,12 @@ function ensureChartJs() {
 }
 </script>
 <style>
+  /* 共通トークン（--theme-* / --elem-* / --md-*）は /css/theme.css に一元化 */
   :root {
-    --theme-bg:#0a0a0a; --theme-surface:#111111; --theme-surface-container:#191919;
-    --theme-surface-container-high:#242424; --theme-outline:#363636; --theme-outline-variant:#202020;
-    --theme-on-surface:#e2e8f0; --theme-on-surface-variant:#8a9ab0;
-    --chart-grid-color:rgba(255,255,255,0.09);
-    --elem-color:#3b82f6; --elem-color-light:#60a5fa99;
-    --md-surface-dim:var(--theme-bg); --md-surface:var(--theme-surface);
-    --md-surface-container:var(--theme-surface-container);
-    --md-surface-container-high:var(--theme-surface-container-high);
-    --md-surface-bright:var(--theme-surface-container-high);
-    --md-on-surface:var(--theme-on-surface); --md-on-surface-variant:var(--theme-on-surface-variant);
-    --md-outline:var(--theme-outline); --md-outline-variant:var(--theme-outline-variant);
-    --md-primary:var(--elem-color); --md-primary-dim:var(--elem-color);
-    --md-primary-container:var(--theme-surface-container-high);
-    --md-on-primary-container:var(--theme-on-surface);
-    --md-secondary:var(--elem-color-light); --md-secondary-container:var(--theme-surface-container-high);
-    --md-success:#4ade80; --md-warning:#fbbf24; --md-error:#f87171;
-    --md-shape-xs:4px; --md-shape-sm:8px; --md-shape-md:12px; --md-shape-lg:16px; --md-shape-full:9999px;
-    --md-ease:cubic-bezier(0.2,0,0,1); --md-duration-short:150ms; --md-duration-medium:300ms;
-    --md-elevation-1:0 1px 3px rgba(0,0,0,0.3); --md-elevation-2:0 2px 6px rgba(0,0,0,0.3);
-    --md-elevation-3:0 4px 12px rgba(0,0,0,0.3);
     --row-top1-bg:#2a2200; --row-top2-bg:#1e1e2e; --row-top3-bg:#261400;
     --row-odd-bg:rgba(255,255,255,0.04); --row-hairline:rgba(255,255,255,0.05); --row-hover:rgba(255,255,255,0.05);
   }
   html[data-theme="light"]{
-    --theme-bg:#f4f5f7; --theme-surface:#ffffff; --theme-surface-container:#f1f2f4;
-    --theme-surface-container-high:#e7e9ec; --theme-outline:#cfd3da; --theme-outline-variant:#e2e5ea;
-    --theme-on-surface:#1a1d21; --theme-on-surface-variant:#586173;
-    --chart-grid-color:rgba(0,0,0,0.08);
-    --md-elevation-1:0 1px 3px rgba(0,0,0,0.10); --md-elevation-2:0 2px 6px rgba(0,0,0,0.10);
-    --md-elevation-3:0 4px 12px rgba(0,0,0,0.12);
     --row-top1-bg:#fdf6cf; --row-top2-bg:#edf1f6; --row-top3-bg:#fce4e4;
     --row-odd-bg:#eaf2fb; --row-hairline:#e3e6ea; --row-hover:rgba(26,115,232,0.10);
   }
@@ -344,7 +331,7 @@ function ensureChartJs() {
   html[data-theme="light"] .score-bar-bg{opacity:0.30;}
   html[data-theme="light"] .score-diff{color:var(--md-on-surface-variant) !important;font-weight:600;}
   html,body{min-height:100%;margin:0;padding:0;}
-  body{background:var(--theme-bg);color:var(--theme-on-surface);font-family:'Segoe UI',sans-serif;display:flex;flex-direction:column;}
+  body{background:var(--theme-bg);color:var(--theme-on-surface);display:flex;flex-direction:column;}
   .main-wrap{flex:1;display:flex;flex-direction:column;}
   /* Header */
   .header{background:var(--theme-surface);border-bottom:2px solid var(--elem-color);padding:12px 16px;box-shadow:0 2px 12px rgba(0,0,0,0.5);}
@@ -363,7 +350,8 @@ function ensureChartJs() {
   .tab-btn.active{background:var(--md-surface-container-high);color:var(--md-primary);border-color:var(--md-primary);box-shadow:0 0 8px color-mix(in srgb,var(--elem-color) 40%,transparent);}
   .tab-btn:not(.active){background:var(--md-surface-container-high);color:var(--md-on-surface-variant);}
   .tab-btn:not(.active):hover{background:var(--md-surface-bright);color:var(--md-on-surface);}
-  .tab-sub{font-size:0.5625rem;font-weight:400;opacity:0.65;}
+  .tab-sub{font-size:0.6875rem;font-weight:400;color:var(--text-caption);}
+  .tab-btn.active .tab-sub{color:var(--md-on-surface);}
   /* Table */
   table{width:100%;border-collapse:collapse;table-layout:fixed;}
   th{background:var(--md-surface);color:var(--md-on-surface-variant);font-size:0.6875rem;padding:8px 12px;letter-spacing:0.04em;text-transform:uppercase;font-weight:500;position:sticky;top:0;z-index:2;white-space:nowrap;overflow:hidden;}
@@ -379,7 +367,7 @@ function ensureChartJs() {
   .score-bar-bg{position:absolute;left:0;top:0;bottom:0;border-radius:var(--md-shape-xs);opacity:0.15;pointer-events:none;}
   .score-diff{position:relative;font-weight:700;font-size:0.875rem;display:block;line-height:1.3;}
   /* Badges */
-  .type-badge{display:inline-block;padding:4px 12px;border-radius:var(--md-shape-full);font-size:0.75rem;font-weight:700;}
+  .type-badge{display:inline-block;padding:4px 12px;border-radius:var(--md-shape-full);font-size:0.75rem;font-weight:700;white-space:nowrap;flex-shrink:0;}
   .type-20min{background:var(--md-secondary-container);color:var(--md-on-primary-container);}
   .type-daily{background:#1a3020;color:var(--md-success);}
   .type-morning{background:#3b2f00;color:var(--md-warning);}
@@ -1513,7 +1501,8 @@ function renderTable(data) {
   typeEl.className = 'type-badge ' + (typeMap[data.type] || 'type-20min');
   typeEl.textContent = data.type + (data.isLive ? '(進行中)' : '');
   const fmt = s => s ? s.substring(5, 16) : '--';
-  document.getElementById('stat-period').textContent = `${fmt(data.before)} → ${fmt(data.after)}`;
+  const sameDay = data.before && data.after && data.before.substring(0, 10) === data.after.substring(0, 10);
+  document.getElementById('stat-period').textContent = `${fmt(data.before)} → ${sameDay ? data.after.substring(11, 16) : fmt(data.after)}`;
   document.getElementById('stat-count').textContent = `${guilds.length}団`;
   document.getElementById('stat-bar').style.display = 'flex';
 
@@ -1564,7 +1553,7 @@ function renderTable(data) {
     const battleMark = bInfo ? `<span class="battle-row-mark" style="background:${bInfo.color}"></span>` : '';
     const gnCls = bInfo ? ' gn-pinned' : '';
     const gnCol = bInfo ? ` style="color:${bInfo.color}"` : '';
-    const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openGuildModal(${g.guild_id},'${escHtml(g.name)}')" title="履歴を見る">📋</span>`;
+    const histBtn = `<span class="hist-btn" style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openGuildModal(${g.guild_id},'${escHtml(g.name)}')" title="履歴を見る">📋</span>`;
     const profileLink = `<a class="gn-profile-link" href="https://game.granbluefantasy.jp/#guild/detail/${g.guild_id}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="GBF団ページ">↗</a>`;
     const starBtn = `<button class="watch-star ${wOn?'on':''}" onclick="toggleWatch(${g.guild_id},'${escHtml(g.name)}')" title="${wOn?'注目解除':'注目'}">★</button>`;
     const gnCell = `${battleMark}${histBtn}<span class="gn-clickable${gnCls}"${gnCol} onclick="toggleBattleGuild(${g.guild_id},'${escHtml(g.name)}')">${escHtml(g.name)}</span>${profileLink}${starBtn}`;
