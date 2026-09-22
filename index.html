@@ -3384,6 +3384,7 @@ async function openPlayerModal(playerId, username, eventId) {
         honor_diff:  p.honorDiff,
         kill_count:  p.kill_count ?? null,
         kill_diff:   p.killDiff,
+        is_estimated: !!p.isEstimated,
       });
     }
     // ※ 20分速データは既に前スナップとの差分を持つため追加計算不要
@@ -3422,8 +3423,10 @@ async function openPlayerModal(playerId, username, eventId) {
     const rank20Clr = h.rank_20min != null && h.rank_20min <= 10 ? '#facc15' : '#94a3b8';
     const rank20Wt  = h.rank_20min != null && h.rank_20min <= 3  ? 700 : 400;
     const timeStr   = escHtml((h.captured_at || '').substring(0, 16)); // 秒数削除
-    return `<tr>
-      <td>${timeStr}</td>
+    const isEst     = !!(h.is_estimated || h.isEstimated);
+    const estTag    = isEst ? ' <span title="取得漏れのため前後の順位から算出した推定値です" style="color:#fbbf24;font-size:10px;border:1px solid #fbbf24;border-radius:3px;padding:0 3px">推定</span>' : '';
+    return `<tr${isEst ? ' style="opacity:0.75"' : ''}>
+      <td>${timeStr}${estTag}</td>
       <td style="color:${rank20Clr};font-weight:${rank20Wt}">${rank20}</td>
       <td>${h.rank || '-'}</td>
       <td style="color:${killColor}">${killStr}</td>
@@ -3650,16 +3653,17 @@ function updateGraphPlayerTags() {
     el.innerHTML = '<span style="font-size:11px;color:var(--md-on-surface-variant)">バトルバーまたは下の検索からプレイヤーを追加</span>';
     return;
   }
-  el.innerHTML = graphPlayers.map(p =>
-    `<span class="graph-player-tag" style="color:${p.color};border-color:${p.color};background:${p.color}18"
+  el.innerHTML = graphPlayers.map(p => {
+    const label = p.name ? escHtml(p.name) : `(GN未設定 ID:${p.id})`;
+    return `<span class="graph-player-tag" style="color:${p.color};border-color:${p.color};background:${p.color}18"
       onmouseenter="highlightGraphLine('${escHtml(p.name)}')"
       onmouseleave="unhighlightGraphLine()"
       ontouchstart="highlightGraphLine('${escHtml(p.name)}')"
       ontouchend="unhighlightGraphLine()"
-    ><span style="pointer-events:none">${escHtml(p.name)}</span
+    ><span style="pointer-events:none">${label}</span
     ><span onclick="event.stopPropagation();toggleGraphPlayer(${p.id != null ? p.id : 'null'},'${escHtml(p.name)}')"
-      style="margin-left:5px;opacity:0.7;font-size:11px;cursor:pointer;padding:0 2px">✕</span></span>`
-  ).join('');
+      style="margin-left:5px;opacity:0.7;font-size:11px;cursor:pointer;padding:0 2px">✕</span></span>`;
+  }).join('');
 }
 
 // ---- 期間セレクト ----
@@ -3680,13 +3684,17 @@ function onGraphPlayerSearch() {
   const q = (document.getElementById('graph-player-search').value || '').trim().toLowerCase();
   const sug = document.getElementById('graph-player-suggest');
   if (!q) { sug.style.display = 'none'; return; }
-  // 現在のランキングデータからプレイヤー名を検索
+  // 現在のランキングデータからプレイヤー名を検索（GN空白のプレイヤーはIDでも検索可能にする）
   const all = window._lastRankingPlayers || [];
-  const hits = all.filter(p => (p.username || '').toLowerCase().includes(q)).slice(0, 10);
+  const hits = all.filter(p =>
+    (p.username || '').toLowerCase().includes(q) ||
+    (p.player_id != null && String(p.player_id).includes(q))
+  ).slice(0, 10);
   if (!hits.length) { sug.style.display = 'none'; return; }
-  sug.innerHTML = hits.map(p =>
-    `<div class="graph-suggest-item" onmousedown="addGraphPlayerFromSuggest(${p.player_id ?? 'null'},'${escHtml(p.username)}')">${escHtml(p.username)}</div>`
-  ).join('');
+  sug.innerHTML = hits.map(p => {
+    const label = p.username ? escHtml(p.username) : `(GN未設定 ID:${p.player_id})`;
+    return `<div class="graph-suggest-item" onmousedown="addGraphPlayerFromSuggest(${p.player_id ?? 'null'},'${escHtml(p.username)}')">${label}</div>`;
+  }).join('');
   sug.style.display = '';
 }
 function addGraphPlayerFromSuggest(id, name) {
@@ -3940,10 +3948,11 @@ async function renderGraph() {
   for (const gp of graphPlayers) {
     const key = String(gp.id ?? gp.name);
     const vals = (playerSeries[key] || {})[yKey] || labels.map(() => null);
+    const displayName = gp.name || `(GN未設定 ID:${gp.id})`;
 
     // 実データセット
     datasets.push({
-      label: gp.name,
+      label: displayName,
       _playerName: gp.name,
       _origColor: gp.color,
       data: showPredict ? [...vals, ...Array(PRED_STEPS).fill(null)] : vals,
@@ -3967,7 +3976,7 @@ async function renderGraph() {
         const predVals = [...predData, ...pred.preds];
 
         datasets.push({
-          label: gp.name + ' (予測)',
+          label: displayName + ' (予測)',
           _playerName: gp.name,
           _origColor: gp.color,
           _isPred: true,
