@@ -1528,6 +1528,14 @@ class VirtualScroll {
           <button onclick="document.getElementById('save-range-from').value=1;document.getElementById('save-range-to').value=10000" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">全件</button>
         </div>
       </div>
+      <!-- 列数（縦に長くなりすぎる場合に分割） -->
+      <div class="save-section">
+        <div class="save-label">列数（横に分割）</div>
+        <div class="range-row">
+          <input type="number" id="save-col-count" value="1" min="1" max="10"> 列
+          <span style="color:var(--md-on-surface-variant)">※1件あたりの行が多い時、横に並べて縦長になりすぎるのを防ぎます</span>
+        </div>
+      </div>
       <!-- ソート -->
       <div class="save-section">
         <div class="save-label">ソート</div>
@@ -1546,6 +1554,14 @@ class VirtualScroll {
           </select>
           <button onclick="applyCurrSort()" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">現在と同じ</button>
         </div>
+      </div>
+      <!-- 画像テーマ -->
+      <div class="save-section">
+        <div class="save-label">画像テーマ</div>
+        <select id="save-theme" class="save-select">
+          <option value="light">ライト</option>
+          <option value="dark">ダーク</option>
+        </select>
       </div>
       <!-- 列選択 -->
       <div class="save-section">
@@ -1899,6 +1915,9 @@ function openSaveModal() {
   if (!players || !players.length) return;
   // ソートを現在と同期
   applyCurrSort();
+  // 画像テーマ: サイトが現在ダークでもデフォルトはライトにする（保存時に切替可能）
+  const themeSel = document.getElementById('save-theme');
+  if (themeSel) themeSel.value = 'light';
   // 列チェックボックスを生成
   const grid = document.getElementById('save-col-checks');
   grid.innerHTML = colOrder.map(k => {
@@ -1984,6 +2003,11 @@ function execSavePNG() {
     return 100;
   });
 
+  // 列数（縦に長くなりすぎるのを防ぐため、指定列数で横に分割する）
+  const colCount   = Math.max(1, Math.min(10, parseInt(document.getElementById('save-col-count')?.value) || 1, sliced.length || 1));
+  const rowsPerGrp = Math.ceil(sliced.length / colCount);
+  const groups     = Array.from({ length: colCount }, (_, gi) => sliced.slice(gi * rowsPerGrp, (gi + 1) * rowsPerGrp));
+
   // Canvas設計
   const dpr      = Math.min(window.devicePixelRatio || 1, 2);
   const padX     = 14;
@@ -1992,12 +2016,15 @@ function execSavePNG() {
   const headerH  = 30;
   const rowH     = 26;
   const footerH  = 22;
+  const groupGap = 20; // 列グループ間の余白
   const font     = '13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
   const fontBold = 'bold 13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
   const fontSm   = '10px sans-serif';
 
-  const totalW = colWidths.reduce((a, b) => a + b, 0) + padX * 2;
-  const totalH = padY + titleH + headerH + rowH * sliced.length + footerH + padY;
+  const groupContentW = colWidths.reduce((a, b) => a + b, 0);
+  const groupW = groupContentW + padX * 2; // 元の単一列時と同じ余白を1グループぶんとする
+  const totalW = groupW * colCount + groupGap * (colCount - 1);
+  const totalH = padY + titleH + headerH + rowH * rowsPerGrp + footerH + padY;
 
   const canvas = document.createElement('canvas');
   canvas.width  = totalW * dpr;
@@ -2005,26 +2032,34 @@ function execSavePNG() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // ---- 画像出力専用カラーパレット（現在のテーマに追従）----
+  // ---- 画像出力カラーパレット ----
+  // サイト本体のテーマ（ダーク/ライト）とは切り離し、保存モーダルで選んだテーマを使う
+  // （サイトがダークモードでも、デフォルトはライトで出力する）。
+  // ライブのCSS変数はページの現在のテーマしか反映できないため、両テーマぶんの値を固定値として持つ。
   const cs        = getComputedStyle(document.documentElement);
   const elemColor = cs.getPropertyValue('--elem-color').trim() || '#3b82f6';
-  const isLight   = document.documentElement.getAttribute('data-theme') === 'light';
+  const isLight   = (document.getElementById('save-theme')?.value || 'light') === 'light';
 
-  const bgMain      = isLight ? '#f4f5f7' : '#111827';
-  const bgDim       = isLight ? '#e7e9ec' : '#1e2a3d';
-  const bgContHigh  = isLight ? '#dfe2e7' : '#1a2438';
-  const outlineVar  = isLight ? '#cfd3da' : '#2e3f58';
-  const textMain    = isLight ? '#1a1d21' : '#e8edf4';
-  const textMuted   = isLight ? '#586173' : '#8fa8c8';
+  const PALETTE = {
+    light: {
+      bgMain: '#f4f5f7', bgDim: '#e7e9ec', bgContHigh: '#dfe2e7', outlineVar: '#cfd3da',
+      textMain: '#1a1d21', textMuted: '#586173', rowOddBg: '#eaf2fb', colorGN: '#1a73e8',
+      bg1: '#fdf6cf', bg2: '#edf1f6', bg3: '#fce4e4',
+    },
+    dark: {
+      bgMain: '#111827', bgDim: '#1e2a3d', bgContHigh: '#1a2438', outlineVar: '#2e3f58',
+      textMain: '#e8edf4', textMuted: '#8fa8c8', rowOddBg: 'rgba(255,255,255,0.06)', colorGN: '#e8edf4',
+      bg1: '#3d2c00', bg2: '#1c2540', bg3: '#3a1e00',
+    },
+  };
+  const pal = isLight ? PALETTE.light : PALETTE.dark;
+  const { bgMain, bgDim, bgContHigh, outlineVar, textMain, textMuted, rowOddBg, colorGN, bg1, bg2, bg3 } = pal;
+
   const colorSuccess= '#4ade80';
   const colorWarn   = '#fbbf24';
   const colorErr    = '#f87171';
-  const colorGN     = isLight ? '#1a73e8' : textMain;
   const colorUp     = '#60a5fa';
   const colorDown   = colorErr;
-  const bg1         = isLight ? '#fdf6cf' : '#3d2c00';
-  const bg2         = isLight ? '#edf1f6' : '#1c2540';
-  const bg3         = isLight ? '#fce4e4' : '#3a1e00';
 
   // 全体背景
   ctx.fillStyle = bgMain;
@@ -2053,52 +2088,58 @@ function execSavePNG() {
   const sub = [eventName, rangeStr, `${fromRank}〜${toRank}位`].filter(Boolean).join('  ');
   ctx.fillText('  |  ' + sub, padX + 8 + tabW, padY + titleH / 2 + 5);
 
-  // テーブルヘッダー行
+  // テーブルヘッダー行（列グループごとに繰り返す）
   let baseY = padY + titleH;
   ctx.fillStyle = bgContHigh;
   ctx.fillRect(0, baseY, totalW, headerH);
   ctx.font = fontBold;
   ctx.fillStyle = textMuted;
-  let cx = padX;
-  allCols.forEach((k, ci) => {
-    ctx.fillText(colLabels[ci], cx + 4, baseY + headerH / 2 + 5);
-    cx += colWidths[ci];
-  });
+  for (let gi = 0; gi < colCount; gi++) {
+    const groupX = gi * (groupW + groupGap);
+    let cx = groupX + padX;
+    allCols.forEach((k, ci) => {
+      ctx.fillText(colLabels[ci], cx + 4, baseY + headerH / 2 + 5);
+      cx += colWidths[ci];
+    });
+  }
   ctx.strokeStyle = outlineVar;
   ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(0, baseY + headerH); ctx.lineTo(totalW, baseY + headerH); ctx.stroke();
 
-  // ---- データ行 ----
+  // ---- データ行（列グループごと） ----
   baseY += headerH;
-  sliced.forEach((p, i) => {
-    const rowY  = baseY + i * rowH;
-    const textY = rowY + rowH / 2 + 5;
-    const hr    = p.honorRank ?? 999; // 増加量順位
+  groups.forEach((grp, gi) => {
+    const groupX  = gi * (groupW + groupGap);
+    const rankOff = fromRank + gi * rowsPerGrp; // このグループの先頭順位
+    grp.forEach((p, i) => {
+      const rowY  = baseY + i * rowH;
+      const textY = rowY + rowH / 2 + 5;
+      const hr    = p.honorRank ?? 999; // 増加量順位
 
-    // 行背景（サイトの rowBg と同じ）
-    ctx.fillStyle = hr === 1 ? bg1 : hr === 2 ? bg2 : hr === 3 ? bg3 : bgMain;
-    ctx.fillRect(0, rowY, totalW, rowH);
-    // rank4以降: 奇数行に白オーバーレイ（サイトの rgba(255,255,255,0.04) と同じ）
-    if (hr > 3 && (fromRank - 1 + i) % 2 === 1) {
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
-      ctx.fillRect(0, rowY, totalW, rowH);
-    }
+      // 行背景（サイトの rowBg と同じ）
+      ctx.fillStyle = hr === 1 ? bg1 : hr === 2 ? bg2 : hr === 3 ? bg3 : bgMain;
+      ctx.fillRect(groupX, rowY, groupW, rowH);
+      // rank4以降: 奇数行に縞模様（サイトの --row-odd-bg と同じ色。テーマごとに異なる）
+      if (hr > 3 && i % 2 === 1) {
+        ctx.fillStyle = rowOddBg;
+        ctx.fillRect(groupX, rowY, groupW, rowH);
+      }
 
-    ctx.font = font;
-    let rx = padX;
+      ctx.font = font;
+      let rx = groupX + padX;
 
-    allCols.forEach((k, ci) => {
+      allCols.forEach((k, ci) => {
       const tx = rx + 4;
 
       if (k === '_rank') {
         // 表示順位（連番）— .cell-rank は --md-on-surface-variant (textMuted)
         ctx.fillStyle = textMuted;
-        ctx.fillText(String(fromRank + i), tx, textY);
+        ctx.fillText(String(rankOff + i), tx, textY);
 
       } else if (k === 'honorRank') {
         // 増加量順位：top3はメダル色
         ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32' : textMain;
-        ctx.fillText(String(hr < 999 ? hr : fromRank + i), tx, textY);
+        ctx.fillText(String(hr < 999 ? hr : rankOff + i), tx, textY);
 
       } else if (k === 'rank') {
         // .cell-rank は --md-on-surface-variant (textMuted)
@@ -2162,19 +2203,30 @@ function execSavePNG() {
       rx += colWidths[ci];
     });
 
-    // 行区切り
+    // 行区切り（グループ内のみ）
     ctx.strokeStyle = outlineVar;
     ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(0, rowY + rowH); ctx.lineTo(totalW, rowY + rowH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(groupX, rowY + rowH); ctx.lineTo(groupX + groupW, rowY + rowH); ctx.stroke();
+    });
   });
 
-  // 縦区切り線
-  cx = padX;
-  for (let ci = 0; ci < allCols.length - 1; ci++) {
-    cx += colWidths[ci];
-    ctx.strokeStyle = outlineVar;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(cx, padY + titleH); ctx.lineTo(cx, totalH - footerH - padY); ctx.stroke();
+  // 縦区切り線（列グループごと）
+  for (let gi = 0; gi < colCount; gi++) {
+    const groupX = gi * (groupW + groupGap);
+    let cx = groupX + padX;
+    for (let ci = 0; ci < allCols.length - 1; ci++) {
+      cx += colWidths[ci];
+      ctx.strokeStyle = outlineVar;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(cx, padY + titleH); ctx.lineTo(cx, totalH - footerH - padY); ctx.stroke();
+    }
+    // 列グループ間の区切り線（可読性のため。最後のグループの右側には引かない）
+    if (gi < colCount - 1) {
+      const dividerX = groupX + groupW + groupGap / 2;
+      ctx.strokeStyle = outlineVar;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(dividerX, padY + titleH); ctx.lineTo(dividerX, totalH - footerH - padY); ctx.stroke();
+    }
   }
 
   // ---- フッター ----
