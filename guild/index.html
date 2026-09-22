@@ -26,7 +26,83 @@ window.__STATIC_CACHE_PROMISE__=fetch('./../guild-data.json.gz')
   })
   .catch(function(e){window.__STATIC_CACHE__={};console.warn('GBF: データ読み込み失敗',e);});
 </script>
-<link rel="stylesheet" href="/css/theme.css">
+<style>
+/* 共通デザイントークン（dashboard / border / guild で共有）
+ * ページ固有の値（--row-* など）は各ページの <style> 側に置く。
+ * 静的エクスポート時は export.js の embedStaticScripts でインライン化される。 */
+:root {
+  /* === Background & Theme === */
+  --theme-bg: #0a0a0a;
+  --theme-surface: #111111;
+  --theme-surface-container: #191919;
+  --theme-surface-container-high: #242424;
+  --theme-outline: #363636;
+  --theme-outline-variant: #202020;
+  --theme-on-surface: #e2e8f0;
+  --theme-on-surface-variant: #8a9ab0;
+  --chart-grid-color: rgba(255,255,255,0.09);
+  /* === Element Color（theme-manager.js がイベント属性に応じて上書き） === */
+  --elem-color: #3b82f6;
+  --elem-color-light: #60a5fa99;
+  /* === MD3 Design Tokens === */
+  --md-surface-dim: var(--theme-bg);
+  --md-surface: var(--theme-surface);
+  --md-surface-container: var(--theme-surface-container);
+  --md-surface-container-high: var(--theme-surface-container-high);
+  --md-surface-bright: var(--theme-surface-container-high);
+  --md-on-surface: var(--theme-on-surface);
+  --md-on-surface-variant: var(--theme-on-surface-variant);
+  --md-outline: var(--theme-outline);
+  --md-outline-variant: var(--theme-outline-variant);
+  --md-primary: var(--elem-color);
+  --md-primary-dim: var(--elem-color);
+  --md-primary-container: var(--theme-surface-container-high);
+  --md-on-primary-container: var(--theme-on-surface);
+  --md-secondary: var(--elem-color-light);
+  --md-secondary-container: var(--theme-surface-container-high);
+  --md-success: #4ade80;
+  --md-warning: #fbbf24;
+  --md-error: #f87171;
+  --md-shape-xs: 4px;
+  --md-shape-sm: 8px;
+  --md-shape-md: 12px;
+  --md-shape-lg: 16px;
+  --md-shape-full: 9999px;
+  --md-ease: cubic-bezier(0.2, 0, 0, 1);
+  --md-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-duration-short: 150ms;
+  --md-duration-medium: 300ms;
+  --md-duration-long: 500ms;
+  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --md-elevation-2: 0 2px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+  --md-elevation-3: 0 4px 12px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
+  /* 補足テキスト（タブの時間帯表示など）: 背景に対してコントラスト4.5:1以上を確保した色 */
+  --text-caption: #a3b1c4;
+}
+
+html[data-theme="light"] {
+  --theme-bg: #f4f5f7;
+  --theme-surface: #ffffff;
+  --theme-surface-container: #f1f2f4;
+  --theme-surface-container-high: #e7e9ec;
+  --theme-outline: #cfd3da;
+  --theme-outline-variant: #e2e5ea;
+  --theme-on-surface: #1a1d21;
+  --theme-on-surface-variant: #586173;
+  --chart-grid-color: rgba(0,0,0,0.08);
+  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+  --md-elevation-2: 0 2px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --md-elevation-3: 0 4px 12px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
+  --text-caption: #4b5563;
+}
+
+/* 日本語フォントを明示（Windowsの見た目は従来と同じMeiryo、macOS/iOSはヒラギノに統一） */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+               'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+}
+
+</style>
 <style>
 /* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
 
@@ -95,17 +171,6 @@ html[data-theme="light"] .hover\:text-white:hover { color: #1a1d21; }
 
 /* --- Truncate --- */
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* --- タップ領域の拡張（見た目は変えず、透明な当たり判定だけ広げる） ---
- * 実測: 📋 14x13px / GN 高さ18px / ↗ 約10px。行の高さ(34px)いっぱいまで縦に広げる。
- * 横は隣の要素（📋→GN→↗）と当たり判定が重ならないよう最小限に留める。 */
-.hist-btn, .gn-clickable, .gn-profile-link { position: relative; }
-.hist-btn::before, .gn-clickable::before, .gn-profile-link::before {
-  content: ''; position: absolute; top: -10px; bottom: -10px;
-}
-.hist-btn::before        { left: -4px; right: -2px; }
-.gn-clickable::before    { left: 0;    right: 0; }
-.gn-profile-link::before { left: -3px; right: -6px; }
 
 </style>
 <style>
@@ -385,6 +450,12 @@ function ensureChartJs() {
   .gn-pinned{font-weight:800;text-decoration:underline dotted;}
   .gn-profile-link{color:var(--md-on-surface-variant);font-size:0.625rem;text-decoration:none;margin-left:4px;transition:color var(--md-duration-short) var(--md-ease);vertical-align:middle;}
   .gn-profile-link:hover{color:var(--md-primary);}
+  /* タップ領域の拡張（見た目は変えず当たり判定だけ広げる。外部CSSは7日キャッシュのためHTML側に置く） */
+  .hist-btn,.gn-clickable,.gn-profile-link{position:relative;}
+  .hist-btn::before,.gn-clickable::before,.gn-profile-link::before{content:'';position:absolute;top:-10px;bottom:-10px;}
+  .hist-btn::before{left:-4px;right:-2px;}
+  .gn-clickable::before{left:0;right:0;}
+  .gn-profile-link::before{left:-3px;right:-6px;}
   /* ソート & カラムリサイズ */
   th.sortable{cursor:pointer;position:relative;}
   th.sortable:hover{color:var(--md-on-surface);}
