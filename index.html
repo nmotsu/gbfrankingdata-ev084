@@ -1048,6 +1048,7 @@ class VirtualScroll {
       <span id="type-badge-label" class="type-badge type-20min">20分速</span>
       <span class="text-gray-400">期間:</span>
       <span id="stat-range" class="text-blue-300 font-mono text-xs"></span>
+      <span id="refresh-status" style="font-size:11px;color:var(--md-on-surface-variant);white-space:nowrap"></span>
       <button onclick="openSaveModal()" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;flex-shrink:0" title="PNG保存">保存</button>
     </div>
     <div id="updating-badge" style="display:none;font-size:11px;text-align:center;padding:3px 12px;background:#78350f;border-bottom:1px solid #d97706;color:#fbbf24;animation:pulse-badge 1.5s ease-in-out infinite;letter-spacing:0.02em"></div>
@@ -1682,7 +1683,13 @@ async function apiFetch(url) {
   if (window.__STATIC_CACHE__ && url in window.__STATIC_CACHE__) return window.__STATIC_CACHE__[url];
   const entry = _apiCache.get(url);
   if (entry && Date.now() - entry.ts < API_CACHE_TTL) return entry.data;
-  const data = await fetch(url).then(r => r.ok ? r.json() : null).catch(() => null);
+  const timeoutMs = 15000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const data = await fetch(url, { signal: controller.signal })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .finally(() => clearTimeout(timer));
   if (data != null) _apiCache.set(url, { data, ts: Date.now() });
   return data;
 }
@@ -2448,6 +2455,7 @@ function onColDragEnd(e) {
 let sortKey  = 'honorDiff';
 let sortDir  = -1;
 let currentRenderData = null;
+let _reloadSeq = 0;
 
 function sortBy(key) {
   if (sortKey === key) { sortDir = -sortDir; }
@@ -2815,12 +2823,15 @@ function connectLiveSSE() {
         return;
       }
       if (currentEventId && String(info.eventId) !== String(currentEventId)) return;
+      // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
+      // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
+      if (info.kind && !String(info.kind).includes('ranking')) return;
       apiCacheInvalidate('/api/ranking/latest');
       apiCacheInvalidate('/api/ranking/snapshots');
       apiCacheInvalidate('/api/ranking/20min');
       apiCacheInvalidate('/api/ranking/daily');
       flashOnRender = true;
-      reload();
+      reload({ background: true });
       if (currentTab === '20min') updateSnapList();
     } catch {}
   };
@@ -2884,6 +2895,15 @@ function renderDaySelect(selectedDay) {
   });
 }
 
+// 全件が推定値のスナップショットは、信頼できる順位付けができないためランキング表には出さない
+// （個々人のグラフ・ボーダーグラフには影響しない＝snapGroups/allSnaps自体はそのまま残す）
+function isFullyEstimatedSnap(s) {
+  return s.estimated_count != null && s.player_count > 0 && s.estimated_count >= s.player_count;
+}
+function viewableDaySnaps(gbfDay) {
+  return (snapGroups[gbfDay] || []).filter(s => !isFullyEstimatedSnap(s));
+}
+
 function renderTimeSelect(gbfDay, selectedSnapId) {
   const sel = document.getElementById('snap-time-select');
   if (!sel) return;
@@ -2896,9 +2916,9 @@ function renderTimeSelect(gbfDay, selectedSnapId) {
   sel.disabled = false;
   sel.style.opacity = '';
   sel.innerHTML = '<option value="">-- この日の最新 --</option>';
-  (snapGroups[gbfDay] || []).forEach(s => {
+  viewableDaySnaps(gbfDay).forEach(s => {
     const time = s.captured_at.substring(11, 19);
-    const estTag = s.estimated_count > 0 ? (s.estimated_count >= s.player_count ? ' [推定]' : ` [一部推定:${s.estimated_count}件]`) : '';
+    const estTag = s.estimated_count > 0 ? ` [一部推定:${s.estimated_count}件]` : '';
     sel.innerHTML += `<option value="${s.id}"${String(s.id) === String(selectedSnapId) ? ' selected' : ''}>${time} (${s.player_count}件)${estTag}</option>`;
   });
 }
@@ -2927,7 +2947,7 @@ async function loadCurrentSnap() {
   if (snapId) {
     data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
   } else if (gbfDay) {
-    const daySnaps = snapGroups[gbfDay] || [];
+    const daySnaps = viewableDaySnaps(gbfDay);
     if (daySnaps.length > 0) {
       data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
     } else {
@@ -2964,24 +2984,22 @@ function shiftSnap(dir) {
   if (snapId) {
     curGlobalIdx = allSnaps.findIndex(s => String(s.id) === String(snapId));
   } else if (gbfDay) {
-    const daySnaps = snapGroups[gbfDay] || [];
+    const daySnaps = viewableDaySnaps(gbfDay);
     if (daySnaps.length > 0) {
       curGlobalIdx = allSnaps.findIndex(s => s.id === daySnaps[0].id);
     }
   }
 
+  // 全件推定のスナップショットは順位表示の対象外なので、その分はさらに1つ先/前へ進める
   if (dir === -1) {
-    if (curGlobalIdx === -1) {
-      syncSnapshotSelection(0);
-    } else if (curGlobalIdx < allSnaps.length - 1) {
-      syncSnapshotSelection(curGlobalIdx + 1);
-    }
+    let idx = curGlobalIdx === -1 ? 0 : curGlobalIdx + 1;
+    while (idx < allSnaps.length && isFullyEstimatedSnap(allSnaps[idx])) idx++;
+    if (idx < allSnaps.length) syncSnapshotSelection(idx);
   } else {
-    if (curGlobalIdx <= 0) {
-      clearSnapSelect();
-    } else {
-      syncSnapshotSelection(curGlobalIdx - 1);
-    }
+    let idx = curGlobalIdx - 1;
+    while (idx >= 0 && isFullyEstimatedSnap(allSnaps[idx])) idx--;
+    if (idx < 0) { clearSnapSelect(); }
+    else syncSnapshotSelection(idx);
   }
 }
 
@@ -3067,11 +3085,20 @@ function clearSnapSelect() {
   reload();
 }
 
-async function reload() {
+async function reload(opts = {}) {
+  const mySeq = ++_reloadSeq;
   currentDate = document.getElementById('date-select').value;
   if (!currentEventId) { showNoData('イベントを選択してください'); return; }
-  showLoading();
+
+  const isBackground = !!opts.background;
+  const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
+  const skipBlank = isBackground && hasData;
+
+  if (skipBlank) setRefreshStatus('loading');
+  else showLoading();
+
   let data = null;
+  let fetchFailed = false;
   try {
     if (currentTab === '20min') {
       const gbfDay = document.getElementById('snap-day-select')?.value || '';
@@ -3097,13 +3124,24 @@ async function reload() {
         data = await apiFetch(url);
       }
     }
+    if (data == null) fetchFailed = true;
   } catch (err) {
     console.error('[reload]', err);
+    fetchFailed = true;
   }
+
+  if (mySeq !== _reloadSeq) return; // より新しいreload()に追い越された場合は破棄
+
+  if (skipBlank && fetchFailed) {
+    setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
+    return;
+  }
+
   try { renderRanking(data); } catch (e) {
     console.error('[renderRanking]', e);
     showNoData('表示エラー: ' + (e.message || e));
   }
+  if (skipBlank) setRefreshStatus(null);
 }
 
 const TYPE_META = {
@@ -3322,6 +3360,25 @@ function showLoading() {
   document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="loading">読み込み中...</td></tr>`;
   document.getElementById('stat-bar').style.display = 'none';
 }
+function setRefreshStatus(mode) {
+  const el = document.getElementById('refresh-status');
+  if (!el) return;
+  if (mode === 'loading') {
+    el.textContent = '更新中…';
+    el.style.color = 'var(--md-on-surface-variant)';
+    el.style.cursor = '';
+    el.onclick = null;
+  } else if (mode === 'error') {
+    el.textContent = '⚠ 更新に失敗しました（クリックで再試行）';
+    el.style.color = '#f87171';
+    el.style.cursor = 'pointer';
+    el.onclick = () => reload({ background: true });
+  } else {
+    el.textContent = '';
+    el.style.cursor = '';
+    el.onclick = null;
+  }
+}
 function showNoData(msg) {
   document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">${escHtml(msg)}</td></tr>`;
   document.getElementById('stat-bar').style.display = 'none';
@@ -3341,7 +3398,7 @@ function startAutoRefresh() {
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
   autoTimer = setInterval(() => {
     apiCacheInvalidate();
-    reload();
+    reload({ background: true });
   }, 5 * 60 * 1000);
 }
 
