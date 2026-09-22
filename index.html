@@ -2815,7 +2815,7 @@ function connectLiveSSE() {
   if (liveSSE) liveSSE.close();
   liveSSE = new EventSource('/api/ranking/updates');
   liveSSE.onopen = () => { stopViewerPoll(); };
-  liveSSE.onmessage = (e) => {
+  liveSSE.onmessage = async (e) => {
     try {
       const info = JSON.parse(e.data);
       if (info.type === 'viewers') {
@@ -2831,8 +2831,10 @@ function connectLiveSSE() {
       apiCacheInvalidate('/api/ranking/20min');
       apiCacheInvalidate('/api/ranking/daily');
       flashOnRender = true;
-      reload({ background: true });
-      if (currentTab === '20min') updateSnapList();
+      // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
+      // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
+      await reload({ background: true });
+      if (currentTab === '20min') await updateSnapList();
     } catch {}
   };
   liveSSE.onerror = () => {
@@ -3097,32 +3099,42 @@ async function reload(opts = {}) {
   if (skipBlank) setRefreshStatus('loading');
   else showLoading();
 
-  let data = null;
-  let fetchFailed = false;
-  try {
+  async function attemptFetch() {
     if (currentTab === '20min') {
       const gbfDay = document.getElementById('snap-day-select')?.value || '';
       const snapId = document.getElementById('snap-time-select')?.value || '';
       if (gbfDay) await ensureSnapDayLoaded(gbfDay);
       if (snapId) {
-        data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
+        return await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
       } else if (gbfDay) {
         const daySnaps = snapGroups[gbfDay] || [];
         if (daySnaps.length > 0) {
-          data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
+          return await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
         }
+        return null;
       } else {
-        data = await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
+        return await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
       }
     } else {
       const ep = { morning: 'morning', daily: 'daily', overnight: 'overnight' }[currentTab];
-      if (ep) {
-        // 集計タブは日別ファイル(snap-DATE.json.gz)へ分離済み → 静的モードでは当日分を遅延ロード
-        const aggDay = currentDate || snapDayList[snapDayList.length - 1] || '';
-        if (aggDay) await ensureSnapDayLoaded(aggDay);
-        const url = `/api/ranking/${ep}?event_id=${currentEventId}${currentDate ? `&date=${currentDate}` : ''}`;
-        data = await apiFetch(url);
-      }
+      if (!ep) return null;
+      // 集計タブは日別ファイル(snap-DATE.json.gz)へ分離済み → 静的モードでは当日分を遅延ロード
+      const aggDay = currentDate || snapDayList[snapDayList.length - 1] || '';
+      if (aggDay) await ensureSnapDayLoaded(aggDay);
+      const url = `/api/ranking/${ep}?event_id=${currentEventId}${currentDate ? `&date=${currentDate}` : ''}`;
+      return await apiFetch(url);
+    }
+  }
+
+  let data = null;
+  let fetchFailed = false;
+  try {
+    data = await attemptFetch();
+    // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、
+    // 背景更新（画面上に表示中データがある場合）に限り1回だけ間を置いて再試行する。
+    if (data == null && skipBlank) {
+      await new Promise(r => setTimeout(r, 1200));
+      if (mySeq === _reloadSeq) data = await attemptFetch();
     }
     if (data == null) fetchFailed = true;
   } catch (err) {
