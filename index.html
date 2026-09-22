@@ -3215,11 +3215,18 @@ async function reload(opts = {}) {
   let fetchFailed = false;
   try {
     data = await attemptFetch();
-    // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、
-    // 背景更新（画面上に表示中データがある場合）に限り1回だけ間を置いて再試行する。
+    // Cloudflare Tunnel経由だと単発リクエストが約3回に1回の頻度で接続断になることが実測で
+    // 確認されている。背景更新（画面上に表示中データがある場合）に限り、間隔を空けながら
+    // 最大3回まで再試行する（1回だけだと連続失敗が無視できない確率で起こるため）。
     if (data == null && skipBlank) {
-      await new Promise(r => setTimeout(r, 1200));
-      if (mySeq === _reloadSeq) data = await attemptFetch();
+      const retryDelaysMs = [1200, 2000, 3000];
+      for (const delay of retryDelaysMs) {
+        if (mySeq !== _reloadSeq) break;
+        await new Promise(r => setTimeout(r, delay));
+        if (mySeq !== _reloadSeq) break;
+        data = await attemptFetch();
+        if (data != null) break;
+      }
     }
     if (data == null) fetchFailed = true;
   } catch (err) {
