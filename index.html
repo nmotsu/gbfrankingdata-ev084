@@ -3024,25 +3024,40 @@ function onSnapTimeChange() {
   loadCurrentSnap();
 }
 
+// Cloudflare Tunnel経由の低確率な接続断対策。apiFetch()自体は15秒でタイムアウトするが、
+// それでも失敗する場合に間隔を空けながら最大3回まで再試行する（reload()の背景更新と同じ考え方）。
+async function apiFetchWithRetry(url) {
+  let data = await apiFetch(url);
+  if (data == null) {
+    for (const delay of [1200, 2000, 3000]) {
+      await new Promise(r => setTimeout(r, delay));
+      data = await apiFetch(url);
+      if (data != null) break;
+    }
+  }
+  return data;
+}
+
 async function loadCurrentSnap() {
   if (currentTab !== '20min') return;
   const gbfDay = document.getElementById('snap-day-select')?.value || '';
   const snapId = document.getElementById('snap-time-select')?.value || '';
   showLoading();
   if (gbfDay) await ensureSnapDayLoaded(gbfDay);
-  let data = null;
+  let url = null;
   if (snapId) {
-    data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
+    url = `/api/ranking/20min?snapshot_id=${snapId}`;
   } else if (gbfDay) {
     const daySnaps = viewableDaySnaps(gbfDay);
     if (daySnaps.length > 0) {
-      data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
+      url = `/api/ranking/20min?snapshot_id=${daySnaps[0].id}`;
     } else {
       showNoData('この日のスナップがありません'); return;
     }
   } else {
-    data = await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
+    url = `/api/ranking/latest?event_id=${currentEventId}`;
   }
+  const data = await apiFetchWithRetry(url);
   renderRanking(data);
 }
 
@@ -3098,7 +3113,7 @@ function syncSnapshotSelection(globalIdx) {
   renderTimeSelect(gbfDay, snap.id);
   showLoading();
   ensureSnapDayLoaded(gbfDay)
-    .then(() => apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`))
+    .then(() => apiFetchWithRetry(`/api/ranking/20min?snapshot_id=${snap.id}`))
     .then(data => renderRanking(data))
     .catch(() => renderRanking(null));
 }
@@ -3152,7 +3167,7 @@ async function updateSnapList() {
   if (!currentEventId) return;
   const daySelEl = document.getElementById('snap-day-select');
   if (daySelEl) daySelEl.innerHTML = '<option value="">読み込み中...</option>';
-  allSnaps = await apiFetch(`/api/ranking/snapshots?event_id=${currentEventId}`) ?? [];
+  allSnaps = await apiFetchWithRetry(`/api/ranking/snapshots?event_id=${currentEventId}`) ?? [];
 
   buildSnapGroups();
 
