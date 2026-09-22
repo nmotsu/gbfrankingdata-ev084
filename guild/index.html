@@ -2355,7 +2355,8 @@ async function renderGuildGraph() {
     if (!goal) return 0;
     const lastMs = new Date(lastCapturedAt.replace(' ', 'T')).getTime();
     const remainingMin = (goal.getTime() - lastMs) / 60000;
-    return Math.max(0, Math.floor(remainingMin / 20));
+    // floorだとゴール直前で切り捨てられ、予測線がゴールに届かず手前で止まってしまうためceilにする
+    return Math.max(0, Math.ceil(remainingMin / 20));
   })();
   const predLabels = (() => {
     if (!showPredict || PRED_STEPS === 0 || !lastCapturedAt) return [];
