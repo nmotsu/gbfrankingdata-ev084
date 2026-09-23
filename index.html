@@ -3220,6 +3220,9 @@ async function reload(opts = {}) {
   // （例: 2000件取得中に10000件完了の通知が来ても、busy解除後に自動で拾い直す）。
   if (isBackground && _backgroundReloadBusy) { _backgroundReloadPending = true; return; }
   if (isBackground) _backgroundReloadBusy = true;
+  // pendingによる「もう1周」が、スクレイピング中に来続ける通知のせいで際限なく続き、
+  // エラー表示にすら到達できず無言で固まり続けることがないよう、全体の上限時間を設ける。
+  const overallDeadline = Date.now() + 5 * 60 * 1000;
 
   try {
    do {
@@ -3287,8 +3290,9 @@ async function reload(opts = {}) {
 
     if (skipBlank && fetchFailed) {
       // busy中に新しいトリガーが来ていれば（pending）、エラー表示にせずもう1周フレッシュに取り直す。
-      // 何も来ていなければ通常通りエラー表示にして今回は諦める。
-      if (_backgroundReloadPending) continue;
+      // ただし全体で5分を超えたら、pendingが立っていても諦めてエラー表示にする
+      // （でないと通知が来続ける限り永久にエラーへ到達できず、無言で固まって見えてしまう）。
+      if (_backgroundReloadPending && Date.now() < overallDeadline) continue;
       setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
       return;
     }
