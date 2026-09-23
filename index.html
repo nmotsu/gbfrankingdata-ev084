@@ -2543,6 +2543,10 @@ let currentRenderData = null;
 let _reloadSeq = 0;
 let _sseUpdateBusy = false;
 let _sseUpdatePending = false;
+// 個人ランキングの段階的取得（100→1000→2000→10000件）中は、5並列のスクレイパーが
+// ブラウザウィンドウを起動してCPUを占有し、サーバー/トンネルの応答が数分単位で不安定になることがある。
+// 短い再試行ではこの間ずっと失敗し続けてしまうため、背景更新は最大約3分かけて粘り強く再試行する。
+const BACKGROUND_RETRY_DELAYS_MS = [1200, 2000, 3000, 5000, 8000, 10000, 10000, 10000, 15000, 15000, 20000, 20000, 20000, 20000, 20000];
 
 function sortBy(key) {
   if (sortKey === key) { sortDir = -sortDir; }
@@ -3038,12 +3042,13 @@ function onSnapTimeChange() {
   loadCurrentSnap();
 }
 
-// Cloudflare Tunnel経由の低確率な接続断対策。apiFetch()自体は15秒でタイムアウトするが、
-// それでも失敗する場合に間隔を空けながら最大3回まで再試行する（reload()の背景更新と同じ考え方）。
+// Cloudflare Tunnel経由の接続断対策。apiFetch()自体は15秒でタイムアウトするが、
+// スクレイピング中（5並列ブラウザがCPUを占有）は数分単位で不安定になることがあるため、
+// 手動操作でも諦めずに最大約3分かけて再試行する（reload()の背景更新と同じ考え方）。
 async function apiFetchWithRetry(url) {
   let data = await apiFetch(url);
   if (data == null) {
-    for (const delay of [1200, 2000, 3000]) {
+    for (const delay of BACKGROUND_RETRY_DELAYS_MS) {
       await new Promise(r => setTimeout(r, delay));
       data = await apiFetch(url);
       if (data != null) break;
@@ -3244,12 +3249,11 @@ async function reload(opts = {}) {
   let fetchFailed = false;
   try {
     data = await attemptFetch();
-    // Cloudflare Tunnel経由だと単発リクエストが約3回に1回の頻度で接続断になることが実測で
-    // 確認されている。背景更新（画面上に表示中データがある場合）に限り、間隔を空けながら
-    // 最大3回まで再試行する（1回だけだと連続失敗が無視できない確率で起こるため）。
+    // Cloudflare Tunnel経由の接続断対策。個人ランキングの段階的取得中（5並列ブラウザがCPUを
+    // 占有）は応答不能な状態が数分続くことがあるため、背景更新（画面上に表示中データがある場合）
+    // は諦めずに最大約3分かけて粘り強く再試行する。
     if (data == null && skipBlank) {
-      const retryDelaysMs = [1200, 2000, 3000];
-      for (const delay of retryDelaysMs) {
+      for (const delay of BACKGROUND_RETRY_DELAYS_MS) {
         if (mySeq !== _reloadSeq) break;
         await new Promise(r => setTimeout(r, delay));
         if (mySeq !== _reloadSeq) break;
