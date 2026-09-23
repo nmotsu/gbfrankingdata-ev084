@@ -2541,6 +2541,8 @@ let sortKey  = 'honorDiff';
 let sortDir  = -1;
 let currentRenderData = null;
 let _reloadSeq = 0;
+let _sseUpdateBusy = false;
+let _sseUpdatePending = false;
 
 function sortBy(key) {
   if (sortKey === key) { sortDir = -sortDir; }
@@ -2911,15 +2913,27 @@ function connectLiveSSE() {
       // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
       // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
       if (info.kind && !String(info.kind).includes('ranking')) return;
-      apiCacheInvalidate('/api/ranking/latest');
-      apiCacheInvalidate('/api/ranking/snapshots');
-      apiCacheInvalidate('/api/ranking/20min');
-      apiCacheInvalidate('/api/ranking/daily');
-      flashOnRender = true;
-      // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
-      // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
-      await reload({ background: true });
-      if (currentTab === '20min') await updateSnapList();
+      // 個人ランキングは段階的import（100→1000→2000→10000件）のたびにそれぞれ更新通知が飛ぶため、
+      // 短時間に複数回pushされることがある。並行してreload()すると、そのぶんだけ同時接続が増えて
+      // Cloudflare Tunnel経由での接続失敗を誘発するため、実行中は新規pushを「後追い1回」に間引く。
+      if (_sseUpdateBusy) { _sseUpdatePending = true; return; }
+      _sseUpdateBusy = true;
+      try {
+        do {
+          _sseUpdatePending = false;
+          apiCacheInvalidate('/api/ranking/latest');
+          apiCacheInvalidate('/api/ranking/snapshots');
+          apiCacheInvalidate('/api/ranking/20min');
+          apiCacheInvalidate('/api/ranking/daily');
+          flashOnRender = true;
+          // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
+          // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
+          await reload({ background: true });
+          if (currentTab === '20min') await updateSnapList();
+        } while (_sseUpdatePending);
+      } finally {
+        _sseUpdateBusy = false;
+      }
     } catch {}
   };
   liveSSE.onerror = () => {
@@ -3284,6 +3298,9 @@ function renderRanking(data, keepScroll = false) {
     tbody.innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">データがありません（スナップショットが2件以上必要です）${hint}</td></tr>`;
     statBar.style.display = 'none';
     updateSearchCount(0, 0);
+    // 直前の描画で出した「更新中...件」バッジが、この空描画では更新されず古いまま残ってしまうため消す
+    const staleBadge = document.getElementById('updating-badge');
+    if (staleBadge) staleBadge.style.display = 'none';
     return;
   }
 
