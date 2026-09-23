@@ -2541,12 +2541,8 @@ let sortKey  = 'honorDiff';
 let sortDir  = -1;
 let currentRenderData = null;
 let _reloadSeq = 0;
-let _sseUpdateBusy = false;
-let _sseUpdatePending = false;
-// 5分ポーリングとSSE通知、どちらから来た背景更新でも同時に1本しか走らせないためのフラグ
-// （reload()自身が管理。_sseUpdateBusyはSSE経路の間引き専用で、5分ポーリングは対象外だった）
+// 定期ポーリング（startAutoRefresh）の背景更新を同時に1本だけに制限するためのフラグ
 let _backgroundReloadBusy = false;
-let _backgroundReloadPending = false;
 // 個人ランキングの段階的取得（100→1000→2000→10000件）中は、5並列のスクレイパーが
 // ブラウザウィンドウを起動してCPUを占有し、サーバー/トンネルの応答が数分単位で不安定になることがある。
 // 短い再試行ではこの間ずっと失敗し続けてしまうため、背景更新は最大約3分かけて粘り強く再試行する。
@@ -2910,43 +2906,15 @@ function connectLiveSSE() {
   if (liveSSE) liveSSE.close();
   liveSSE = new EventSource('/api/ranking/updates');
   liveSSE.onopen = () => { stopViewerPoll(); };
-  liveSSE.onmessage = async (e) => {
+  // SSEは「閲覧者数バッジ更新」専用。ランキング更新の即時反映はやめ、
+  // startAutoRefresh()の単純な定期ポーリングだけに一本化した（複数のトリガー元が
+  // 絡み合うbusy/pending状態機械が、かえって「詰まって二度と動かない」状態を
+  // 作りやすくしていたため）。
+  liveSSE.onmessage = (e) => {
     try {
       const info = JSON.parse(e.data);
       if (info.type === 'viewers') {
         updateViewerBadge(info.count);
-        return;
-      }
-      if (currentEventId && String(info.eventId) !== String(currentEventId)) return;
-      // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
-      // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
-      if (info.kind && !String(info.kind).includes('ranking')) return;
-      // 同時視聴者（多い時は200人規模）全員のブラウザが、このSSE通知を受け取った瞬間に一斉に
-      // reload()するとCloudflare Tunnelへの同時接続が殺到し、サンダリングハード状態になって
-      // 軒並み接続失敗する。各クライアントの実行開始タイミングを0〜8秒のランダム遅延で
-      // 分散させ、一斉アクセスを時間的にならす。
-      await new Promise(r => setTimeout(r, Math.random() * 8000));
-      if (currentEventId && String(info.eventId) !== String(currentEventId)) return; // 遅延中にイベント切替された場合は中断
-      // 個人ランキングは段階的import（100→1000→2000→10000件）のたびにそれぞれ更新通知が飛ぶため、
-      // 短時間に複数回pushされることがある。並行してreload()すると、そのぶんだけ同時接続が増えて
-      // Cloudflare Tunnel経由での接続失敗を誘発するため、実行中は新規pushを「後追い1回」に間引く。
-      if (_sseUpdateBusy) { _sseUpdatePending = true; return; }
-      _sseUpdateBusy = true;
-      try {
-        do {
-          _sseUpdatePending = false;
-          apiCacheInvalidate('/api/ranking/latest');
-          apiCacheInvalidate('/api/ranking/snapshots');
-          apiCacheInvalidate('/api/ranking/20min');
-          apiCacheInvalidate('/api/ranking/daily');
-          flashOnRender = true;
-          // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
-          // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
-          await reload({ background: true });
-          if (currentTab === '20min') await updateSnapList();
-        } while (_sseUpdatePending);
-      } finally {
-        _sseUpdateBusy = false;
       }
     } catch {}
   };
@@ -3218,21 +3186,13 @@ function clearSnapSelect() {
 
 async function reload(opts = {}) {
   const isBackground = !!opts.background;
-  // 背景更新（5分ポーリングとSSE通知は互いに独立したトリガーで、どちらも重ねてreload()を
-  // 呼び得る）が重なると、先発の呼び出しが最大3分の再試行中に後発の呼び出しに追い越され、
-  // 「_reloadSeq不一致で黙って終了」を繰り返して更新中バッジが永久に解消されないバグがあった。
-  // 背景更新は同時に1本だけに制限するが、busy中に来た後発リクエストは「取りこぼし」にせず
-  // pendingフラグに記録し、実行中の1本が終わった直後にもう1回だけ追いかけて最新状態を取得する
-  // （例: 2000件取得中に10000件完了の通知が来ても、busy解除後に自動で拾い直す）。
-  if (isBackground && _backgroundReloadBusy) { _backgroundReloadPending = true; return; }
+  // 背景更新（startAutoRefresh()の定期ポーリングのみが呼ぶ）が重なった場合は、
+  // 後発の呼び出しを黙って捨てる（一定間隔で確実に次のポーリングが来るため、
+  // busy/pending等の複雑な追跡は不要）。
+  if (isBackground && _backgroundReloadBusy) return;
   if (isBackground) _backgroundReloadBusy = true;
-  // pendingによる「もう1周」が、スクレイピング中に来続ける通知のせいで際限なく続き、
-  // エラー表示にすら到達できず無言で固まり続けることがないよう、全体の上限時間を設ける。
-  const overallDeadline = Date.now() + 5 * 60 * 1000;
 
   try {
-   do {
-    _backgroundReloadPending = false;
     const mySeq = ++_reloadSeq;
     currentDate = document.getElementById('date-select').value;
     if (!currentEventId) { showNoData('イベントを選択してください'); return; }
@@ -3297,10 +3257,6 @@ async function reload(opts = {}) {
     if (mySeq !== _reloadSeq) return; // 別の（前面操作による）reload()に追い越された場合は破棄
 
     if (skipBlank && fetchFailed) {
-      // busy中に新しいトリガーが来ていれば（pending）、エラー表示にせずもう1周フレッシュに取り直す。
-      // ただし全体で5分を超えたら、pendingが立っていても諦めてエラー表示にする
-      // （でないと通知が来続ける限り永久にエラーへ到達できず、無言で固まって見えてしまう）。
-      if (_backgroundReloadPending && Date.now() < overallDeadline) continue;
       setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
       return;
     }
@@ -3310,7 +3266,6 @@ async function reload(opts = {}) {
       showNoData('表示エラー: ' + (e.message || e));
     }
     if (skipBlank) setRefreshStatus(null);
-   } while (isBackground && _backgroundReloadPending);
   } finally {
     if (isBackground) _backgroundReloadBusy = false;
   }
@@ -3576,12 +3531,14 @@ function updateSearchCount(filtered, total) {
 function startAutoRefresh() {
   if (autoTimer) clearInterval(autoTimer);
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
+  // SSEによる即時反映をやめ、この定期ポーリングのみに一本化したため、
+  // 従来の5分間隔から60秒間隔に短縮して反映の遅れを補う。
   autoTimer = setInterval(async () => {
-    // SSE通知と同様、多数の同時視聴者が同じタイミングで一斉にreload()しないよう分散させる
+    // 多数の同時視聴者が同じタイミングで一斉にreload()しないよう分散させる
     await new Promise(r => setTimeout(r, Math.random() * 8000));
     apiCacheInvalidate();
     reload({ background: true });
-  }, 5 * 60 * 1000);
+  }, 60 * 1000);
 }
 
 async function openPlayerModal(playerId, username, eventId) {
