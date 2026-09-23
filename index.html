@@ -3275,9 +3275,11 @@ async function reload(opts = {}) {
   try {
     data = await attemptFetch();
     // Cloudflare Tunnel経由の接続断対策。個人ランキングの段階的取得中（5並列ブラウザがCPUを
-    // 占有）は応答不能な状態が数分続くことがあるため、背景更新（画面上に表示中データがある場合）
-    // は諦めずに最大約3分かけて粘り強く再試行する。
-    if (data == null && skipBlank) {
+    // 占有）は応答不能な状態が数分続くことがある。以前は背景更新（画面上に表示中データが
+    // ある場合）のみ再試行していたが、初回読み込み・タブ切替などフォアグラウンド側は
+    // 1回失敗しただけで「データがありません」になり長時間何も出ない不具合があったため、
+    // フォアグラウンドでも同じだけ粘り強く再試行する（表示は「読み込み中...」のまま続く）。
+    if (data == null) {
       for (const delay of BACKGROUND_RETRY_DELAYS_MS) {
         if (mySeq !== _reloadSeq) break;
         await new Promise(r => setTimeout(r, delay));
