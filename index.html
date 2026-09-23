@@ -17,83 +17,6 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"GBF古戦場ランキング","url":"https://gbfranking.com/","description":"グランブルーファンタジー古戦場のリアルタイムランキングデータを記録・公開する非公式ファンサイト","applicationCategory":"Sports","inLanguage":"ja","offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"}}</script>
 <link rel="icon" href="./favicon-rich.png" type="image/png"><link rel="apple-touch-icon" href="./favicon-rich.png">
 <style>
-/* 共通デザイントークン（dashboard / border / guild で共有）
- * ページ固有の値（--row-* など）は各ページの <style> 側に置く。
- * 静的エクスポート時は export.js の embedStaticScripts でインライン化される。 */
-:root {
-  /* === Background & Theme === */
-  --theme-bg: #0a0a0a;
-  --theme-surface: #111111;
-  --theme-surface-container: #191919;
-  --theme-surface-container-high: #242424;
-  --theme-outline: #363636;
-  --theme-outline-variant: #202020;
-  --theme-on-surface: #e2e8f0;
-  --theme-on-surface-variant: #8a9ab0;
-  --chart-grid-color: rgba(255,255,255,0.09);
-  /* === Element Color（theme-manager.js がイベント属性に応じて上書き） === */
-  --elem-color: #3b82f6;
-  --elem-color-light: #60a5fa99;
-  /* === MD3 Design Tokens === */
-  --md-surface-dim: var(--theme-bg);
-  --md-surface: var(--theme-surface);
-  --md-surface-container: var(--theme-surface-container);
-  --md-surface-container-high: var(--theme-surface-container-high);
-  --md-surface-bright: var(--theme-surface-container-high);
-  --md-on-surface: var(--theme-on-surface);
-  --md-on-surface-variant: var(--theme-on-surface-variant);
-  --md-outline: var(--theme-outline);
-  --md-outline-variant: var(--theme-outline-variant);
-  --md-primary: var(--elem-color);
-  --md-primary-dim: var(--elem-color);
-  --md-primary-container: var(--theme-surface-container-high);
-  --md-on-primary-container: var(--theme-on-surface);
-  --md-secondary: var(--elem-color-light);
-  --md-secondary-container: var(--theme-surface-container-high);
-  --md-success: #4ade80;
-  --md-warning: #fbbf24;
-  --md-error: #f87171;
-  --md-shape-xs: 4px;
-  --md-shape-sm: 8px;
-  --md-shape-md: 12px;
-  --md-shape-lg: 16px;
-  --md-shape-full: 9999px;
-  --md-ease: cubic-bezier(0.2, 0, 0, 1);
-  --md-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
-  --md-duration-short: 150ms;
-  --md-duration-medium: 300ms;
-  --md-duration-long: 500ms;
-  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
-  --md-elevation-2: 0 2px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
-  --md-elevation-3: 0 4px 12px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
-  /* 補足テキスト（タブの時間帯表示など）: 背景に対してコントラスト4.5:1以上を確保した色 */
-  --text-caption: #a3b1c4;
-}
-
-html[data-theme="light"] {
-  --theme-bg: #f4f5f7;
-  --theme-surface: #ffffff;
-  --theme-surface-container: #f1f2f4;
-  --theme-surface-container-high: #e7e9ec;
-  --theme-outline: #cfd3da;
-  --theme-outline-variant: #e2e5ea;
-  --theme-on-surface: #1a1d21;
-  --theme-on-surface-variant: #586173;
-  --chart-grid-color: rgba(0,0,0,0.08);
-  --md-elevation-1: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
-  --md-elevation-2: 0 2px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
-  --md-elevation-3: 0 4px 12px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
-  --text-caption: #4b5563;
-}
-
-/* 日本語フォントを明示（Windowsの見た目は従来と同じMeiryo、macOS/iOSはヒラギノに統一） */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-               'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-}
-
-</style>
-<style>
 /* layout.css — Tailwind CDN 代替ユーティリティ (dashboard/border/guild 実使用クラスのみ) */
 
 /* --- Display --- */
@@ -372,9 +295,52 @@ function ensureChartJs() {
 }
 </script>
 <style>
-  /* 共通トークン（--theme-* / --elem-* / --md-*）は /css/theme.css に一元化 */
   :root {
-    /* 行/オーバーレイ（テーマ追従・このページ固有） */
+    /* === Background & Theme Variables (managed by theme-manager.js) === */
+    --theme-bg: #0a0a0a;
+    --theme-surface: #111111;
+    --theme-surface-container: #191919;
+    --theme-surface-container-high: #242424;
+    --theme-outline: #363636;
+    --theme-outline-variant: #202020;
+    --theme-on-surface: #e2e8f0;
+    --theme-on-surface-variant: #8a9ab0;
+    --chart-grid-color: rgba(255,255,255,0.09);
+    /* === Element Color Variables === */
+    --elem-color: #3b82f6;
+    --elem-color-light: #60a5fa99;
+    /* === MD3 Design Tokens === */
+    --md-surface-dim: var(--theme-bg);
+    --md-surface: var(--theme-surface);
+    --md-surface-container: var(--theme-surface-container);
+    --md-surface-container-high: var(--theme-surface-container-high);
+    --md-surface-bright: var(--theme-surface-container-high);
+    --md-on-surface: var(--theme-on-surface);
+    --md-on-surface-variant: var(--theme-on-surface-variant);
+    --md-outline: var(--theme-outline);
+    --md-outline-variant: var(--theme-outline-variant);
+    --md-primary: var(--elem-color);
+    --md-primary-dim: var(--elem-color);
+    --md-primary-container: var(--theme-surface-container-high);
+    --md-on-primary-container: var(--theme-on-surface);
+    --md-secondary: var(--elem-color-light);
+    --md-secondary-container: var(--theme-surface-container-high);
+    --md-success: #4ade80;
+    --md-warning: #fbbf24;
+    --md-error: #f87171;
+    --md-shape-xs: 4px;
+    --md-shape-sm: 8px;
+    --md-shape-md: 12px;
+    --md-shape-lg: 16px;
+    --md-shape-full: 9999px;
+    --md-ease: cubic-bezier(0.2, 0, 0, 1);
+    --md-duration-short: 150ms;
+    --md-duration-medium: 300ms;
+    --md-duration-long: 500ms;
+    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.2);
+    /* 行/オーバーレイ（テーマ追従） */
     --row-top1-bg: #2a2200;
     --row-top2-bg: #1e1e2e;
     --row-top3-bg: #261400;
@@ -384,6 +350,18 @@ function ensureChartJs() {
   }
   /* === ライトモード（data-theme="light" で base 変数を上書き、MD3トークンへ波及） === */
   html[data-theme="light"] {
+    --theme-bg: #f4f5f7;
+    --theme-surface: #ffffff;
+    --theme-surface-container: #f1f2f4;
+    --theme-surface-container-high: #e7e9ec;
+    --theme-outline: #cfd3da;
+    --theme-outline-variant: #e2e5ea;
+    --theme-on-surface: #1a1d21;
+    --theme-on-surface-variant: #586173;
+    --chart-grid-color: rgba(0,0,0,0.08);
+    --md-elevation-1: 0 1px 3px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+    --md-elevation-2: 0 2px 6px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+    --md-elevation-3: 0 4px 12px rgba(0,0,0,0.12), 0 3px 6px rgba(0,0,0,0.08);
     --row-top1-bg: #fdf6cf;
     --row-top2-bg: #edf1f6;
     --row-top3-bg: #fce4e4;
@@ -398,7 +376,7 @@ function ensureChartJs() {
   html[data-theme="light"] .gn-clickable:not(.gn-pinned) { color:#1a73e8 !important; text-decoration:underline; }
   html[data-theme="light"] .honor-bar-bg { opacity:0.30; }
   html[data-theme="light"] .honor-diff { color:var(--md-on-surface-variant) !important; font-weight:600; }
-  body { background: var(--theme-bg); color: var(--theme-on-surface); }
+  body { background: var(--theme-bg); color: var(--theme-on-surface); font-family: 'Segoe UI', sans-serif; }
   .header { background: var(--theme-surface); border-bottom: 2px solid var(--elem-color); padding: 12px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.5); }
   .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
   .hdr-h1 { font-size: 1.05rem; color: var(--md-primary); font-weight: 500; display: flex; align-items: center; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; letter-spacing: 0.01em; }
@@ -442,9 +420,7 @@ function ensureChartJs() {
   .tab-btn.active { background: var(--md-surface-container-high); color: var(--md-primary); border-color: var(--md-primary); box-shadow: 0 0 8px color-mix(in srgb, var(--elem-color) 40%, transparent); }
   .tab-btn:not(.active) { background: var(--md-surface-container-high); color: var(--md-on-surface-variant); }
   .tab-btn:not(.active):hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
-  /* 時間帯の補足: 9px・不透明度65%（コントラスト3.1:1）だったため、11px・専用の補足色（4.5:1以上）に変更 */
-  .tab-sub { font-size: 0.6875rem; font-weight:400; color: var(--text-caption); }
-  .tab-btn.active .tab-sub { color: var(--md-on-surface); }
+  .tab-sub { font-size: 0.5625rem; font-weight:400; opacity:0.65; }
   tr.rank-row:nth-child(even) { background: var(--row-odd-bg); }
   .rank-row:hover { background: var(--row-hover) !important; }
   .rank-row.top-1 { border-left: 4px solid var(--md-warning); box-shadow: inset 60px 0 20px -20px rgba(251,191,36,0.12); }
@@ -483,8 +459,7 @@ function ensureChartJs() {
   .day-nav-btn:hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
   .day-nav-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
   /* タイプバッジ */
-  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
-  .stat-label    { white-space: nowrap; flex-shrink: 0; }
+  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; }
   .type-20min    { background: var(--md-secondary-container); color: var(--md-on-primary-container); }
   .type-morning  { background: #3b2f00; color: var(--md-warning); }
   .type-daily    { background: #1a3020; color: var(--md-success); }
@@ -559,14 +534,6 @@ function ensureChartJs() {
   .gn-clickable:hover { text-decoration: underline; }
   .gn-profile-link { color: var(--md-on-surface-variant); font-size: 0.625rem; text-decoration: none; margin-left: 4px; transition: color var(--md-duration-short) var(--md-ease); }
   .gn-profile-link:hover { color: var(--md-primary); }
-  /* タップ領域の拡張（見た目は変えず透明な当たり判定だけ広げる。実測: 📋14x13 / GN高さ18 / ↗13）
-   * 縦は行の高さいっぱいまで、横は隣の要素と重ならない最小限に留める。
-   * ※外部CSSは7日キャッシュされるため、即反映させる目的でHTML側（no-cache）に置いている */
-  .hist-btn, .gn-clickable, .gn-profile-link { position: relative; }
-  .hist-btn::before, .gn-clickable::before, .gn-profile-link::before { content: ''; position: absolute; top: -10px; bottom: -10px; }
-  .hist-btn::before        { left: -4px; right: -2px; }
-  .gn-clickable::before    { left: 0; right: 0; }
-  .gn-profile-link::before { left: -3px; right: -6px; }
   /* 検索バー */
   .search-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
   .search-bar input { width: 200px; font-size: 0.75rem; }
@@ -1079,7 +1046,7 @@ class VirtualScroll {
     <!-- 統計バー（テーブルカード内ヘッダー） -->
     <div id="stat-bar" style="display:none;align-items:center;gap:10px">
       <span id="type-badge-label" class="type-badge type-20min">20分速</span>
-      <span class="text-gray-400 stat-label">期間:</span>
+      <span class="text-gray-400">期間:</span>
       <span id="stat-range" class="text-blue-300 font-mono text-xs"></span>
       <span id="refresh-status" style="font-size:11px;color:var(--md-on-surface-variant);white-space:nowrap"></span>
       <button onclick="openSaveModal()" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;flex-shrink:0" title="PNG保存">保存</button>
@@ -1561,14 +1528,6 @@ class VirtualScroll {
           <button onclick="document.getElementById('save-range-from').value=1;document.getElementById('save-range-to').value=10000" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">全件</button>
         </div>
       </div>
-      <!-- 列数（縦に長くなりすぎる場合に分割） -->
-      <div class="save-section">
-        <div class="save-label">列数（横に分割）</div>
-        <div class="range-row">
-          <input type="number" id="save-col-count" value="1" min="1" max="10"> 列
-          <span style="color:var(--md-on-surface-variant)">※1件あたりの行が多い時、横に並べて縦長になりすぎるのを防ぎます</span>
-        </div>
-      </div>
       <!-- ソート -->
       <div class="save-section">
         <div class="save-label">ソート</div>
@@ -1588,18 +1547,23 @@ class VirtualScroll {
           <button onclick="applyCurrSort()" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer">現在と同じ</button>
         </div>
       </div>
-      <!-- 画像テーマ -->
-      <div class="save-section">
-        <div class="save-label">画像テーマ</div>
-        <select id="save-theme" class="save-select">
-          <option value="light">ライト</option>
-          <option value="dark">ダーク</option>
-        </select>
-      </div>
       <!-- 列選択 -->
       <div class="save-section">
         <div class="save-label">出力項目</div>
         <div class="col-check-grid" id="save-col-checks"></div>
+      </div>
+      <!-- レイアウト・テーマ -->
+      <div class="save-section">
+        <div class="save-label">画像レイアウト</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:12px;color:var(--md-on-surface-variant)">列数</span>
+          <input type="number" id="save-col-count" value="1" min="1" max="10" style="width:56px;font-size:12px;padding:3px 6px;background:var(--md-surface-container-high);border:1px solid var(--md-outline);border-radius:4px;color:var(--md-on-surface);text-align:right">
+          <span style="font-size:12px;color:var(--md-on-surface-variant);margin-left:10px">画像テーマ</span>
+          <select id="save-theme" class="save-select">
+            <option value="light">ライト</option>
+            <option value="dark">ダーク</option>
+          </select>
+        </div>
       </div>
       <!-- オプション -->
       <div id="save-solo-section" class="save-section" style="display:none">
@@ -1948,9 +1912,6 @@ function openSaveModal() {
   if (!players || !players.length) return;
   // ソートを現在と同期
   applyCurrSort();
-  // 画像テーマ: サイトが現在ダークでもデフォルトはライトにする（保存時に切替可能）
-  const themeSel = document.getElementById('save-theme');
-  if (themeSel) themeSel.value = 'light';
   // 列チェックボックスを生成
   const grid = document.getElementById('save-col-checks');
   grid.innerHTML = colOrder.map(k => {
@@ -1962,6 +1923,10 @@ function openSaveModal() {
     </label>`;
   }).join('');
   document.getElementById('save-range-to').value = Math.min(players.length, 100);
+  document.getElementById('save-col-count').value = 1;
+  // サイトが現在ダークモードでも、画像出力はダークモード運用者以外にも見やすいライトを既定にする。
+  // 選択自体は保存設定時に毎回選べる。
+  document.getElementById('save-theme').value = 'light';
   // 推定ソロセクション（ソロ有効時のみ表示）
   const soloSec = document.getElementById('save-solo-section');
   if (soloSec) {
@@ -2036,11 +2001,6 @@ function execSavePNG() {
     return 100;
   });
 
-  // 列数（縦に長くなりすぎるのを防ぐため、指定列数で横に分割する）
-  const colCount   = Math.max(1, Math.min(10, parseInt(document.getElementById('save-col-count')?.value) || 1, sliced.length || 1));
-  const rowsPerGrp = Math.ceil(sliced.length / colCount);
-  const groups     = Array.from({ length: colCount }, (_, gi) => sliced.slice(gi * rowsPerGrp, (gi + 1) * rowsPerGrp));
-
   // Canvas設計
   const dpr      = Math.min(window.devicePixelRatio || 1, 2);
   const padX     = 14;
@@ -2049,15 +2009,50 @@ function execSavePNG() {
   const headerH  = 30;
   const rowH     = 26;
   const footerH  = 22;
-  const groupGap = 20; // 列グループ間の余白
   const font     = '13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
   const fontBold = 'bold 13px "Hiragino Kaku Gothic Pro","Meiryo",sans-serif';
   const fontSm   = '10px sans-serif';
 
-  const groupContentW = colWidths.reduce((a, b) => a + b, 0);
-  const groupW = groupContentW + padX * 2; // 元の単一列時と同じ余白を1グループぶんとする
-  const totalW = groupW * colCount + groupGap * (colCount - 1);
-  const totalH = padY + titleH + headerH + rowH * rowsPerGrp + footerH + padY;
+  // ---- レイアウト・テーマ設定 ----
+  // 何行で折り返すかをユーザーが指定できる（縦に長くなりすぎるのを防ぐ）。
+  // 画像テーマはサイトの現在の配色から独立させ、保存設定時に選んだ値を毎回使う
+  // （ダークモード運用中でも既定はライトで、意図せず読みにくい画像にならないようにする）。
+  const colCount = Math.max(1, Math.min(10, parseInt(document.getElementById('save-col-count').value) || 1));
+  const theme    = document.getElementById('save-theme').value === 'dark' ? 'dark' : 'light';
+  const PALETTE = {
+    light: {
+      bgMain: '#f4f5f7', bgDim: '#e7e9ec', bgContHigh: '#dfe2e7', outlineVar: '#cfd3da',
+      textMain: '#1a1d21', textMuted: '#586173', colorGN: '#1a73e8', rowOddBg: '#eaf2fb',
+      bg1: '#fdf6cf', bg2: '#edf1f6', bg3: '#fce4e4',
+    },
+    dark: {
+      bgMain: '#111827', bgDim: '#1e2a3d', bgContHigh: '#1a2438', outlineVar: '#2e3f58',
+      textMain: '#e8edf4', textMuted: '#8fa8c8', colorGN: '#e8edf4', rowOddBg: 'rgba(255,255,255,0.06)',
+      bg1: '#3d2c00', bg2: '#1c2540', bg3: '#3a1e00',
+    },
+  };
+  const pal = PALETTE[theme];
+  const elemColor    = getComputedStyle(document.documentElement).getPropertyValue('--elem-color').trim() || '#3b82f6';
+  const colorSuccess = '#4ade80';
+  const colorWarn    = '#fbbf24';
+  const colorErr     = '#f87171';
+  const colorUp      = '#60a5fa';
+  const colorDown    = colorErr;
+
+  // 指定列数に行を分割（左から順に詰める）
+  const rowsPerGrp = Math.ceil(sliced.length / colCount);
+  const groups = [];
+  for (let g = 0; g < colCount; g++) {
+    const part = sliced.slice(g * rowsPerGrp, (g + 1) * rowsPerGrp);
+    if (part.length > 0) groups.push({ rows: part, startIdx: g * rowsPerGrp });
+  }
+  const actualCols     = groups.length || 1;
+  const maxRowsInGroup = Math.max(1, ...groups.map(g => g.rows.length));
+
+  const groupW  = colWidths.reduce((a, b) => a + b, 0) + padX * 2;
+  const groupGap = 20;
+  const totalW = groupW * actualCols + groupGap * (actualCols - 1);
+  const totalH = padY + titleH + headerH + rowH * maxRowsInGroup + footerH + padY;
 
   const canvas = document.createElement('canvas');
   canvas.width  = totalW * dpr;
@@ -2065,41 +2060,12 @@ function execSavePNG() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // ---- 画像出力カラーパレット ----
-  // サイト本体のテーマ（ダーク/ライト）とは切り離し、保存モーダルで選んだテーマを使う
-  // （サイトがダークモードでも、デフォルトはライトで出力する）。
-  // ライブのCSS変数はページの現在のテーマしか反映できないため、両テーマぶんの値を固定値として持つ。
-  const cs        = getComputedStyle(document.documentElement);
-  const elemColor = cs.getPropertyValue('--elem-color').trim() || '#3b82f6';
-  const isLight   = (document.getElementById('save-theme')?.value || 'light') === 'light';
-
-  const PALETTE = {
-    light: {
-      bgMain: '#f4f5f7', bgDim: '#e7e9ec', bgContHigh: '#dfe2e7', outlineVar: '#cfd3da',
-      textMain: '#1a1d21', textMuted: '#586173', rowOddBg: '#eaf2fb', colorGN: '#1a73e8',
-      bg1: '#fdf6cf', bg2: '#edf1f6', bg3: '#fce4e4',
-    },
-    dark: {
-      bgMain: '#111827', bgDim: '#1e2a3d', bgContHigh: '#1a2438', outlineVar: '#2e3f58',
-      textMain: '#e8edf4', textMuted: '#8fa8c8', rowOddBg: 'rgba(255,255,255,0.06)', colorGN: '#e8edf4',
-      bg1: '#3d2c00', bg2: '#1c2540', bg3: '#3a1e00',
-    },
-  };
-  const pal = isLight ? PALETTE.light : PALETTE.dark;
-  const { bgMain, bgDim, bgContHigh, outlineVar, textMain, textMuted, rowOddBg, colorGN, bg1, bg2, bg3 } = pal;
-
-  const colorSuccess= '#4ade80';
-  const colorWarn   = '#fbbf24';
-  const colorErr    = '#f87171';
-  const colorUp     = '#60a5fa';
-  const colorDown   = colorErr;
-
   // 全体背景
-  ctx.fillStyle = bgMain;
+  ctx.fillStyle = pal.bgMain;
   ctx.fillRect(0, 0, totalW, totalH);
 
-  // タイトル背景（surface-dim）
-  ctx.fillStyle = bgDim;
+  // タイトル背景（surface-dim、全幅）
+  ctx.fillStyle = pal.bgDim;
   ctx.fillRect(0, 0, totalW, padY + titleH);
 
   // 左アクセントライン（属性カラー）
@@ -2117,156 +2083,153 @@ function execSavePNG() {
   ctx.fillText(tabLabel, padX + 8, padY + titleH / 2 + 5);
   const tabW = ctx.measureText(tabLabel).width;
   ctx.font = '12px sans-serif';
-  ctx.fillStyle = textMuted;
+  ctx.fillStyle = pal.textMuted;
   const sub = [eventName, rangeStr, `${fromRank}〜${toRank}位`].filter(Boolean).join('  ');
   ctx.fillText('  |  ' + sub, padX + 8 + tabW, padY + titleH / 2 + 5);
 
-  // テーブルヘッダー行（列グループごとに繰り返す）
-  let baseY = padY + titleH;
-  ctx.fillStyle = bgContHigh;
-  ctx.fillRect(0, baseY, totalW, headerH);
-  ctx.font = fontBold;
-  ctx.fillStyle = textMuted;
-  for (let gi = 0; gi < colCount; gi++) {
-    const groupX = gi * (groupW + groupGap);
-    let cx = groupX + padX;
+  // ---- グループ（列）ごとの描画 ----
+  groups.forEach((group, gi) => {
+    const gx = gi * (groupW + groupGap);
+
+    // ヘッダー行
+    let baseY = padY + titleH;
+    ctx.fillStyle = pal.bgContHigh;
+    ctx.fillRect(gx, baseY, groupW, headerH);
+    ctx.font = fontBold;
+    ctx.fillStyle = pal.textMuted;
+    let cx = gx + padX;
     allCols.forEach((k, ci) => {
       ctx.fillText(colLabels[ci], cx + 4, baseY + headerH / 2 + 5);
       cx += colWidths[ci];
     });
-  }
-  ctx.strokeStyle = outlineVar;
-  ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(0, baseY + headerH); ctx.lineTo(totalW, baseY + headerH); ctx.stroke();
+    ctx.strokeStyle = pal.outlineVar;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(gx, baseY + headerH); ctx.lineTo(gx + groupW, baseY + headerH); ctx.stroke();
 
-  // ---- データ行（列グループごと） ----
-  baseY += headerH;
-  groups.forEach((grp, gi) => {
-    const groupX  = gi * (groupW + groupGap);
-    const rankOff = fromRank + gi * rowsPerGrp; // このグループの先頭順位
-    grp.forEach((p, i) => {
+    // データ行
+    baseY += headerH;
+    group.rows.forEach((p, i) => {
+      const globalIdx = group.startIdx + i;
       const rowY  = baseY + i * rowH;
       const textY = rowY + rowH / 2 + 5;
       const hr    = p.honorRank ?? 999; // 増加量順位
 
       // 行背景（サイトの rowBg と同じ）
-      ctx.fillStyle = hr === 1 ? bg1 : hr === 2 ? bg2 : hr === 3 ? bg3 : bgMain;
-      ctx.fillRect(groupX, rowY, groupW, rowH);
-      // rank4以降: 奇数行に縞模様（サイトの --row-odd-bg と同じ色。テーマごとに異なる）
-      if (hr > 3 && i % 2 === 1) {
-        ctx.fillStyle = rowOddBg;
-        ctx.fillRect(groupX, rowY, groupW, rowH);
+      ctx.fillStyle = hr === 1 ? pal.bg1 : hr === 2 ? pal.bg2 : hr === 3 ? pal.bg3 : pal.bgMain;
+      ctx.fillRect(gx, rowY, groupW, rowH);
+      // rank4以降: 奇数行にゼブラ（サイトの --row-odd-bg と同じ値。ライト/ダークで別値）
+      if (hr > 3 && (fromRank - 1 + globalIdx) % 2 === 1) {
+        ctx.fillStyle = pal.rowOddBg;
+        ctx.fillRect(gx, rowY, groupW, rowH);
       }
 
       ctx.font = font;
-      let rx = groupX + padX;
+      let rx = gx + padX;
 
       allCols.forEach((k, ci) => {
-      const tx = rx + 4;
+        const tx = rx + 4;
 
-      if (k === '_rank') {
-        // 表示順位（連番）— .cell-rank は --md-on-surface-variant (textMuted)
-        ctx.fillStyle = textMuted;
-        ctx.fillText(String(rankOff + i), tx, textY);
+        if (k === '_rank') {
+          // 表示順位（連番）— .cell-rank は --md-on-surface-variant (textMuted)
+          ctx.fillStyle = pal.textMuted;
+          ctx.fillText(String(fromRank + globalIdx), tx, textY);
 
-      } else if (k === 'honorRank') {
-        // 増加量順位：top3はメダル色
-        ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32' : textMain;
-        ctx.fillText(String(hr < 999 ? hr : rankOff + i), tx, textY);
+        } else if (k === 'honorRank') {
+          // 増加量順位：top3はメダル色
+          ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32' : pal.textMain;
+          ctx.fillText(String(hr < 999 ? hr : fromRank + globalIdx), tx, textY);
 
-      } else if (k === 'rank') {
-        // .cell-rank は --md-on-surface-variant (textMuted)
-        ctx.fillStyle = textMuted;
-        ctx.fillText(String(p.rank ?? '-'), tx, textY);
+        } else if (k === 'rank') {
+          // .cell-rank は --md-on-surface-variant (textMuted)
+          ctx.fillStyle = pal.textMuted;
+          ctx.fillText(String(p.rank ?? '-'), tx, textY);
 
-      } else if (k === 'rankChange') {
-        // ▲▼→NEW — サイトの formatChange と完全一致
-        if (p.prevRank == null) {
-          ctx.fillStyle = colorSuccess;
-          ctx.fillText('NEW', tx, textY);
-        } else {
-          const rc = p.rankChange ?? 0;
-          if (rc > 0) {
-            ctx.fillStyle = colorUp; // .up = --md-primary = elemColor
-            ctx.fillText(`▲${rc}`, tx, textY);
-          } else if (rc < 0) {
-            ctx.fillStyle = colorDown;
-            ctx.fillText(`▼${Math.abs(rc)}`, tx, textY);
+        } else if (k === 'rankChange') {
+          // ▲▼→NEW — サイトの formatChange と完全一致
+          if (p.prevRank == null) {
+            ctx.fillStyle = colorSuccess;
+            ctx.fillText('NEW', tx, textY);
           } else {
-            ctx.fillStyle = textMuted;
-            ctx.fillText('→', tx, textY);
+            const rc = p.rankChange ?? 0;
+            if (rc > 0) {
+              ctx.fillStyle = colorUp; // .up = --md-primary = elemColor
+              ctx.fillText(`▲${rc}`, tx, textY);
+            } else if (rc < 0) {
+              ctx.fillStyle = colorDown;
+              ctx.fillText(`▼${Math.abs(rc)}`, tx, textY);
+            } else {
+              ctx.fillStyle = pal.textMuted;
+              ctx.fillText('→', tx, textY);
+            }
           }
-        }
 
-      } else if (k === 'username') {
-        const isSolo = showSoloIcon && getSoloMatch(p) != null;
-        if (isSolo) {
-          ctx.fillStyle = colorErr;
-          const tag = '[S] ';
-          ctx.fillText(tag, tx, textY);
-          ctx.fillStyle = colorGN;
-          ctx.fillText(p.username ?? '', tx + ctx.measureText(tag).width, textY);
+        } else if (k === 'username') {
+          const isSolo = showSoloIcon && getSoloMatch(p) != null;
+          if (isSolo) {
+            ctx.fillStyle = colorErr;
+            const tag = '[S] ';
+            ctx.fillText(tag, tx, textY);
+            ctx.fillStyle = pal.colorGN;
+            ctx.fillText(p.username ?? '', tx + ctx.measureText(tag).width, textY);
+          } else {
+            ctx.fillStyle = pal.colorGN;
+            ctx.fillText(p.username ?? '', tx, textY);
+          }
+
+        } else if (k === 'killDiff') {
+          // .cell-kill は --md-on-surface-variant (textMuted)
+          const kv = p.killDiff ?? 0;
+          ctx.fillStyle = pal.textMuted;
+          ctx.fillText(kv > 0 ? '+' + numFmt(kv) : kv === 0 ? '-' : numFmt(kv), tx, textY);
+
+        } else if (k === 'honorDiff') {
+          // diffColor と同じロジック（サイトの renderRanking と一致）
+          ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32'
+                        : (p.honorDiff ?? 0) > 0 ? pal.textMain : pal.textMuted;
+          const sign = (p.honorDiff ?? 0) > 0 ? '+' : '';
+          ctx.fillText(sign + numFmt(p.honorDiff ?? 0), tx, textY);
+
+        } else if (k === 'honor') {
+          ctx.fillStyle = pal.textMain;
+          ctx.fillText(p.honor != null ? numFmt(p.honor) : '-', tx, textY);
+
         } else {
-          ctx.fillStyle = colorGN;
-          ctx.fillText(p.username ?? '', tx, textY);
+          ctx.fillStyle = pal.textMain;
+          ctx.fillText(p[k] != null ? String(p[k]) : '', tx, textY);
         }
 
-      } else if (k === 'killDiff') {
-        // .cell-kill は --md-on-surface-variant (textMuted)
-        const kv = p.killDiff ?? 0;
-        ctx.fillStyle = textMuted;
-        ctx.fillText(kv > 0 ? '+' + numFmt(kv) : kv === 0 ? '-' : numFmt(kv), tx, textY);
+        rx += colWidths[ci];
+      });
 
-      } else if (k === 'honorDiff') {
-        // diffColor と同じロジック（サイトの renderRanking と一致）
-        ctx.fillStyle = hr === 1 ? colorWarn : hr === 2 ? '#c0c0c0' : hr === 3 ? '#cd7c32'
-                      : (p.honorDiff ?? 0) > 0 ? textMain : textMuted;
-        const sign = (p.honorDiff ?? 0) > 0 ? '+' : '';
-        ctx.fillText(sign + numFmt(p.honorDiff ?? 0), tx, textY);
-
-      } else if (k === 'honor') {
-        ctx.fillStyle = textMain;
-        ctx.fillText(p.honor != null ? numFmt(p.honor) : '-', tx, textY);
-
-      } else {
-        ctx.fillStyle = textMain;
-        ctx.fillText(p[k] != null ? String(p[k]) : '', tx, textY);
-      }
-
-      rx += colWidths[ci];
-    });
-
-    // 行区切り（グループ内のみ）
-    ctx.strokeStyle = outlineVar;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(groupX, rowY + rowH); ctx.lineTo(groupX + groupW, rowY + rowH); ctx.stroke();
-    });
-  });
-
-  // 縦区切り線（列グループごと）
-  for (let gi = 0; gi < colCount; gi++) {
-    const groupX = gi * (groupW + groupGap);
-    let cx = groupX + padX;
-    for (let ci = 0; ci < allCols.length - 1; ci++) {
-      cx += colWidths[ci];
-      ctx.strokeStyle = outlineVar;
+      // 行区切り
+      ctx.strokeStyle = pal.outlineVar;
       ctx.lineWidth = 0.5;
-      ctx.beginPath(); ctx.moveTo(cx, padY + titleH); ctx.lineTo(cx, totalH - footerH - padY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gx, rowY + rowH); ctx.lineTo(gx + groupW, rowY + rowH); ctx.stroke();
+    });
+
+    // 縦区切り線（列内）
+    let cx2 = gx + padX;
+    for (let ci = 0; ci < allCols.length - 1; ci++) {
+      cx2 += colWidths[ci];
+      ctx.strokeStyle = pal.outlineVar;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(cx2, padY + titleH); ctx.lineTo(cx2, totalH - footerH - padY); ctx.stroke();
     }
-    // 列グループ間の区切り線（可読性のため。最後のグループの右側には引かない）
-    if (gi < colCount - 1) {
-      const dividerX = groupX + groupW + groupGap / 2;
-      ctx.strokeStyle = outlineVar;
+
+    // グループ間の仕切り線
+    if (gi < groups.length - 1) {
+      const dividerX = gx + groupW + groupGap / 2;
+      ctx.strokeStyle = pal.outlineVar;
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(dividerX, padY + titleH); ctx.lineTo(dividerX, totalH - footerH - padY); ctx.stroke();
     }
-  }
+  });
 
   // ---- フッター ----
   const footerY = totalH - padY / 2 - 2;
   // gbfranking.com（左下 — shareGraph と同じ位置）
   ctx.font = fontSm;
-  ctx.fillStyle = textMuted;
+  ctx.fillStyle = pal.textMuted;
   ctx.fillText('gbfranking.com', padX, footerY);
   // [S] 凡例（右側）— showSoloIcon 時のみ
   if (showSoloIcon) {
@@ -2276,7 +2239,7 @@ function execSavePNG() {
     ctx.fillStyle = colorErr;
     ctx.fillText('[S]', lx, footerY);
     lx += ctx.measureText('[S]').width;
-    ctx.fillStyle = textMuted;
+    ctx.fillStyle = pal.textMuted;
     ctx.fillText(legend, lx, footerY);
   }
 
@@ -2541,12 +2504,6 @@ let sortKey  = 'honorDiff';
 let sortDir  = -1;
 let currentRenderData = null;
 let _reloadSeq = 0;
-// 定期ポーリング（startAutoRefresh）の背景更新を同時に1本だけに制限するためのフラグ
-let _backgroundReloadBusy = false;
-// 個人ランキングの段階的取得（100→1000→2000→10000件）中は、5並列のスクレイパーが
-// ブラウザウィンドウを起動してCPUを占有し、サーバー/トンネルの応答が数分単位で不安定になることがある。
-// 短い再試行ではこの間ずっと失敗し続けてしまうため、背景更新は最大約3分かけて粘り強く再試行する。
-const BACKGROUND_RETRY_DELAYS_MS = [1200, 2000, 3000, 5000, 8000, 10000, 10000, 10000, 15000, 15000, 20000, 20000, 20000, 20000, 20000];
 
 function sortBy(key) {
   if (sortKey === key) { sortDir = -sortDir; }
@@ -2906,16 +2863,26 @@ function connectLiveSSE() {
   if (liveSSE) liveSSE.close();
   liveSSE = new EventSource('/api/ranking/updates');
   liveSSE.onopen = () => { stopViewerPoll(); };
-  // SSEは「閲覧者数バッジ更新」専用。ランキング更新の即時反映はやめ、
-  // startAutoRefresh()の単純な定期ポーリングだけに一本化した（複数のトリガー元が
-  // 絡み合うbusy/pending状態機械が、かえって「詰まって二度と動かない」状態を
-  // 作りやすくしていたため）。
-  liveSSE.onmessage = (e) => {
+  liveSSE.onmessage = async (e) => {
     try {
       const info = JSON.parse(e.data);
       if (info.type === 'viewers') {
         updateViewerBadge(info.count);
+        return;
       }
+      if (currentEventId && String(info.eventId) !== String(currentEventId)) return;
+      // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
+      // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
+      if (info.kind && !String(info.kind).includes('ranking')) return;
+      apiCacheInvalidate('/api/ranking/latest');
+      apiCacheInvalidate('/api/ranking/snapshots');
+      apiCacheInvalidate('/api/ranking/20min');
+      apiCacheInvalidate('/api/ranking/daily');
+      flashOnRender = true;
+      // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
+      // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
+      await reload({ background: true });
+      if (currentTab === '20min') await updateSnapList();
     } catch {}
   };
   liveSSE.onerror = () => {
@@ -3020,41 +2987,25 @@ function onSnapTimeChange() {
   loadCurrentSnap();
 }
 
-// Cloudflare Tunnel経由の接続断対策。apiFetch()自体は15秒でタイムアウトするが、
-// スクレイピング中（5並列ブラウザがCPUを占有）は数分単位で不安定になることがあるため、
-// 手動操作でも諦めずに最大約3分かけて再試行する（reload()の背景更新と同じ考え方）。
-async function apiFetchWithRetry(url) {
-  let data = await apiFetch(url);
-  if (data == null) {
-    for (const delay of BACKGROUND_RETRY_DELAYS_MS) {
-      await new Promise(r => setTimeout(r, delay));
-      data = await apiFetch(url);
-      if (data != null) break;
-    }
-  }
-  return data;
-}
-
 async function loadCurrentSnap() {
   if (currentTab !== '20min') return;
   const gbfDay = document.getElementById('snap-day-select')?.value || '';
   const snapId = document.getElementById('snap-time-select')?.value || '';
   showLoading();
   if (gbfDay) await ensureSnapDayLoaded(gbfDay);
-  let url = null;
+  let data = null;
   if (snapId) {
-    url = `/api/ranking/20min?snapshot_id=${snapId}`;
+    data = await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
   } else if (gbfDay) {
     const daySnaps = viewableDaySnaps(gbfDay);
     if (daySnaps.length > 0) {
-      url = `/api/ranking/20min?snapshot_id=${daySnaps[0].id}`;
+      data = await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
     } else {
       showNoData('この日のスナップがありません'); return;
     }
   } else {
-    url = `/api/ranking/latest?event_id=${currentEventId}`;
+    data = await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
   }
-  const data = await apiFetchWithRetry(url);
   renderRanking(data);
 }
 
@@ -3110,7 +3061,7 @@ function syncSnapshotSelection(globalIdx) {
   renderTimeSelect(gbfDay, snap.id);
   showLoading();
   ensureSnapDayLoaded(gbfDay)
-    .then(() => apiFetchWithRetry(`/api/ranking/20min?snapshot_id=${snap.id}`))
+    .then(() => apiFetch(`/api/ranking/20min?snapshot_id=${snap.id}`))
     .then(data => renderRanking(data))
     .catch(() => renderRanking(null));
 }
@@ -3164,7 +3115,7 @@ async function updateSnapList() {
   if (!currentEventId) return;
   const daySelEl = document.getElementById('snap-day-select');
   if (daySelEl) daySelEl.innerHTML = '<option value="">読み込み中...</option>';
-  allSnaps = await apiFetchWithRetry(`/api/ranking/snapshots?event_id=${currentEventId}`) ?? [];
+  allSnaps = await apiFetch(`/api/ranking/snapshots?event_id=${currentEventId}`) ?? [];
 
   buildSnapGroups();
 
@@ -3185,23 +3136,16 @@ function clearSnapSelect() {
 }
 
 async function reload(opts = {}) {
+  const mySeq = ++_reloadSeq;
+  currentDate = document.getElementById('date-select').value;
+  if (!currentEventId) { showNoData('イベントを選択してください'); return; }
+
   const isBackground = !!opts.background;
-  // 背景更新（startAutoRefresh()の定期ポーリングのみが呼ぶ）が重なった場合は、
-  // 後発の呼び出しを黙って捨てる（一定間隔で確実に次のポーリングが来るため、
-  // busy/pending等の複雑な追跡は不要）。
-  if (isBackground && _backgroundReloadBusy) return;
-  if (isBackground) _backgroundReloadBusy = true;
+  const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
+  const skipBlank = isBackground && hasData;
 
-  try {
-    const mySeq = ++_reloadSeq;
-    currentDate = document.getElementById('date-select').value;
-    if (!currentEventId) { showNoData('イベントを選択してください'); return; }
-
-    const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
-    const skipBlank = isBackground && hasData;
-
-    if (skipBlank) setRefreshStatus('loading');
-    else showLoading();
+  if (skipBlank) setRefreshStatus('loading');
+  else showLoading();
 
   async function attemptFetch() {
     if (currentTab === '20min') {
@@ -3234,19 +3178,11 @@ async function reload(opts = {}) {
   let fetchFailed = false;
   try {
     data = await attemptFetch();
-    // Cloudflare Tunnel経由の接続断対策。個人ランキングの段階的取得中（5並列ブラウザがCPUを
-    // 占有）は応答不能な状態が数分続くことがある。以前は背景更新（画面上に表示中データが
-    // ある場合）のみ再試行していたが、初回読み込み・タブ切替などフォアグラウンド側は
-    // 1回失敗しただけで「データがありません」になり長時間何も出ない不具合があったため、
-    // フォアグラウンドでも同じだけ粘り強く再試行する（表示は「読み込み中...」のまま続く）。
-    if (data == null) {
-      for (const delay of BACKGROUND_RETRY_DELAYS_MS) {
-        if (mySeq !== _reloadSeq) break;
-        await new Promise(r => setTimeout(r, delay));
-        if (mySeq !== _reloadSeq) break;
-        data = await attemptFetch();
-        if (data != null) break;
-      }
+    // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、
+    // 背景更新（画面上に表示中データがある場合）に限り1回だけ間を置いて再試行する。
+    if (data == null && skipBlank) {
+      await new Promise(r => setTimeout(r, 1200));
+      if (mySeq === _reloadSeq) data = await attemptFetch();
     }
     if (data == null) fetchFailed = true;
   } catch (err) {
@@ -3254,21 +3190,18 @@ async function reload(opts = {}) {
     fetchFailed = true;
   }
 
-    if (mySeq !== _reloadSeq) return; // 別の（前面操作による）reload()に追い越された場合は破棄
+  if (mySeq !== _reloadSeq) return; // より新しいreload()に追い越された場合は破棄
 
-    if (skipBlank && fetchFailed) {
-      setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
-      return;
-    }
-
-    try { renderRanking(data); } catch (e) {
-      console.error('[renderRanking]', e);
-      showNoData('表示エラー: ' + (e.message || e));
-    }
-    if (skipBlank) setRefreshStatus(null);
-  } finally {
-    if (isBackground) _backgroundReloadBusy = false;
+  if (skipBlank && fetchFailed) {
+    setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
+    return;
   }
+
+  try { renderRanking(data); } catch (e) {
+    console.error('[renderRanking]', e);
+    showNoData('表示エラー: ' + (e.message || e));
+  }
+  if (skipBlank) setRefreshStatus(null);
 }
 
 const TYPE_META = {
@@ -3292,9 +3225,6 @@ function renderRanking(data, keepScroll = false) {
     tbody.innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">データがありません（スナップショットが2件以上必要です）${hint}</td></tr>`;
     statBar.style.display = 'none';
     updateSearchCount(0, 0);
-    // 直前の描画で出した「更新中...件」バッジが、この空描画では更新されず古いまま残ってしまうため消す
-    const staleBadge = document.getElementById('updating-badge');
-    if (staleBadge) staleBadge.style.display = 'none';
     return;
   }
 
@@ -3324,13 +3254,8 @@ function renderRanking(data, keepScroll = false) {
     honorRankMap.get(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`) || 999;
 
   statBar.style.display = 'flex';
-  // 年はイベント名で分かるため省略し、同日なら終了側は時刻のみにする（モバイルで折り返さない長さに）
-  const bef = data.before ? data.before.substring(5, 16) : '?';
-  const aft = data.after
-    ? (data.before && data.before.substring(0, 10) === data.after.substring(0, 10)
-        ? data.after.substring(11, 16)
-        : data.after.substring(5, 16))
-    : '?';
+  const bef = data.before ? data.before.substring(0, 16) : '?';
+  const aft = data.after  ? data.after.substring(0, 16)  : '?';
   document.getElementById('stat-range').textContent = `${bef} → ${aft}`;
   const active   = data.players.filter(p => p.honorDiff > 0);
   const topHonor = Math.max(0, ...active.map(p => p.honorDiff));
@@ -3387,7 +3312,7 @@ function renderRanking(data, keepScroll = false) {
     const markEl = bInfo ? `<span class="battle-row-mark" style="background:${bInfo.color}"></span>` : '';
     const gnCls  = bInfo ? ' gn-pinned' : '';
     const gnCol  = bInfo ? ` style="color:${bInfo.color}"` : '';
-    const histBtn = `<span class="hist-btn" style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
+    const histBtn = `<span style="cursor:pointer;color:var(--md-on-surface-variant);font-size:10px;margin-right:3px" onclick="event.stopPropagation();openPlayerModal(${p.player_id ?? 'null'},${escHtml(JSON.stringify(p.username))},${currentEventId})" title="履歴を見る">📋</span>`;
     const starBtn = p.player_id == null ? '' : `<button class="watch-star${watchedPlayers.has(p.player_id)?' on':''}" data-pid="${p.player_id}" onclick="toggleWatch(event,${p.player_id},${escHtml(JSON.stringify(p.username))})" title="${watchedPlayers.has(p.player_id)?'注目解除':'注目に追加'}">★</button>`;
     const _soloMatch = getSoloMatch(p);
     const soloMark = _soloMatch ? `<span class="solo-mark" title="推定ソロ: ${_soloMatch}">S</span>` : '';
@@ -3531,14 +3456,10 @@ function updateSearchCount(filtered, total) {
 function startAutoRefresh() {
   if (autoTimer) clearInterval(autoTimer);
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
-  // SSEによる即時反映をやめ、この定期ポーリングのみに一本化したため、
-  // 従来の5分間隔から60秒間隔に短縮して反映の遅れを補う。
-  autoTimer = setInterval(async () => {
-    // 多数の同時視聴者が同じタイミングで一斉にreload()しないよう分散させる
-    await new Promise(r => setTimeout(r, Math.random() * 8000));
+  autoTimer = setInterval(() => {
     apiCacheInvalidate();
     reload({ background: true });
-  }, 60 * 1000);
+  }, 5 * 60 * 1000);
 }
 
 async function openPlayerModal(playerId, username, eventId) {
@@ -4117,8 +4038,7 @@ async function renderGraph() {
     if (!goal) return 0;
     const lastMs = new Date(lastCapturedAt.replace(' ', 'T')).getTime();
     const remainingMin = (goal.getTime() - lastMs) / 60000;
-    // floorだとゴール直前で切り捨てられ、予測線がゴールに届かず手前で止まってしまうためceilにする
-    return Math.max(0, Math.ceil(remainingMin / 20));
+    return Math.max(0, Math.floor(remainingMin / 20));
   })();
 
   // 予測ラベル生成（実際の時刻形式 MM-DD HH:mm）
