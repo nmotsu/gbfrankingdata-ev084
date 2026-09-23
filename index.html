@@ -2543,6 +2543,10 @@ let currentRenderData = null;
 let _reloadSeq = 0;
 let _sseUpdateBusy = false;
 let _sseUpdatePending = false;
+// 5分ポーリングとSSE通知、どちらから来た背景更新でも同時に1本しか走らせないためのフラグ
+// （reload()自身が管理。_sseUpdateBusyはSSE経路の間引き専用で、5分ポーリングは対象外だった）
+let _backgroundReloadBusy = false;
+let _backgroundReloadPending = false;
 // 個人ランキングの段階的取得（100→1000→2000→10000件）中は、5並列のスクレイパーが
 // ブラウザウィンドウを起動してCPUを占有し、サーバー/トンネルの応答が数分単位で不安定になることがある。
 // 短い再試行ではこの間ずっと失敗し続けてしまうため、背景更新は最大約3分かけて粘り強く再試行する。
@@ -3207,16 +3211,28 @@ function clearSnapSelect() {
 }
 
 async function reload(opts = {}) {
-  const mySeq = ++_reloadSeq;
-  currentDate = document.getElementById('date-select').value;
-  if (!currentEventId) { showNoData('イベントを選択してください'); return; }
-
   const isBackground = !!opts.background;
-  const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
-  const skipBlank = isBackground && hasData;
+  // 背景更新（5分ポーリングとSSE通知は互いに独立したトリガーで、どちらも重ねてreload()を
+  // 呼び得る）が重なると、先発の呼び出しが最大3分の再試行中に後発の呼び出しに追い越され、
+  // 「_reloadSeq不一致で黙って終了」を繰り返して更新中バッジが永久に解消されないバグがあった。
+  // 背景更新は同時に1本だけに制限するが、busy中に来た後発リクエストは「取りこぼし」にせず
+  // pendingフラグに記録し、実行中の1本が終わった直後にもう1回だけ追いかけて最新状態を取得する
+  // （例: 2000件取得中に10000件完了の通知が来ても、busy解除後に自動で拾い直す）。
+  if (isBackground && _backgroundReloadBusy) { _backgroundReloadPending = true; return; }
+  if (isBackground) _backgroundReloadBusy = true;
 
-  if (skipBlank) setRefreshStatus('loading');
-  else showLoading();
+  try {
+   do {
+    _backgroundReloadPending = false;
+    const mySeq = ++_reloadSeq;
+    currentDate = document.getElementById('date-select').value;
+    if (!currentEventId) { showNoData('イベントを選択してください'); return; }
+
+    const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
+    const skipBlank = isBackground && hasData;
+
+    if (skipBlank) setRefreshStatus('loading');
+    else showLoading();
 
   async function attemptFetch() {
     if (currentTab === '20min') {
@@ -3267,18 +3283,25 @@ async function reload(opts = {}) {
     fetchFailed = true;
   }
 
-  if (mySeq !== _reloadSeq) return; // より新しいreload()に追い越された場合は破棄
+    if (mySeq !== _reloadSeq) return; // 別の（前面操作による）reload()に追い越された場合は破棄
 
-  if (skipBlank && fetchFailed) {
-    setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
-    return;
-  }
+    if (skipBlank && fetchFailed) {
+      // busy中に新しいトリガーが来ていれば（pending）、エラー表示にせずもう1周フレッシュに取り直す。
+      // 何も来ていなければ通常通りエラー表示にして今回は諦める。
+      if (_backgroundReloadPending) continue;
+      setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
+      return;
+    }
 
-  try { renderRanking(data); } catch (e) {
-    console.error('[renderRanking]', e);
-    showNoData('表示エラー: ' + (e.message || e));
+    try { renderRanking(data); } catch (e) {
+      console.error('[renderRanking]', e);
+      showNoData('表示エラー: ' + (e.message || e));
+    }
+    if (skipBlank) setRefreshStatus(null);
+   } while (isBackground && _backgroundReloadPending);
+  } finally {
+    if (isBackground) _backgroundReloadBusy = false;
   }
-  if (skipBlank) setRefreshStatus(null);
 }
 
 const TYPE_META = {
