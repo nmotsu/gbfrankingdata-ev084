@@ -2921,6 +2921,12 @@ function connectLiveSSE() {
       // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
       // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
       if (info.kind && !String(info.kind).includes('ranking')) return;
+      // 同時視聴者（多い時は200人規模）全員のブラウザが、このSSE通知を受け取った瞬間に一斉に
+      // reload()するとCloudflare Tunnelへの同時接続が殺到し、サンダリングハード状態になって
+      // 軒並み接続失敗する。各クライアントの実行開始タイミングを0〜8秒のランダム遅延で
+      // 分散させ、一斉アクセスを時間的にならす。
+      await new Promise(r => setTimeout(r, Math.random() * 8000));
+      if (currentEventId && String(info.eventId) !== String(currentEventId)) return; // 遅延中にイベント切替された場合は中断
       // 個人ランキングは段階的import（100→1000→2000→10000件）のたびにそれぞれ更新通知が飛ぶため、
       // 短時間に複数回pushされることがある。並行してreload()すると、そのぶんだけ同時接続が増えて
       // Cloudflare Tunnel経由での接続失敗を誘発するため、実行中は新規pushを「後追い1回」に間引く。
@@ -3568,7 +3574,9 @@ function updateSearchCount(filtered, total) {
 function startAutoRefresh() {
   if (autoTimer) clearInterval(autoTimer);
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
-  autoTimer = setInterval(() => {
+  autoTimer = setInterval(async () => {
+    // SSE通知と同様、多数の同時視聴者が同じタイミングで一斉にreload()しないよう分散させる
+    await new Promise(r => setTimeout(r, Math.random() * 8000));
     apiCacheInvalidate();
     reload({ background: true });
   }, 5 * 60 * 1000);
