@@ -347,6 +347,8 @@ function ensureChartJs() {
     --row-odd-bg: rgba(255,255,255,0.04);
     --row-hairline: rgba(255,255,255,0.05);
     --row-hover: rgba(255,255,255,0.05);
+    /* 補足テキスト（タブの時間帯表示など）: 背景に対してコントラスト4.5:1以上を確保した色 */
+    --text-caption: #a3b1c4;
   }
   /* === ライトモード（data-theme="light" で base 変数を上書き、MD3トークンへ波及） === */
   html[data-theme="light"] {
@@ -368,6 +370,7 @@ function ensureChartJs() {
     --row-odd-bg: #eaf2fb;
     --row-hairline: #e3e6ea;
     --row-hover: rgba(26,115,232,0.10);
+    --text-caption: #4b5563;
   }
   html[data-theme="light"] .type-morning  { background:#fff3d6; color:#92600a; }
   html[data-theme="light"] .type-daily    { background:#dcf5e3; color:#15803d; }
@@ -420,7 +423,9 @@ function ensureChartJs() {
   .tab-btn.active { background: var(--md-surface-container-high); color: var(--md-primary); border-color: var(--md-primary); box-shadow: 0 0 8px color-mix(in srgb, var(--elem-color) 40%, transparent); }
   .tab-btn:not(.active) { background: var(--md-surface-container-high); color: var(--md-on-surface-variant); }
   .tab-btn:not(.active):hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
-  .tab-sub { font-size: 0.5625rem; font-weight:400; opacity:0.65; }
+  /* 時間帯の補足: 9px・不透明度65%（コントラスト3.1:1）だったため、11px・専用の補足色（4.5:1以上）に変更 */
+  .tab-sub { font-size: 0.6875rem; font-weight:400; color: var(--text-caption); }
+  .tab-btn.active .tab-sub { color: var(--md-on-surface); }
   tr.rank-row:nth-child(even) { background: var(--row-odd-bg); }
   .rank-row:hover { background: var(--row-hover) !important; }
   .rank-row.top-1 { border-left: 4px solid var(--md-warning); box-shadow: inset 60px 0 20px -20px rgba(251,191,36,0.12); }
@@ -459,7 +464,7 @@ function ensureChartJs() {
   .day-nav-btn:hover { background: var(--md-surface-bright); color: var(--md-on-surface); }
   .day-nav-btn:focus-visible { outline: 2px solid var(--md-primary); outline-offset: 2px; }
   /* タイプバッジ */
-  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; }
+  .type-badge    { display: inline-block; padding: 4px 12px; border-radius: var(--md-shape-full); font-size: 0.75rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
   .type-20min    { background: var(--md-secondary-container); color: var(--md-on-primary-container); }
   .type-morning  { background: #3b2f00; color: var(--md-warning); }
   .type-daily    { background: #1a3020; color: var(--md-success); }
