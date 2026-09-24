@@ -921,7 +921,7 @@ class VirtualScroll {
 
     <!-- ① タブ: 4列1行（全幅） -->
     <div id="tab-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">
-      <button class="tab-btn active" id="tab-20min" onclick="switchTab('20min')">20分速<span class="tab-sub">直前→最新</span></button>
+      <button class="tab-btn active" id="tab-20min" onclick="switchTab('20min')">20分速<span class="tab-sub">直近の速度</span></button>
       <button class="tab-btn" id="tab-morning" onclick="switchTab('morning')">朝活<span class="tab-sub" id="tab-morning-sub">7:00→8:00</span></button>
       <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">日速<span class="tab-sub" id="tab-daily-sub">7:00→最新</span></button>
       <button class="tab-btn" id="tab-overnight" onclick="switchTab('overnight')">残業<span class="tab-sub" id="tab-overnight-sub">24:00→7:00</span></button>
@@ -1051,9 +1051,7 @@ class VirtualScroll {
     <!-- 統計バー（テーブルカード内ヘッダー） -->
     <div id="stat-bar" style="display:none;align-items:center;gap:10px">
       <span id="type-badge-label" class="type-badge type-20min">20分速</span>
-      <span class="text-gray-400">期間:</span>
       <span id="stat-range" class="text-blue-300 font-mono text-xs"></span>
-      <span id="refresh-status" style="font-size:11px;color:var(--md-on-surface-variant);white-space:nowrap"></span>
       <button onclick="openSaveModal()" style="margin-left:auto;font-size:11px;padding:3px 10px;border-radius:var(--md-shape-sm);background:var(--md-surface-container-high);border:1px solid var(--md-outline);color:var(--md-on-surface-variant);cursor:pointer;flex-shrink:0" title="PNG保存">保存</button>
     </div>
     <div id="updating-badge" style="display:none;font-size:11px;text-align:center;padding:3px 12px;background:#78350f;border-bottom:1px solid #d97706;color:#fbbf24;animation:pulse-badge 1.5s ease-in-out infinite;letter-spacing:0.02em"></div>
@@ -2868,7 +2866,7 @@ function connectLiveSSE() {
   if (liveSSE) liveSSE.close();
   liveSSE = new EventSource('/api/ranking/updates');
   liveSSE.onopen = () => { stopViewerPoll(); };
-  liveSSE.onmessage = async (e) => {
+  liveSSE.onmessage = (e) => {
     try {
       const info = JSON.parse(e.data);
       if (info.type === 'viewers') {
@@ -2879,15 +2877,9 @@ function connectLiveSSE() {
       // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
       // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
       if (info.kind && !String(info.kind).includes('ranking')) return;
-      apiCacheInvalidate('/api/ranking/latest');
-      apiCacheInvalidate('/api/ranking/snapshots');
-      apiCacheInvalidate('/api/ranking/20min');
-      apiCacheInvalidate('/api/ranking/daily');
-      flashOnRender = true;
-      // reload()とupdateSnapList()を同時に発火すると、Cloudflare Tunnel経由では
-      // 同時接続数の制限に引っかかり一方が即座に接続失敗することがあるため、直列実行にする。
-      await reload({ background: true });
-      if (currentTab === '20min') await updateSnapList();
+      // fetch→部分再描画の複雑な非同期フローをやめ、単純にページ全体をreloadする。
+      // 同時視聴者が一斉にreloadしてトンネルへの同時接続が殺到しないよう、時間的にならす。
+      setTimeout(() => location.reload(), Math.random() * 8000);
     } catch {}
   };
   liveSSE.onerror = () => {
@@ -3140,17 +3132,12 @@ function clearSnapSelect() {
   reload();
 }
 
-async function reload(opts = {}) {
+async function reload() {
   const mySeq = ++_reloadSeq;
   currentDate = document.getElementById('date-select').value;
   if (!currentEventId) { showNoData('イベントを選択してください'); return; }
 
-  const isBackground = !!opts.background;
-  const hasData = !!(currentRenderData && currentRenderData.players && currentRenderData.players.length > 0);
-  const skipBlank = isBackground && hasData;
-
-  if (skipBlank) setRefreshStatus('loading');
-  else showLoading();
+  showLoading();
 
   async function attemptFetch() {
     if (currentTab === '20min') {
@@ -3180,33 +3167,23 @@ async function reload(opts = {}) {
   }
 
   let data = null;
-  let fetchFailed = false;
   try {
     data = await attemptFetch();
-    // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、
-    // 背景更新（画面上に表示中データがある場合）に限り1回だけ間を置いて再試行する。
-    if (data == null && skipBlank) {
+    // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、1回だけ間を置いて再試行する。
+    if (data == null) {
       await new Promise(r => setTimeout(r, 1200));
       if (mySeq === _reloadSeq) data = await attemptFetch();
     }
-    if (data == null) fetchFailed = true;
   } catch (err) {
     console.error('[reload]', err);
-    fetchFailed = true;
   }
 
   if (mySeq !== _reloadSeq) return; // より新しいreload()に追い越された場合は破棄
-
-  if (skipBlank && fetchFailed) {
-    setRefreshStatus('error'); // 表示中のデータはそのまま維持し、失敗のみ知らせる
-    return;
-  }
 
   try { renderRanking(data); } catch (e) {
     console.error('[renderRanking]', e);
     showNoData('表示エラー: ' + (e.message || e));
   }
-  if (skipBlank) setRefreshStatus(null);
 }
 
 const TYPE_META = {
@@ -3259,8 +3236,11 @@ function renderRanking(data, keepScroll = false) {
     honorRankMap.get(p.player_id != null ? `id:${p.player_id}` : `nm:${p.username}`) || 999;
 
   statBar.style.display = 'flex';
-  const bef = data.before ? data.before.substring(0, 16) : '?';
-  const aft = data.after  ? data.after.substring(0, 16)  : '?';
+  // 団ランキングと同じ表記（年省略・同日ならafter側は時刻のみ）
+  const fmtRange = s => s ? s.substring(5, 16) : '?';
+  const sameDayRange = data.before && data.after && data.before.substring(0, 10) === data.after.substring(0, 10);
+  const bef = fmtRange(data.before);
+  const aft = sameDayRange ? (data.after ? data.after.substring(11, 16) : '?') : fmtRange(data.after);
   document.getElementById('stat-range').textContent = `${bef} → ${aft}`;
   const active   = data.players.filter(p => p.honorDiff > 0);
   const topHonor = Math.max(0, ...active.map(p => p.honorDiff));
@@ -3270,7 +3250,7 @@ function renderRanking(data, keepScroll = false) {
   const badgeEl = document.getElementById('type-badge-label');
   badgeEl.textContent = meta.label;
   badgeEl.className   = `type-badge ${meta.cls}`;
-  // タブのサブテキストを更新（日速・朝活）
+  // タブのサブテキストを更新（日速・朝活・残業。20分速は団ランキングと同じ「直近の速度」で固定）
   const dailySubEl = document.getElementById('tab-daily-sub');
   if (dailySubEl && data.type === '日速') dailySubEl.textContent = data.isLive ? '7:00→最新' : '7:00→24:00';
   const morningSubEl = document.getElementById('tab-morning-sub');
@@ -3425,25 +3405,6 @@ function showLoading() {
   document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="loading">読み込み中...</td></tr>`;
   document.getElementById('stat-bar').style.display = 'none';
 }
-function setRefreshStatus(mode) {
-  const el = document.getElementById('refresh-status');
-  if (!el) return;
-  if (mode === 'loading') {
-    el.textContent = '更新中…';
-    el.style.color = 'var(--md-on-surface-variant)';
-    el.style.cursor = '';
-    el.onclick = null;
-  } else if (mode === 'error') {
-    el.textContent = '⚠ 更新に失敗しました（クリックで再試行）';
-    el.style.color = '#f87171';
-    el.style.cursor = 'pointer';
-    el.onclick = () => reload({ background: true });
-  } else {
-    el.textContent = '';
-    el.style.cursor = '';
-    el.onclick = null;
-  }
-}
 function showNoData(msg) {
   document.getElementById('ranking-body').innerHTML = `<tr><td colspan="${colOrder.length}" class="no-data">${escHtml(msg)}</td></tr>`;
   document.getElementById('stat-bar').style.display = 'none';
@@ -3462,8 +3423,8 @@ function startAutoRefresh() {
   if (autoTimer) clearInterval(autoTimer);
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
   autoTimer = setInterval(() => {
-    apiCacheInvalidate();
-    reload({ background: true });
+    // 同時視聴者が一斉にreloadしてトンネルへの同時接続が殺到しないよう、時間的にならす。
+    setTimeout(() => location.reload(), Math.random() * 8000);
   }, 5 * 60 * 1000);
 }
 
