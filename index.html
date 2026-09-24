@@ -1828,11 +1828,27 @@ async function loadSoloDifficulties() {
 // タブごとの計測時間（分）
 const TAB_DURATION_MIN = { '20min': 20, 'morning': 60, 'daily': 1020, 'overnight': 420 };
 
+// 休み期間（予選2日目24:00〜翌7:00、本戦1〜3日目24:00〜翌7:00）はソロ行動が出来ないため、
+// 推定ソロ判定の対象から除外する（computeRestWindowsはグラフの休み期間帯表示と共通のロジック）。
+function isNightRestPeriod(capturedAt) {
+  if (!capturedAt) return false;
+  const startDateStr = currentEventStartDate();
+  if (!startDateStr) return false;
+  const windows = computeRestWindows(startDateStr, false);
+  const [datePart, timePart] = capturedAt.split(' ');
+  const [y, m, d] = (datePart || '').split('-').map(Number);
+  const [hh, mm, ss] = (timePart || '00:00:00').split(':').map(Number);
+  if (!y || !m || !d) return false;
+  const t = new Date(y, m - 1, d, hh || 0, mm || 0, ss || 0).getTime();
+  return windows.some(([from, to]) => t >= from.getTime() && t <= to.getTime());
+}
+
 // 貢献度/討伐数 がいずれかの難易度値の設定範囲内に収まる場合、難易度名を返す
 // 討伐数は「20分あたり」に換算してから閾値と比較（朝活・日速は時間が長い分、討伐数が増えるため）
 function getSoloMatch(p) {
   if (!soloEnabled) return null;
   if (currentTab === 'overnight') return null; // 残業はソロ不可
+  if (isNightRestPeriod(currentRenderData?.after)) return null; // 休み期間（夜間）はソロ不可
   if (p.honorDiff == null || p.killDiff == null || p.killDiff < 1) return null;
   const durationMin = TAB_DURATION_MIN[currentTab] ?? 20;
   const killsPer20  = p.killDiff / (durationMin / 20);
@@ -2633,6 +2649,12 @@ if (window.__STATIC_MODE__) {
 
 async function loadEvents() {
   loadedEvents = await apiFetch('/api/ranking/events') || [];
+  // 初回ロード（特にサーバーが更新処理中に強制reloadで開いた場合）は1回失敗しただけで
+  // イベント一覧が空のまま何も表示されなくなってしまうため、1回だけ間を置いて再試行する。
+  if (loadedEvents.length === 0 && !window.__STATIC_MODE__) {
+    await new Promise(r => setTimeout(r, 2000));
+    loadedEvents = await apiFetch('/api/ranking/events') || [];
+  }
 
   // 静的モード: インデックスの events.json から最新イベント一覧を動的取得
   if (window.__STATIC_MODE__ && window.__STATIC_INDEX_URL__) {
