@@ -2296,9 +2296,16 @@ async function loadGuildGraphData() {
     const data = snapDataList[si];
     if (!data?.guilds) continue;
     labels.push(snap.captured_at.substring(5, 16));
+    // サーバー障害等でスナップショット間隔が通常の20分より大きく開いた場合、scoreDiffは
+    // その空白期間全体の増加量になってしまい「20分速」として表示すると異常な急騰スパイクに
+    // 見えるため、間隔が通常の1.5倍(30分)を超える点は速度なし(null)として線を途切れさせる。
+    const beforeMs = data.before ? new Date(data.before.replace(' ', 'T')).getTime() : null;
+    const afterMs  = data.after  ? new Date(data.after.replace(' ', 'T')).getTime()  : null;
+    const gapMin = beforeMs && afterMs ? (afterMs - beforeMs) / 60000 : 0;
+    const gapIsAbnormal = gapMin > 30;
     for (const g of graphGuilds) {
       const gd = data.guilds.find(x => x.guild_id === g.id);
-      guildSeries[g.id].speed.push(gd ? (gd.scoreDiff ?? null) : null);
+      guildSeries[g.id].speed.push(gd && !gapIsAbnormal ? (gd.scoreDiff ?? null) : null);
       guildSeries[g.id].score.push(gd ? (gd.score ?? null) : null);
       guildSeries[g.id].rank.push(gd ? (gd.rank ?? null) : null);
     }
