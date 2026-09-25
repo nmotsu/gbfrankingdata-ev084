@@ -1651,6 +1651,7 @@ let currentEventIsDemo = false;
 let currentEventDates  = { start: null, end: null };
 let playerSearchTerm   = '';
 let flashOnRender      = false;
+let updBadgeShownAt    = 0; // 更新中バッジを最後に「進行中」と確認できた時刻（陳腐化検知用）
 
 // 推定ソロ設定
 const _soloSaved = (() => { try { return JSON.parse(localStorage.getItem('gbf_solo') || '{}'); } catch { return {}; } })();
@@ -3313,6 +3314,7 @@ function renderRanking(data, keepScroll = false) {
       const phase = cnt < 200 ? '1/4' : cnt < 1100 ? '2/4' : cnt < 2100 ? '3/4' : '4/4';
       updBadge.textContent = `更新中 ${cnt}→10000件 (Phase ${phase})`;
       updBadge.style.display = '';
+      updBadgeShownAt = Date.now(); // 「まだ進行中」と新鮮なデータで確認できた時刻を更新
     } else {
       updBadge.style.display = 'none';
     }
@@ -3472,6 +3474,17 @@ function startAutoRefresh() {
     setTimeout(backgroundUpdate, Math.random() * 8000);
   }, 5 * 60 * 1000);
 }
+
+// 「更新中」バッジの陳腐化監視。backgroundUpdate()が更新失敗を繰り返して再描画されないと、
+// 実際は更新が終わっているのにバッジだけ「更新中」のまま置き去りになることがあったため、
+// 直近に進行中と確認できてから一定時間（8分）経ってもバッジが消えていなければ強制的に隠す。
+setInterval(() => {
+  const updBadge = document.getElementById('updating-badge');
+  if (!updBadge || updBadge.style.display === 'none') return;
+  if (updBadgeShownAt && Date.now() - updBadgeShownAt > 8 * 60 * 1000) {
+    updBadge.style.display = 'none';
+  }
+}, 30 * 1000);
 
 async function openPlayerModal(playerId, username, eventId) {
   const modal = document.getElementById('player-modal');
