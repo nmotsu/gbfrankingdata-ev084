@@ -2899,9 +2899,9 @@ function connectLiveSSE() {
       // kind未指定（過渡期など）は安全側に倒して従来通りreloadする。
       // 明示的にkindが付いていて'ranking'を含まない場合（団・ボーダー単体更新）のみスキップする。
       if (info.kind && !String(info.kind).includes('ranking')) return;
-      // fetch→部分再描画の複雑な非同期フローをやめ、単純にページ全体をreloadする。
-      // 同時視聴者が一斉にreloadしてトンネルへの同時接続が殺到しないよう、時間的にならす。
-      setTimeout(() => location.reload(), Math.random() * 8000);
+      // ランキングは常に表示し続けたいので、ページ全体のreloadはしない。
+      // 同時視聴者が一斉にfetchしてトンネルへの同時接続が殺到しないよう、時間的にならす。
+      setTimeout(backgroundUpdate, Math.random() * 8000);
     } catch {}
   };
   liveSSE.onerror = () => {
@@ -3154,6 +3154,33 @@ function clearSnapSelect() {
   reload();
 }
 
+async function fetchRankingData() {
+  if (currentTab === '20min') {
+    const gbfDay = document.getElementById('snap-day-select')?.value || '';
+    const snapId = document.getElementById('snap-time-select')?.value || '';
+    if (gbfDay) await ensureSnapDayLoaded(gbfDay);
+    if (snapId) {
+      return await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
+    } else if (gbfDay) {
+      const daySnaps = snapGroups[gbfDay] || [];
+      if (daySnaps.length > 0) {
+        return await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
+      }
+      return null;
+    } else {
+      return await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
+    }
+  } else {
+    const ep = { morning: 'morning', daily: 'daily', overnight: 'overnight' }[currentTab];
+    if (!ep) return null;
+    // 集計タブは日別ファイル(snap-DATE.json.gz)へ分離済み → 静的モードでは当日分を遅延ロード
+    const aggDay = currentDate || snapDayList[snapDayList.length - 1] || '';
+    if (aggDay) await ensureSnapDayLoaded(aggDay);
+    const url = `/api/ranking/${ep}?event_id=${currentEventId}${currentDate ? `&date=${currentDate}` : ''}`;
+    return await apiFetch(url);
+  }
+}
+
 async function reload() {
   const mySeq = ++_reloadSeq;
   currentDate = document.getElementById('date-select').value;
@@ -3161,40 +3188,13 @@ async function reload() {
 
   showLoading();
 
-  async function attemptFetch() {
-    if (currentTab === '20min') {
-      const gbfDay = document.getElementById('snap-day-select')?.value || '';
-      const snapId = document.getElementById('snap-time-select')?.value || '';
-      if (gbfDay) await ensureSnapDayLoaded(gbfDay);
-      if (snapId) {
-        return await apiFetch(`/api/ranking/20min?snapshot_id=${snapId}`);
-      } else if (gbfDay) {
-        const daySnaps = snapGroups[gbfDay] || [];
-        if (daySnaps.length > 0) {
-          return await apiFetch(`/api/ranking/20min?snapshot_id=${daySnaps[0].id}`);
-        }
-        return null;
-      } else {
-        return await apiFetch(`/api/ranking/latest?event_id=${currentEventId}`);
-      }
-    } else {
-      const ep = { morning: 'morning', daily: 'daily', overnight: 'overnight' }[currentTab];
-      if (!ep) return null;
-      // 集計タブは日別ファイル(snap-DATE.json.gz)へ分離済み → 静的モードでは当日分を遅延ロード
-      const aggDay = currentDate || snapDayList[snapDayList.length - 1] || '';
-      if (aggDay) await ensureSnapDayLoaded(aggDay);
-      const url = `/api/ranking/${ep}?event_id=${currentEventId}${currentDate ? `&date=${currentDate}` : ''}`;
-      return await apiFetch(url);
-    }
-  }
-
   let data = null;
   try {
-    data = await attemptFetch();
+    data = await fetchRankingData();
     // Cloudflare Tunnel経由だと単発リクエストが低確率で接続断になることがあるため、1回だけ間を置いて再試行する。
     if (data == null) {
       await new Promise(r => setTimeout(r, 1200));
-      if (mySeq === _reloadSeq) data = await attemptFetch();
+      if (mySeq === _reloadSeq) data = await fetchRankingData();
     }
   } catch (err) {
     console.error('[reload]', err);
@@ -3205,6 +3205,29 @@ async function reload() {
   try { renderRanking(data); } catch (e) {
     console.error('[renderRanking]', e);
     showNoData('表示エラー: ' + (e.message || e));
+  }
+}
+
+// 自動更新（SSE通知／定期ポーリング）専用。手動reload()と違いブランクにしない・失敗しても
+// 何もしない（直前の表示をそのまま維持する）。「ランキングは常に表示しておきたい」という
+// 要望に合わせ、更新に失敗しても画面が固まったり消えたりしないようにするための経路。
+async function backgroundUpdate() {
+  if (!currentEventId) return;
+  const mySeq = ++_reloadSeq;
+  let data = null;
+  try {
+    data = await fetchRankingData();
+    if (data == null) {
+      await new Promise(r => setTimeout(r, 1200));
+      if (mySeq === _reloadSeq) data = await fetchRankingData();
+    }
+  } catch (err) {
+    console.error('[backgroundUpdate]', err);
+  }
+  if (mySeq !== _reloadSeq) return; // 追い越されたら破棄
+  if (data == null) return; // 取得失敗時は直前の表示をそのまま維持（ブランクにしない）
+  try { renderRanking(data); } catch (e) {
+    console.error('[renderRanking]', e);
   }
 }
 
@@ -3445,8 +3468,8 @@ function startAutoRefresh() {
   if (autoTimer) clearInterval(autoTimer);
   if (currentEventIsDemo || window.__STATIC_MODE__) return;
   autoTimer = setInterval(() => {
-    // 同時視聴者が一斉にreloadしてトンネルへの同時接続が殺到しないよう、時間的にならす。
-    setTimeout(() => location.reload(), Math.random() * 8000);
+    // 同時視聴者が一斉にfetchしてトンネルへの同時接続が殺到しないよう、時間的にならす。
+    setTimeout(backgroundUpdate, Math.random() * 8000);
   }, 5 * 60 * 1000);
 }
 
